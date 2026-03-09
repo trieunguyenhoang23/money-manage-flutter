@@ -23,25 +23,42 @@ class _MainShellScreenState extends State<MainShellScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double wBottomBar = 1.sw;
+    double hBottomBar = (wBottomBar * 80 / 375).clamp(70, 90);
+    Radius bottomBarRadius = const Radius.circular(20);
+
     return PopScope(
       canPop: false,
       child: Scaffold(
         body: widget.navigationShell,
         bottomNavigationBar: Container(
+          width: wBottomBar,
+          height: hBottomBar,
           decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: bottomBarRadius,
+              topRight: bottomBarRadius,
+            ),
             boxShadow: [
               shadowStyle(ColorConstant.neutral300, const Offset(0, 5), 10),
             ],
-            color: ColorConstant.neutral200,
+            color: Colors.white,
           ),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              ///Bottom Bar Item
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: List.generate(bottomTabBars.length, (index) {
                   final tab = bottomTabBars[index];
                   final isSelected =
                       widget.navigationShell.currentIndex == index;
+
+                  double wItem = (1.sw / bottomTabBars.length).clamp(55, 65);
+                  double hItem = ((41 / 80) * hBottomBar).clamp(50, 60);
+
                   return InkWell(
                     onTap: () {
                       NavigationShellHolder.shell?.goBranch(
@@ -50,8 +67,8 @@ class _MainShellScreenState extends State<MainShellScreen> {
                       );
                     },
                     child: SizedBox(
-                      height: 0.07.sh,
-                      width: 1.sw / bottomTabBars.length,
+                      width: wItem,
+                      height: hItem,
                       child: BottomNavigationWidget(
                         tab: tab,
                         isSelected: isSelected,
@@ -60,7 +77,6 @@ class _MainShellScreenState extends State<MainShellScreen> {
                   );
                 }),
               ),
-              SizedBox(height: 0.015.sh),
               Container(
                 color: Colors.white,
                 height:

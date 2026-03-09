@@ -11,6 +11,6 @@ class TransactionsScreen extends StatefulWidget {
 class _TransactionsScreenState extends State<TransactionsScreen> {
   @override
   Widget build(BuildContext context) {
-    return Center(child: TextGGStyle('Profile', 0.05.sw));
+    return Center(child: TextGGStyle('Profile', 0.05.sw)) ;
   }
 }

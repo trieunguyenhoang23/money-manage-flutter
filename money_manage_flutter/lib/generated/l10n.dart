@@ -63,9 +63,9 @@ class S {
 
   // skipped getter for the '//ANALYTICS' key
 
-  /// `Data Analysis`
+  /// `Analysis`
   String get analytics {
-    return Intl.message('Data Analysis', name: 'analytics', desc: '', args: []);
+    return Intl.message('Analysis', name: 'analytics', desc: '', args: []);
   }
 
   // skipped getter for the '//PROFILE' key
