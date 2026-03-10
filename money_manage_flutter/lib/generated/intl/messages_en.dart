@@ -23,7 +23,29 @@ class MessageLookup extends MessageLookupByLibrary {
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "analytics": MessageLookupByLibrary.simpleMessage("Analysis"),
+    "category": MessageLookupByLibrary.simpleMessage("Category"),
+    "category_create_new": MessageLookupByLibrary.simpleMessage("New category"),
+    "category_edit": MessageLookupByLibrary.simpleMessage("Edit Category"),
+    "category_error_desc_empty": MessageLookupByLibrary.simpleMessage(
+      "Description cannot be empty",
+    ),
+    "category_error_name_short": MessageLookupByLibrary.simpleMessage(
+      "Name must be at least 3 characters",
+    ),
+    "category_error_server": MessageLookupByLibrary.simpleMessage(
+      "Something went wrong on our end",
+    ),
+    "create": MessageLookupByLibrary.simpleMessage("Create"),
+    "created_at": MessageLookupByLibrary.simpleMessage("Create at:"),
+    "description": MessageLookupByLibrary.simpleMessage("Description"),
+    "expense": MessageLookupByLibrary.simpleMessage("Expense"),
+    "income": MessageLookupByLibrary.simpleMessage("Income"),
+    "name": MessageLookupByLibrary.simpleMessage("Name"),
     "profile": MessageLookupByLibrary.simpleMessage("Profile"),
+    "retry": MessageLookupByLibrary.simpleMessage("Retry"),
     "transaction": MessageLookupByLibrary.simpleMessage("Transaction"),
+    "transactions_expense": MessageLookupByLibrary.simpleMessage("Expense"),
+    "transactions_income": MessageLookupByLibrary.simpleMessage("Income"),
+    "updated_at": MessageLookupByLibrary.simpleMessage("Recent update:"),
   };
 }

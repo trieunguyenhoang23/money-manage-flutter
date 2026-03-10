@@ -30,6 +30,23 @@ class _MainShellScreenState extends State<MainShellScreen> {
     return PopScope(
       canPop: false,
       child: Scaffold(
+        appBar: AppBarWidget(
+          title: 'Money Manage',
+          isSetting: true,
+          isCentralTitle: true,
+          actionBtn: [
+            BtnAppbarWidget(
+              widget: const Icon(Icons.category, color: ColorConstant.primary),
+              onTap: () {
+                NavigatorRouter.pushNamed(
+                  context,
+                  CategoryRoutes.categoryName,
+                  pathParameters: {},
+                );
+              },
+            ),
+          ],
+        ),
         body: widget.navigationShell,
         bottomNavigationBar: Container(
           width: wBottomBar,

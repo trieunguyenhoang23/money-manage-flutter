@@ -17,6 +17,8 @@ class SizeAppUtils {
 
   bool get isLargeTablet => ((size?.shortestSide ?? 0) >= 720);
 
+  double get wScreenWithPadding => 1.sw - 0.05.sw * 2;
+
   void getSizeApp(BuildContext context) {
     if (size != null) return;
 

@@ -9,7 +9,7 @@ class TextGGStyle extends StatelessWidget {
   final int maxLines;
   final double textHeight;
   final TextAlign textAlign;
-  final bool isAutoSizeTet;
+  final bool isAutoSizeText;
   final bool isUnderLine;
   final bool isShadow;
   final FontWeight? fontWeight;
@@ -21,7 +21,7 @@ class TextGGStyle extends StatelessWidget {
     this.color,
     this.maxLines = 3,
     this.textHeight = 1.25,
-    this.isAutoSizeTet = true,
+    this.isAutoSizeText = true,
     this.textAlign = TextAlign.left,
     this.isUnderLine = false,
     this.isShadow = false,
@@ -42,7 +42,7 @@ class TextGGStyle extends StatelessWidget {
       customStyle: style,
     );
 
-    return isAutoSizeTet
+    return isAutoSizeText
         ? AutoSizeText(
             text,
             minFontSize: 1,
@@ -70,12 +70,19 @@ TextStyle styleCommon({
   FontWeight? fontWeight,
   TextStyle? customStyle,
 }) {
-  final base = customStyle ?? GoogleFonts.montserrat();
+  final TextStyle base = customStyle != null
+      ? customStyle.copyWith(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          color: color,
+        )
+      : GoogleFonts.montserrat(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          color: color,
+        );
 
   return base.copyWith(
-    color: color ?? base.color,
-    fontWeight: fontWeight ?? base.fontWeight,
-    fontSize: fontSize,
     height: textHeight,
     decoration: isUnderLine ? TextDecoration.underline : TextDecoration.none,
     shadows: isShadow

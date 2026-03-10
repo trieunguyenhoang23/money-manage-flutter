@@ -1,8 +1,25 @@
 {
+  "name": "Name",
+  "description": "Description",
+  "create": "Create",
+  "retry": "Retry",
+  "created_at": "Create at:",
+  "updated_at": "Recent update:",
+  "income": "Income",
+  "expense": "Expense",
   "//TRANSACTIONS": "===============================TRANSACTIONS==============================================",
   "transaction": "Transaction",
+  "transactions_income": "Income",
+  "transactions_expense": "Expense",
   "//ANALYTICS": "===================================ANALYTICS================================================",
   "analytics": "Analysis",
   "//PROFILE": "======================================PROFILE=================================================",
-  "profile": "Profile"
+  "profile": "Profile",
+  "//CATEGORY": "======================================CATEGORY=================================================",
+  "category": "Category",
+  "category_create_new": "New category",
+  "category_error_name_short": "Name must be at least 3 characters",
+  "category_error_desc_empty": "Description cannot be empty",
+  "category_error_server": "Something went wrong on our end",
+  "category_edit": "Edit Category"
 }

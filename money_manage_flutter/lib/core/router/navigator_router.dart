@@ -13,12 +13,12 @@ class NavigatorRouter {
   static Future<void> pushNamed(
     BuildContext context,
     String routeName, {
-    required Map<String, String> pathParameters,
+    Map<String, String>? pathParameters,
     Object? extra,
   }) async {
     await context.pushNamed(
       routeName,
-      pathParameters: pathParameters,
+      pathParameters: pathParameters ?? {},
       extra: extra,
     );
   }
