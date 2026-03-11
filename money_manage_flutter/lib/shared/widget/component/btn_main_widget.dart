@@ -1,9 +1,11 @@
 import 'package:money_manage_flutter/export/ui_external.dart';
 
+import '../../../core/utils/size_app_utils.dart';
+
 class BtnMainWidget extends StatelessWidget {
-  final double w;
-  final double h;
-  final double radius;
+  final double? w;
+  final double? h;
+  final double? radius;
   final Widget child;
   final Color? color;
   final Function()? onTap;
@@ -12,9 +14,9 @@ class BtnMainWidget extends StatelessWidget {
 
   const BtnMainWidget({
     super.key,
-    required this.w,
-    required this.h,
-    required this.radius,
+    this.w,
+    this.h,
+    this.radius,
     required this.child,
     this.color,
     this.onTap,
@@ -24,17 +26,21 @@ class BtnMainWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double wBtn = w ?? SizeAppUtils().wScreenWithPadding;
+    double hBtn = h ?? wBtn * 46 / 344;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         alignment: Alignment.center,
-        width: w,
-        height: h,
+        width: wBtn,
+        height: hBtn,
         decoration: BoxDecoration(
           color: color,
           gradient: gradient,
           border: border,
-          borderRadius: BorderRadius.all(Radius.circular(radius)),
+          borderRadius: BorderRadius.all(
+            Radius.circular(radius ?? hBtn * 0.1),
+          ),
         ),
         child: child,
       ),

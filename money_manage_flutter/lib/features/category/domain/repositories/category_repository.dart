@@ -14,8 +14,10 @@ abstract class CategoryRepository {
     String name,
     String desc,
     TransactionType type,
-      CategoryLocalModel oldItem,
+    CategoryLocalModel oldItem,
   );
 
   Future<List<CategoryLocalModel>> loadCategoryByPage(int page);
+
+  Future<void> clearAllData();
 }

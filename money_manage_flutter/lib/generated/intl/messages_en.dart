@@ -42,6 +42,8 @@ class MessageLookup extends MessageLookupByLibrary {
     "income": MessageLookupByLibrary.simpleMessage("Income"),
     "name": MessageLookupByLibrary.simpleMessage("Name"),
     "profile": MessageLookupByLibrary.simpleMessage("Profile"),
+    "profile_login": MessageLookupByLibrary.simpleMessage("Login"),
+    "profile_logout": MessageLookupByLibrary.simpleMessage("Logout"),
     "retry": MessageLookupByLibrary.simpleMessage("Retry"),
     "transaction": MessageLookupByLibrary.simpleMessage("Transaction"),
     "transactions_expense": MessageLookupByLibrary.simpleMessage("Expense"),

@@ -31,7 +31,21 @@ import '../../features/category/domain/usecase/edit_category_usecase.dart'
     as _i617;
 import '../../features/category/domain/usecase/loading_category_usecase.dart'
     as _i1069;
+import '../../features/main_features/profile/data/datasource/local/user_local_datasource.dart'
+    as _i809;
+import '../../features/main_features/profile/data/datasource/remote/user_remote_datasource.dart'
+    as _i1026;
+import '../../features/main_features/profile/data/repositories/user_repository_impl.dart'
+    as _i790;
+import '../../features/main_features/profile/domain/repositories/user_repository.dart'
+    as _i168;
+import '../../features/main_features/profile/domain/usecase/auth_usecase.dart'
+    as _i429;
 import '../../infrastructure/network/dio_service.dart' as _i960;
+import '../../infrastructure/social_auth/apple_auth_service.dart' as _i502;
+import '../../infrastructure/social_auth/google_auth_service.dart' as _i219;
+import '../../infrastructure/social_auth/social_auth_factory.dart' as _i22;
+import '../network/auth_interceptor.dart' as _i908;
 import 'module_di.dart' as _i633;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -48,17 +62,34 @@ extension GetItInjectableX on _i174.GetIt {
     );
     await gh.factoryAsync<_i214.Isar>(() => moduleDI.isar, preResolve: true);
     gh.lazySingleton<_i558.FlutterSecureStorage>(() => moduleDI.secureStorage);
+    gh.lazySingleton<_i502.AppleAuthService>(() => _i502.AppleAuthService());
+    gh.lazySingleton<_i219.GoogleAuthService>(() => _i219.GoogleAuthService());
     gh.lazySingleton<_i197.CategoryLocalDatasource>(
       () => _i197.CategoryLocalDatasource(gh<_i214.Isar>()),
     );
-    await gh.lazySingletonAsync<_i361.Dio>(
-      () => moduleDI.dioWithCacheInstance(),
-      instanceName: 'dioWithCache',
-      preResolve: true,
+    gh.factory<_i908.AuthInterceptor>(
+      () => _i908.AuthInterceptor(gh<_i558.FlutterSecureStorage>()),
     );
     gh.lazySingleton<_i361.Dio>(
-      () => moduleDI.dioNoCacheInstance,
+      () => moduleDI.dioNoCacheInstance(),
       instanceName: 'dioNoCache',
+    );
+    gh.lazySingleton<_i809.UserLocalDatasource>(
+      () => _i809.UserLocalDatasource(
+        gh<_i214.Isar>(),
+        gh<_i558.FlutterSecureStorage>(),
+      ),
+    );
+    gh.lazySingleton<_i22.SocialAuthFactory>(
+      () => _i22.SocialAuthFactory(
+        gh<_i219.GoogleAuthService>(),
+        gh<_i502.AppleAuthService>(),
+      ),
+    );
+    await gh.lazySingletonAsync<_i361.Dio>(
+      () => moduleDI.dioWithCacheInstance(gh<_i908.AuthInterceptor>()),
+      instanceName: 'dioWithCache',
+      preResolve: true,
     );
     gh.lazySingleton<_i960.DioService>(
       () => _i960.DioService(
@@ -69,10 +100,20 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i702.CategoryRemoteDatasource>(
       () => _i702.CategoryRemoteDatasource(gh<_i989.DioService>()),
     );
+    gh.lazySingleton<_i1026.UserRemoteDatasource>(
+      () => _i1026.UserRemoteDatasource(gh<_i989.DioService>()),
+    );
     gh.lazySingleton<_i869.CategoryRepository>(
       () => _i528.CategoryRepositoryImpl(
         gh<_i702.CategoryRemoteDatasource>(),
         gh<_i197.CategoryLocalDatasource>(),
+      ),
+    );
+    gh.lazySingleton<_i168.UserRepository>(
+      () => _i790.UserRepositoryImpl(
+        gh<_i809.UserLocalDatasource>(),
+        gh<_i1026.UserRemoteDatasource>(),
+        gh<_i989.SocialAuthFactory>(),
       ),
     );
     gh.lazySingleton<_i845.CreateCategoryUseCase>(
@@ -83,6 +124,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i1069.LoadingCategoryUseCase>(
       () => _i1069.LoadingCategoryUseCase(gh<_i869.CategoryRepository>()),
+    );
+    gh.lazySingleton<_i429.AuthUseCase>(
+      () => _i429.AuthUseCase(gh<_i168.UserRepository>()),
     );
     return this;
   }

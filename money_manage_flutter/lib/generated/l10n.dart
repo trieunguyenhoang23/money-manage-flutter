@@ -140,6 +140,16 @@ class S {
     return Intl.message('Profile', name: 'profile', desc: '', args: []);
   }
 
+  /// `Login`
+  String get profile_login {
+    return Intl.message('Login', name: 'profile_login', desc: '', args: []);
+  }
+
+  /// `Logout`
+  String get profile_logout {
+    return Intl.message('Logout', name: 'profile_logout', desc: '', args: []);
+  }
+
   // skipped getter for the '//CATEGORY' key
 
   /// `Category`

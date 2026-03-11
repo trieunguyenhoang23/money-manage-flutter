@@ -63,6 +63,9 @@ class DefaultFirebaseOptions {
     messagingSenderId: '249271941631',
     projectId: 'money-manage-5c5bf',
     storageBucket: 'money-manage-5c5bf.firebasestorage.app',
+    androidClientId: '249271941631-v01afcue3u12enfeepkhmr0rrdd3cqvv.apps.googleusercontent.com',
+    iosClientId: '249271941631-h5pb8tndqr54147m6psldd2b2tu5c7tm.apps.googleusercontent.com',
     iosBundleId: 'vn.nht.manage.money',
   );
+
 }

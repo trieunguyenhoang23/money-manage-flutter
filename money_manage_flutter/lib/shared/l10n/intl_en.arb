@@ -15,6 +15,8 @@
   "analytics": "Analysis",
   "//PROFILE": "======================================PROFILE=================================================",
   "profile": "Profile",
+  "profile_login": "Login",
+  "profile_logout": "Logout",
   "//CATEGORY": "======================================CATEGORY=================================================",
   "category": "Category",
   "category_create_new": "New category",
