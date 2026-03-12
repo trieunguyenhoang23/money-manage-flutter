@@ -48,6 +48,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "transaction": MessageLookupByLibrary.simpleMessage("Transaction"),
     "transactions_expense": MessageLookupByLibrary.simpleMessage("Expense"),
     "transactions_income": MessageLookupByLibrary.simpleMessage("Income"),
+    "update": MessageLookupByLibrary.simpleMessage("Update"),
     "updated_at": MessageLookupByLibrary.simpleMessage("Recent update:"),
   };
 }

@@ -71,7 +71,7 @@ class DioService {
     Map<String, dynamic>? headers,
   }) {
     return _request(
-      () => _noCacheDio.post<T>(
+      () => _cachedDio.post<T>(
         endpoint,
         data: body,
         options: Options(headers: headers),
@@ -85,7 +85,7 @@ class DioService {
     Map<String, dynamic>? headers,
   }) {
     return _request(
-      () => _cachedDio.post<T>(
+      () => _noCacheDio.post<T>(
         endpoint,
         data: body,
         options: Options(headers: headers),

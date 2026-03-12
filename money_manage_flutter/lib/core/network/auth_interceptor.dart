@@ -34,7 +34,7 @@ class AuthInterceptor extends Interceptor {
         try {
           // Use the internal refreshDio to avoid triggering this interceptor again
           final response = await _innerDio.post(
-            UserAuth.refreshToken,
+            UserAuthAPI.post_refresh_token,
             data: {'refreshToken': refreshToken},
           );
 

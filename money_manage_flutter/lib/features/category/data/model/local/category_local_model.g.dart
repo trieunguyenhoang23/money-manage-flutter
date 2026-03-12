@@ -76,12 +76,7 @@ int _categoryLocalModelEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
-  {
-    final value = object.idServer;
-    if (value != null) {
-      bytesCount += 3 + value.length * 3;
-    }
-  }
+  bytesCount += 3 + object.idServer.length * 3;
   {
     final value = object.name;
     if (value != null) {
@@ -129,7 +124,7 @@ CategoryLocalModel _categoryLocalModelDeserialize(
   object.createdAt = reader.readDateTimeOrNull(offsets[0]);
   object.description = reader.readStringOrNull(offsets[1]);
   object.id = id;
-  object.idServer = reader.readStringOrNull(offsets[2]);
+  object.idServer = reader.readString(offsets[2]);
   object.isSynced = reader.readBool(offsets[3]);
   object.name = reader.readStringOrNull(offsets[4]);
   object.type =
@@ -151,7 +146,7 @@ P _categoryLocalModelDeserializeProp<P>(
     case 1:
       return (reader.readStringOrNull(offset)) as P;
     case 2:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 3:
       return (reader.readBool(offset)) as P;
     case 4:
@@ -566,25 +561,7 @@ extension CategoryLocalModelQueryFilter
   }
 
   QueryBuilder<CategoryLocalModel, CategoryLocalModel, QAfterFilterCondition>
-  idServerIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNull(property: r'idServer'),
-      );
-    });
-  }
-
-  QueryBuilder<CategoryLocalModel, CategoryLocalModel, QAfterFilterCondition>
-  idServerIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNotNull(property: r'idServer'),
-      );
-    });
-  }
-
-  QueryBuilder<CategoryLocalModel, CategoryLocalModel, QAfterFilterCondition>
-  idServerEqualTo(String? value, {bool caseSensitive = true}) {
+  idServerEqualTo(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.equalTo(
@@ -598,7 +575,7 @@ extension CategoryLocalModelQueryFilter
 
   QueryBuilder<CategoryLocalModel, CategoryLocalModel, QAfterFilterCondition>
   idServerGreaterThan(
-    String? value, {
+    String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -616,7 +593,7 @@ extension CategoryLocalModelQueryFilter
 
   QueryBuilder<CategoryLocalModel, CategoryLocalModel, QAfterFilterCondition>
   idServerLessThan(
-    String? value, {
+    String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -634,8 +611,8 @@ extension CategoryLocalModelQueryFilter
 
   QueryBuilder<CategoryLocalModel, CategoryLocalModel, QAfterFilterCondition>
   idServerBetween(
-    String? lower,
-    String? upper, {
+    String lower,
+    String upper, {
     bool includeLower = true,
     bool includeUpper = true,
     bool caseSensitive = true,
@@ -1615,7 +1592,7 @@ extension CategoryLocalModelQueryProperty
     });
   }
 
-  QueryBuilder<CategoryLocalModel, String?, QQueryOperations>
+  QueryBuilder<CategoryLocalModel, String, QQueryOperations>
   idServerProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'idServer');

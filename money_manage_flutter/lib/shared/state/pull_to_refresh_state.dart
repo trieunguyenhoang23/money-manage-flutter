@@ -159,7 +159,7 @@ class PullToRefreshNotifier<T> extends StateNotifier<PullToRefreshState<T>> {
   }
 
   Future<void> refresh() async {
-    // 1. Reset state to initial values
+    //Reset state to initial values
     page = 0;
     state = state.copyWith(
       visibleList: [],
@@ -167,7 +167,7 @@ class PullToRefreshNotifier<T> extends StateNotifier<PullToRefreshState<T>> {
       isCanLoadMoreItem: true,
     );
 
-    // 2. Load the first page again
+    //Load the first page again
     await loadMore();
   }
 }

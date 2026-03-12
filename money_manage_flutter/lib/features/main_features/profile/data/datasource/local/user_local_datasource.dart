@@ -6,8 +6,8 @@ import '../../model/local/user_local_model.dart';
 
 @LazySingleton()
 class UserLocalDatasource {
-  Isar _isar;
-  FlutterSecureStorage _secureStorage;
+  final Isar _isar;
+  final FlutterSecureStorage _secureStorage;
 
   UserLocalDatasource(this._isar, this._secureStorage);
 

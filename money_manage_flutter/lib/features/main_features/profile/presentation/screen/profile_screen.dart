@@ -1,7 +1,7 @@
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
-import 'package:money_manage_flutter/features/main_features/profile/presentation/provider/profile_provider.dart';
+import '../provider/profile_provider.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -19,7 +19,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return Center(
       child: profileState.userLocalModel != null
           ? BtnMainWidget(
-              onTap: profileNotifier.onSignIn,
+              onTap: profileNotifier.onLogout,
               color: ColorConstant.error400,
               child: TextGGStyle(context.lang.profile_logout, 0.05.sw),
             )

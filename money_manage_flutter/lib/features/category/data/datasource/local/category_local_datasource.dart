@@ -9,11 +9,14 @@ class CategoryLocalDatasource {
 
   CategoryLocalDatasource(this._isar);
 
-  int limitCount = SizeAppUtils().isTablet ? 12 : 6;
+  Future<List<CategoryLocalModel>> getAll() async {
+    return await _isar.categoryLocalModels.where().findAll();
+  }
 
-  Future<List<CategoryLocalModel>> loadByPage(int page) async {
+  Future<List<CategoryLocalModel>> loadByPage(int page, int limitCount) async {
     return await _isar.categoryLocalModels
         .where()
+        .sortByCreatedAtDesc()
         .offset(page * limitCount)
         .limit(limitCount)
         .findAll();
@@ -21,7 +24,28 @@ class CategoryLocalDatasource {
 
   Future<void> save(CategoryLocalModel cate) async {
     await _isar.writeTxn(() async {
-      _isar.categoryLocalModels.put(cate);
+      await _isar.categoryLocalModels.put(cate);
+    });
+  }
+
+  Future<void> saveAll(List<CategoryLocalModel> cates) async {
+    await _isar.writeTxn(() async {
+      await _isar.categoryLocalModels.putAll(cates);
+    });
+  }
+
+  Future<void> clearAll() async {
+    await _isar.writeTxn(() async {
+      await _isar.categoryLocalModels.clear();
+    });
+  }
+
+  Future<void> markAllAsSynced(List<CategoryLocalModel> list) async {
+    await _isar.writeTxn(() async {
+      for (var item in list) {
+        item.isSynced = true;
+      }
+      await _isar.categoryLocalModels.putAll(list);
     });
   }
 }

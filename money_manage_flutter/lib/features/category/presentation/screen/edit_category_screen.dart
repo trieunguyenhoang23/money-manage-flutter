@@ -106,7 +106,7 @@ class _EditCategoryScreenState extends ConsumerState<EditCategoryScreen> {
                 color: ColorConstant.primary,
                 onTap: _onCreatePressed,
                 child: TextGGStyle(
-                  context.lang.create,
+                  context.lang.update,
                   hBtn * 0.4,
                   color: Colors.white,
                   fontWeight: FontWeight.w600,

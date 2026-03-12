@@ -1,10 +1,12 @@
-import 'package:hooks_riverpod/legacy.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:money_manage_flutter/core/utils/toast_utils.dart';
 import 'package:money_manage_flutter/export/infrastructure.dart';
-import 'package:money_manage_flutter/features/main_features/profile/domain/usecase/logout_usecase.dart';
 import '../../../../../core/di/injection.dart';
+import '../../../../category/presentation/provider/category_provider.dart';
 import '../../data/datasource/local/user_local_datasource.dart';
 import '../../data/model/local/user_local_model.dart';
 import '../../domain/usecase/auth_usecase.dart';
+import '../../domain/usecase/logout_usecase.dart';
 
 class ProfileState {
   final UserLocalModel? userLocalModel;
@@ -12,13 +14,15 @@ class ProfileState {
   ProfileState({this.userLocalModel});
 
   ProfileState copyWith(UserLocalModel? userProfile) {
-    return ProfileState(userLocalModel: userProfile ?? userLocalModel);
+    return ProfileState(userLocalModel: userProfile);
   }
 }
 
-class ProfileNotifier extends StateNotifier<ProfileState> {
-  ProfileNotifier(super.state) {
+class ProfileNotifier extends Notifier<ProfileState> {
+  @override
+  ProfileState build() {
     _init();
+    return ProfileState();
   }
 
   Future<void> _init() async {
@@ -28,15 +32,27 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
 
   void onSignIn() async {
     final result = await getIt<AuthUseCase>().execute(AuthMethod.google);
+    await result.fold(
+      (error) {
+        ToastUtils.showToastFailed(error.message);
+      },
+      (userLocal) async {
+        state = state.copyWith(userLocal);
+
+        ///Refresh category to loading from server
+        await ref.read(loadingCategoryProvider.notifier).refresh();
+      },
+    );
   }
 
   void onLogout() async {
-    await getIt<LogoutUseCase>().execute(isClearLocalData: true);
+    await getIt<LogoutUseCase>().execute().then((_) async {
+      state = state.copyWith(null);
+      await ref.read(loadingCategoryProvider.notifier).refresh();
+    });
   }
 }
 
-final profileProvider = StateNotifierProvider<ProfileNotifier, ProfileState>((
-  ref,
-) {
-  return ProfileNotifier(ProfileState());
+final profileProvider = NotifierProvider<ProfileNotifier, ProfileState>(() {
+  return ProfileNotifier();
 });

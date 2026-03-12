@@ -2,6 +2,7 @@
   "name": "Name",
   "description": "Description",
   "create": "Create",
+  "update": "Update",
   "retry": "Retry",
   "created_at": "Create at:",
   "updated_at": "Recent update:",

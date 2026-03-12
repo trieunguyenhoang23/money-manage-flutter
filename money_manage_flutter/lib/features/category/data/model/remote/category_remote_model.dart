@@ -53,7 +53,6 @@ class CategoryRemoteModel {
 
   CategoryLocalModel toLocalModel({required bool isSynced}) {
     return CategoryLocalModel()
-      ..idServer = id
       ..name = name
       ..description = description
       ..createdAt = createdAt ?? DateTime.now()

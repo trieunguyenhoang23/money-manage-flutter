@@ -12,10 +12,10 @@ import 'package:money_manage_flutter/export/core.dart';
 
 @LazySingleton(as: CategoryRepository)
 class CategoryRepositoryImpl implements CategoryRepository {
-  CategoryRemoteDatasource _remoteDatasource;
-  CategoryLocalDatasource _localDatasource;
-  UserLocalDatasource _userLocalDatasource;
-  FlutterSecureStorage _secureStorage;
+  final CategoryRemoteDatasource _remoteDatasource;
+  final CategoryLocalDatasource _localDatasource;
+  final UserLocalDatasource _userLocalDatasource;
+  final FlutterSecureStorage _secureStorage;
 
   CategoryRepositoryImpl(
     this._remoteDatasource,
@@ -24,6 +24,9 @@ class CategoryRepositoryImpl implements CategoryRepository {
     this._secureStorage,
   );
 
+  int limitCount = SizeAppUtils().isTablet ? 20 : 10;
+
+  /// CRUD
   @override
   Future<Either<Failure, CategoryLocalModel>> createCategory(
     String name,
@@ -31,9 +34,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
     TransactionType type,
   ) async {
     try {
-      final token = await _secureStorage.read(key: tokenKey);
-      final bool isLoggedIn =
-          (await _userLocalDatasource.getCurrentUser()) != null;
+      bool isLogin = await _checkIsLogin();
 
       CategoryRemoteModel categoryRemoteModel = CategoryRemoteModel(
         name: name,
@@ -41,11 +42,11 @@ class CategoryRepositoryImpl implements CategoryRepository {
         type: type,
       );
       CategoryLocalModel categoryLocalModel = categoryRemoteModel.toLocalModel(
-        isSynced: isLoggedIn,
+        isSynced: isLogin,
       );
 
       ///Handle logic for server
-      if (isLoggedIn && token != null) {}
+      if (isLogin) {}
 
       await _localDatasource.save(categoryLocalModel);
 
@@ -57,7 +58,26 @@ class CategoryRepositoryImpl implements CategoryRepository {
 
   @override
   Future<List<CategoryLocalModel>> loadCategoryByPage(int page) async {
-    return await _localDatasource.loadByPage(page);
+    var localData = await _localDatasource.loadByPage(page, limitCount);
+
+    if (await _checkIsLogin() && localData.isEmpty) {
+      final remoteData = await _remoteDatasource.loadCateByPage(
+        page,
+        limitCount,
+      );
+      if (remoteData.isSuccess) {
+        final localModels = await parseListJsonIsolate(
+          CategoryLocalModel.fromJson,
+          remoteData.data,
+        );
+
+        // Save to local Isar
+        await _localDatasource.saveAll(localModels);
+        localData = await _localDatasource.loadByPage(page, limitCount);
+      }
+    }
+
+    return localData;
   }
 
   @override
@@ -68,10 +88,6 @@ class CategoryRepositoryImpl implements CategoryRepository {
     CategoryLocalModel oldItem,
   ) async {
     try {
-      final token = await _secureStorage.read(key: tokenKey);
-      final bool isLoggedIn =
-          (await _userLocalDatasource.getCurrentUser()) != null;
-
       oldItem
         ..name = name
         ..description = desc
@@ -82,8 +98,8 @@ class CategoryRepositoryImpl implements CategoryRepository {
 
       ///Handle logic for server
       ///Parse data local
-      if (isLoggedIn && token != null) {
-        oldItem.toJson('userId');
+      if (await _checkIsLogin()) {
+        oldItem.toJson();
       }
 
       return Right(oldItem);
@@ -93,5 +109,15 @@ class CategoryRepositoryImpl implements CategoryRepository {
   }
 
   @override
-  Future<void> clearAllData() async {}
+  Future<void> clearAllData() async {
+    await _localDatasource.clearAll();
+  }
+
+  Future<bool> _checkIsLogin() async {
+    final bool availableAccessToken =
+        (await _secureStorage.read(key: tokenKey)) != null;
+    final bool availableLocalUser =
+        (await _userLocalDatasource.getCurrentUser()) != null;
+    return availableAccessToken && availableLocalUser;
+  }
 }

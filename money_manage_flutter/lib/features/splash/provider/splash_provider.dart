@@ -1,7 +1,6 @@
 import 'dart:async';
-import 'package:money_manage_flutter/core/router/navigator_router.dart';
-import 'package:money_manage_flutter/export/router.dart';
-
+import 'package:flutter/foundation.dart';
+import 'package:money_manage_flutter/core/constant/string_constant.dart';
 import '../../../firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -23,6 +22,11 @@ class SplashProvider extends AsyncNotifier<double> {
 
   Future<void> initialize() async {
     List<Future<void> Function()> tasks = [_initFirebase];
+
+    if(kDebugMode){
+      String accessToken = await secureStorage.read(key: tokenKey) ?? 'Empty';
+      print('============== Access Token: $accessToken ==============');
+    }
 
     for (int i = 0; i < tasks.length; i++) {
       try {

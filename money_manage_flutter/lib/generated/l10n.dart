@@ -69,6 +69,11 @@ class S {
     return Intl.message('Create', name: 'create', desc: '', args: []);
   }
 
+  /// `Update`
+  String get update {
+    return Intl.message('Update', name: 'update', desc: '', args: []);
+  }
+
   /// `Retry`
   String get retry {
     return Intl.message('Retry', name: 'retry', desc: '', args: []);

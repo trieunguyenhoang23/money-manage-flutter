@@ -4,7 +4,7 @@ import 'package:money_manage_flutter/export/infrastructure.dart';
 
 @LazySingleton()
 class UserRemoteDatasource {
-  DioService _dioService;
+  final DioService _dioService;
 
   UserRemoteDatasource(this._dioService);
 
@@ -12,7 +12,7 @@ class UserRemoteDatasource {
     required Map<String, dynamic> jsonBody,
   }) async {
     final response = await _dioService.postNoAuthorize(
-      UserAuth.verifyAuth,
+      UserAuthAPI.post_verify_auth,
       jsonBody,
     );
 

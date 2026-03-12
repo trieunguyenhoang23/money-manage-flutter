@@ -41,6 +41,13 @@ import '../../features/main_features/profile/domain/repositories/user_repository
     as _i168;
 import '../../features/main_features/profile/domain/usecase/auth_usecase.dart'
     as _i429;
+import '../../features/main_features/profile/domain/usecase/logout_usecase.dart'
+    as _i100;
+import '../../features/sync/data/datasource/remote/sync_remote_datasource.dart'
+    as _i472;
+import '../../features/sync/data/repositories/sync_repository_impl.dart'
+    as _i91;
+import '../../features/sync/domain/repositories/sync_repository.dart' as _i129;
 import '../../infrastructure/network/dio_service.dart' as _i960;
 import '../../infrastructure/social_auth/apple_auth_service.dart' as _i502;
 import '../../infrastructure/social_auth/google_auth_service.dart' as _i219;
@@ -103,10 +110,21 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1026.UserRemoteDatasource>(
       () => _i1026.UserRemoteDatasource(gh<_i989.DioService>()),
     );
+    gh.lazySingleton<_i472.SyncRemoteDatasource>(
+      () => _i472.SyncRemoteDatasource(gh<_i989.DioService>()),
+    );
+    gh.lazySingleton<_i129.SyncRepository>(
+      () => _i91.SyncRepositoryImpl(
+        gh<_i197.CategoryLocalDatasource>(),
+        gh<_i472.SyncRemoteDatasource>(),
+      ),
+    );
     gh.lazySingleton<_i869.CategoryRepository>(
       () => _i528.CategoryRepositoryImpl(
         gh<_i702.CategoryRemoteDatasource>(),
         gh<_i197.CategoryLocalDatasource>(),
+        gh<_i809.UserLocalDatasource>(),
+        gh<_i558.FlutterSecureStorage>(),
       ),
     );
     gh.lazySingleton<_i168.UserRepository>(
@@ -122,11 +140,21 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i617.EditCategoryUseCase>(
       () => _i617.EditCategoryUseCase(gh<_i869.CategoryRepository>()),
     );
+    gh.lazySingleton<_i100.LogoutUseCase>(
+      () => _i100.LogoutUseCase(
+        gh<_i168.UserRepository>(),
+        gh<_i869.CategoryRepository>(),
+      ),
+    );
     gh.lazySingleton<_i1069.LoadingCategoryUseCase>(
       () => _i1069.LoadingCategoryUseCase(gh<_i869.CategoryRepository>()),
     );
     gh.lazySingleton<_i429.AuthUseCase>(
-      () => _i429.AuthUseCase(gh<_i168.UserRepository>()),
+      () => _i429.AuthUseCase(
+        gh<_i168.UserRepository>(),
+        gh<_i129.SyncRepository>(),
+        gh<_i869.CategoryRepository>(),
+      ),
     );
     return this;
   }

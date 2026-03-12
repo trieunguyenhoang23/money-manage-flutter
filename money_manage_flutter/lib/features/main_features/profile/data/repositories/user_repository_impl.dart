@@ -10,9 +10,9 @@ import '../model/local/user_local_model.dart';
 
 @LazySingleton(as: UserRepository)
 class UserRepositoryImpl implements UserRepository {
-  UserLocalDatasource _localDatasource;
-  UserRemoteDatasource _remoteDatasource;
-  SocialAuthFactory _socialAuthFactory;
+  final UserLocalDatasource _localDatasource;
+  final UserRemoteDatasource _remoteDatasource;
+  final SocialAuthFactory _socialAuthFactory;
 
   UserRepositoryImpl(
     this._localDatasource,
@@ -42,10 +42,10 @@ class UserRepositoryImpl implements UserRepository {
       final String refreshToken = data['refreshToken'];
       final Map<String, dynamic> userData = data['user'];
 
-      //Save Tokens to Secure Storage for the Interceptor
+      // Save Tokens to Secure Storage for the Interceptor
       await _localDatasource.saveTokens(accessToken, refreshToken);
 
-      // 4. Map JSON to Local Model and Save to Isar
+      // Map JSON to Local Model and Save to Isar
       final userLocalModel = UserLocalModel.fromDomain(userData);
       await _localDatasource.saveUser(userLocalModel);
       return Right(userLocalModel);

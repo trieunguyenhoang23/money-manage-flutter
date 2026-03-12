@@ -5,16 +5,13 @@ import '../repositories/user_repository.dart';
 
 @LazySingleton()
 class LogoutUseCase {
-  UserRepository _userRepository;
-  CategoryRepository _categoryRepository;
+  final UserRepository _userRepository;
+  final CategoryRepository _categoryRepository;
 
   LogoutUseCase(this._userRepository, this._categoryRepository);
 
-  Future<void> execute({required bool isClearLocalData}) async {
-    _userRepository.clearSession();
-
-    if (isClearLocalData) {
-
-    }
+  Future<void> execute() async {
+    await _userRepository.clearSession();
+    await _categoryRepository.clearAllData();
   }
 }
