@@ -18,4 +18,25 @@ class CategoryRemoteDatasource {
 
     return response;
   }
+
+  Future<ApiResult> uploadCategory(Map<String, dynamic> jsonBodyRequest) async {
+    final response = await _dioService.post(
+      CategoryAPI.post_category,
+      jsonBodyRequest,
+    );
+
+    return response;
+  }
+
+  Future<ApiResult> updateCategory(
+    Map<String, dynamic> jsonBodyRequest, {
+    required String id,
+  }) async {
+    final response = await _dioService.patch(
+      '${CategoryAPI.patch_category_by_id}/$id',
+      jsonBodyRequest,
+    );
+
+    return response;
+  }
 }

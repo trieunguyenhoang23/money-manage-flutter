@@ -93,19 +93,31 @@ class _CategoryGridViewWidgetState
       },
       child: state.visibleList.isEmpty && state.isLoading
           ? const Center(child: CircularProgressIndicator())
-          : GridViewBuilder(
-              crossAxisCount: SizeAppUtils().isTablet ? 2 : 1,
-              itemCount: state.visibleList.length,
-              itemBuilder: (context, index) {
-                CategoryLocalModel item = state.visibleList[index];
-
-                return LayoutBuilder(
-                  builder: (context, cc) {
-                    return CategoryItemWidget(item: item);
-                  },
-                );
+          : NotificationListener<ScrollNotification>(
+              onNotification: (ScrollNotification scrollInfo) {
+                if (scrollInfo.metrics.pixels >=
+                    scrollInfo.metrics.maxScrollExtent) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    notifier.loadMore();
+                  });
+                }
+                return false;
               },
-              childAspectRatio: 275 / 85,
+              child: GridViewBuilder(
+                scrollController: scrollController,
+                crossAxisCount: SizeAppUtils().isTablet ? 2 : 1,
+                itemCount: state.visibleList.length,
+                itemBuilder: (context, index) {
+                  CategoryLocalModel item = state.visibleList[index];
+
+                  return LayoutBuilder(
+                    builder: (context, cc) {
+                      return CategoryItemWidget(item: item);
+                    },
+                  );
+                },
+                childAspectRatio: 275 / 85,
+              ),
             ),
     );
   }

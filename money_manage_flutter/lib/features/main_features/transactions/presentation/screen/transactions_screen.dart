@@ -1,7 +1,7 @@
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
-import 'package:money_manage_flutter/core/extension/context_extension.dart';
-import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
+import '../widget/month_select_widget.dart';
+import '../widget/year_select_widget.dart';
 
 class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({super.key});
@@ -29,38 +29,31 @@ class _TransactionsScreenState extends State<TransactionsScreen>
 
   @override
   Widget build(BuildContext context) {
-    return PaddingStyle(
-      child: ExtendedNestedScrollView(
-        onlyOneScrollInBody: true,
-        physics: const BouncingScrollPhysics(),
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            SliverOverlapAbsorber(
-              handle: ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
-                context,
-              ),
-              sliver: SliverAppBar(
-                pinned: true,
-                floating: false,
-                titleSpacing: 0,
-                title: TabBarWidget(
-                  tabController: tabBarController,
-                  listType: [
-                    context.lang.transactions_income,
-                    context.lang.transactions_expense,
-                  ],
-                ),
-                centerTitle: true,
-                toolbarHeight: (158 / 375).sw.clamp(0, 207) * 35 / 158 + 10,
-                automaticallyImplyLeading: false,
-              ),
+    return ExtendedNestedScrollView(
+      onlyOneScrollInBody: true,
+      physics: const BouncingScrollPhysics(),
+      headerSliverBuilder: (context, innerBoxIsScrolled) {
+        return [
+          SliverOverlapAbsorber(
+            handle: ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
+              context,
             ),
-          ];
-        },
-        body: TabBarView(
-          controller: tabBarController,
-          children: [Container(), Container()],
-        ),
+            sliver: SliverAppBar(
+              pinned: true,
+              floating: false,
+              titleSpacing: 0,
+              title: const YearSelectWidget(),
+              bottom: const MonthSelectWidget(),
+              centerTitle: true,
+              toolbarHeight: (158 / 375).sw.clamp(0, 207) * 35 / 158 + 10,
+              automaticallyImplyLeading: false,
+            ),
+          ),
+        ];
+      },
+      body: TabBarView(
+        controller: tabBarController,
+        children: [Container(), Container()],
       ),
     );
   }

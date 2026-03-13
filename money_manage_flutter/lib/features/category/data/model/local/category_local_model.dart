@@ -46,7 +46,9 @@ class CategoryLocalModel {
       ..updatedAt = json['updated_at'] != null
           ? DateTime.tryParse(json['updated_at'])?.toLocal()
           : null
-      ..type = TransactionType.values.byName(json['type'] ?? 'EXPENSE')
+      ..type = json['type'] is TransactionType
+          ? json['type']
+          : TransactionType.values.byName(json['type'] ?? 'EXPENSE')
       ..isSynced = true; // Data from server is by definition synced
   }
 }

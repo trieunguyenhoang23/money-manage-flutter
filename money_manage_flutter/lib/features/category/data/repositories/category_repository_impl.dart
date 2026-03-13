@@ -36,19 +36,19 @@ class CategoryRepositoryImpl implements CategoryRepository {
     try {
       bool isLogin = await _checkIsLogin();
 
-      CategoryRemoteModel categoryRemoteModel = CategoryRemoteModel(
-        name: name,
-        description: desc,
-        type: type,
-      );
-      CategoryLocalModel categoryLocalModel = categoryRemoteModel.toLocalModel(
-        isSynced: isLogin,
-      );
-
-      ///Handle logic for server
-      if (isLogin) {}
+      CategoryLocalModel categoryLocalModel = CategoryLocalModel.fromJson({
+        'name': name,
+        'description': desc,
+        'type': type,
+        'created_at': DateTime.now().toIso8601String(),
+      });
 
       await _localDatasource.save(categoryLocalModel);
+
+      // Upload data to server if isLogin = true
+      if (isLogin) {
+        await _remoteDatasource.uploadCategory(categoryLocalModel.toJson());
+      }
 
       return Right(categoryLocalModel);
     } catch (e) {
@@ -99,7 +99,10 @@ class CategoryRepositoryImpl implements CategoryRepository {
       ///Handle logic for server
       ///Parse data local
       if (await _checkIsLogin()) {
-        oldItem.toJson();
+        await _remoteDatasource.updateCategory(
+          oldItem.toJson(),
+          id: oldItem.idServer,
+        );
       }
 
       return Right(oldItem);

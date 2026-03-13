@@ -41,12 +41,11 @@ class CategoryRemoteModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'name': name,
       'description': description,
-      'created_at': createdAt?.toIso8601String(),
+      'created_at':
+          createdAt?.toIso8601String() ?? DateTime.now().toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
-      'user_id': userId,
       'type': type?.name,
     };
   }

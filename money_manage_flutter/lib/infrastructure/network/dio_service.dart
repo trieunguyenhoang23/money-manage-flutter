@@ -18,7 +18,11 @@ class DioService {
       final response = await call();
       return ApiResult.success(response.data);
     } on DioException catch (e) {
-      if (kDebugMode) debugPrint('❌ [Dio Error]: ${e.type} -> ${e.message}');
+      if (kDebugMode) {
+        debugPrint('❌ [Dio Error]: ${e.type} -> ${e.message}');
+        debugPrint('📩 [Server Response]: ${e.response?.data}');
+      }
+
       return ApiResult.failure(e);
     } catch (e) {
       if (kDebugMode) debugPrint('❌ [Unexpected Error]: $e');
@@ -39,12 +43,7 @@ class DioService {
     Map<String, dynamic>? params,
   }) {
     return _request(
-      () => _cachedDio.get<T>(
-        endpoint,
-        data: body,
-        options: Options(headers: headers),
-        queryParameters: params,
-      ),
+      () => _cachedDio.get<T>(endpoint, data: body, queryParameters: params),
     );
   }
 
@@ -55,12 +54,7 @@ class DioService {
     Map<String, dynamic>? params,
   }) {
     return _request(
-      () => _noCacheDio.get<T>(
-        endpoint,
-        data: body,
-        options: Options(headers: headers),
-        queryParameters: params,
-      ),
+      () => _noCacheDio.get<T>(endpoint, data: body, queryParameters: params),
     );
   }
 
@@ -70,13 +64,7 @@ class DioService {
     Object? body, {
     Map<String, dynamic>? headers,
   }) {
-    return _request(
-      () => _cachedDio.post<T>(
-        endpoint,
-        data: body,
-        options: Options(headers: headers),
-      ),
-    );
+    return _request(() => _cachedDio.post<T>(endpoint, data: body));
   }
 
   Future<ApiResult<T>> postNoAuthorize<T>(
@@ -84,13 +72,7 @@ class DioService {
     Object? body, {
     Map<String, dynamic>? headers,
   }) {
-    return _request(
-      () => _noCacheDio.post<T>(
-        endpoint,
-        data: body,
-        options: Options(headers: headers),
-      ),
-    );
+    return _request(() => _noCacheDio.post<T>(endpoint, data: body));
   }
 
   /// PATCH
@@ -99,13 +81,7 @@ class DioService {
     Object? body, {
     Map<String, dynamic>? headers,
   }) {
-    return _request(
-      () => _noCacheDio.patch<T>(
-        endpoint,
-        data: body,
-        options: Options(headers: headers),
-      ),
-    );
+    return _request(() => _cachedDio.patch<T>(endpoint, data: body));
   }
 
   /// DELETE
@@ -116,12 +92,7 @@ class DioService {
     Map<String, dynamic>? params,
   }) {
     return _request(
-      () => _noCacheDio.delete<T>(
-        endpoint,
-        data: body,
-        options: Options(headers: headers),
-        queryParameters: params,
-      ),
+      () => _cachedDio.delete<T>(endpoint, data: body, queryParameters: params),
     );
   }
 
