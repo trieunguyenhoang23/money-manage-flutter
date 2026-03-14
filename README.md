@@ -12,7 +12,7 @@ Personal Finance Manager helps users track income and expenses, create custom ca
   Navigation: GoRouter.
 
 3. ✨ Use Case Diagram & Features
-  ![Usecase Diagram](diagram/usecase)
+  ![Usecase Diagram](diagram/usecase.png)
   Login & Sync: Log in and sync data across multiple devices. ✅ Complete
   Custom Categories: Create custom income and expense categories. ✅ Complete
   Manage Transactions: Record income and expenses. ⏳ In Progress
