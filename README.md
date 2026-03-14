@@ -8,7 +8,7 @@ Personal Finance Manager helps users track income and expenses, create custom ca
 - **State Management**: Riverpod.
 - **Database**: Isar, Hive (Cache), Secure Storage.
 - **Networking**: Dio with Interceptors (Retry & Cache logic).
-- **Backend Services**: Firebase (Analytics, Crashlytics, Remote Config, Cloud Messaging).
+- **Backend**: LoopBack 4, Firebase (Analytics, Crashlytics, Remote Config, FCM).
 - **Navigation**: GoRouter.
 
 #### 3. ✨ Use Case Diagram & Features
@@ -43,9 +43,9 @@ Personal Finance Manager helps users track income and expenses, create custom ca
 ```bash
 lib/
 ├── core/                   
-│   ├── constants/          # App constants, API endpoints
-│   ├── error/              # Failure & Exception classes (Dartz)
-│   └── network/            # Network info, Dio configuration
+│   ├── constants/          # App constants, API endpoints, ...
+│   ├── error/              # Failure & Exception classes
+│   └── network/            # API Result, Auth Interceptor
 │
 ├── features/               # Business Logic by Features (Feature-first)
 │   ├── transaction/        
@@ -56,15 +56,16 @@ lib/
 │   └── auth/               
 │
 ├── infrastructure/         # External Services Implementation
-│   ├── firebase/           # Firebase Messaging
-│   └── social_auth/         # Global repository implementations (if any)
+│   ├── firebase/           # Remote config, FCM, ...
+│   ├── network/            # Dio Service
+│   └── social_auth/        # Google, Apple, ... sign in service
 │
 ├── shared/                 # Reusable Components across features
-│   ├── widgets/            # Common UI (Custom buttons, Textfields)
-│   ├── l10n/               # Localization (i18n)
+│   ├── widgets/            # Common UI (Custom buttons, Textfields, Style, ...)
+│   ├── l10n/               # Localization
 │   └── utils/              # Extension methods, formatters
 │
 ├── export/                 # Barrel files (exporting common modules)
-├── generated/              # Auto-generated code (Injectable, Isar, Intl)
+├── generated/              # Auto-generated code (Intl)
 ├── firebase_options.dart   # Firebase configuration
 └── main.dart               # Entry point of the application
