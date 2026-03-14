@@ -22,6 +22,7 @@ Personal Finance Manager helps users track income and expenses, create custom ca
 - **Data Analysis**: Analyze financial data for insights. ⏳ **In Progress**
 
 #### 4. 🏛️ Architecture
+![Architecture Diagram](diagram/architecture.png)
 - **UI**: Displays data and handles user interactions.
 - **Riverpod**: Manages app state reactively.
 - **Use Case**: Executes business logic and use cases.
@@ -29,6 +30,7 @@ Personal Finance Manager helps users track income and expenses, create custom ca
 - **Data Sources (Local & Remote)**: Fetches and stores data from local DB or remote API.
 
 #### 5. 🧩 Entity Relationship Diagram
+![Entity Relationship Diagram](diagram/erd.png)
 - **User → Category**: A User can create multiple Categories (1 - N).
 - **User → AuthProvider**: A User can have multiple authentication providers (e.g., Google, Apple, Facebook) (1 - N).
 - **User → Reminder**: A User can set up multiple Reminders for recurring income or expense (1 - N).
