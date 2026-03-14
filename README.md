@@ -12,7 +12,7 @@ Personal Finance Manager helps users track income and expenses, create custom ca
 - **Navigation**: GoRouter.
 
 #### 3. ✨ Use Case Diagram & Features
-![Usecase Diagram](diagram/usecase.png)  
+![Usecase Diagram](diagram/usecase.jpg)  
 
 - **Login & Sync**: Log in and sync data across multiple devices. ✅ **Complete**
 - **Custom Categories**: Create custom income and expense categories. ✅ **Complete**
@@ -30,7 +30,7 @@ Personal Finance Manager helps users track income and expenses, create custom ca
 - **Data Sources (Local & Remote)**: Fetches and stores data from local DB or remote API.
 
 #### 5. 🧩 Entity Relationship Diagram
-![Entity Relationship Diagram](diagram/erd.png)
+![Entity Relationship Diagram](diagram/erd.jpg)
 - **User → Category**: A User can create multiple Categories (1 - N).
 - **User → AuthProvider**: A User can have multiple authentication providers (e.g., Google, Apple, Facebook) (1 - N).
 - **User → Reminder**: A User can set up multiple Reminders for recurring income or expense (1 - N).
