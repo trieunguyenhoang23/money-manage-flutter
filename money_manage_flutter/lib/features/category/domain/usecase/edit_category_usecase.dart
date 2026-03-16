@@ -1,6 +1,6 @@
 import 'package:injectable/injectable.dart';
 import 'package:money_manage_flutter/export/core.dart';
-import '../../../main_features/transactions/domain/enums/transaction_type.dart';
+import '../../../../core/enum/transaction_type.dart';
 import '../../data/model/local/category_local_model.dart';
 import '../repositories/category_repository.dart';
 import 'package:dartz/dartz.dart';

@@ -6,6 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:isar_community/isar.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/features/main_features/profile/data/model/local/user_local_model.dart';
+import 'package:money_manage_flutter/features/main_features/transactions/data/model/local/transaction_local_model.dart';
 import '../../export/core_external.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/category/data/model/local/category_local_model.dart';
@@ -23,9 +24,7 @@ abstract class ModuleDI {
   @lazySingleton
   Dio dioNoCacheInstance() {
     final dio = Dio(BaseOptions(baseUrl: APIConstants.bareUrl));
-    dio.interceptors.addAll([
-      LogInterceptor(responseBody: true),
-    ]);
+    dio.interceptors.addAll([LogInterceptor(responseBody: true)]);
     return dio;
   }
 
@@ -56,7 +55,11 @@ abstract class ModuleDI {
   @preResolve
   Future<Isar> get isar async {
     final dir = await getApplicationDocumentsDirectory();
-    final schemas = [CategoryLocalModelSchema, UserLocalModelSchema];
+    final schemas = [
+      CategoryLocalModelSchema,
+      UserLocalModelSchema,
+      TransactionLocalModelSchema,
+    ];
 
     return await Isar.open(schemas, directory: dir.path, inspector: kDebugMode);
   }

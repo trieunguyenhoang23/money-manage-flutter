@@ -10,4 +10,16 @@ extension DateTimeLocaleX on DateTime? {
     final String locale = Localizations.localeOf(context).toString();
     return DateFormat.yMd(locale).add_jm().format(this!);
   }
+
+  String formatDate(BuildContext context) {
+    if (this == null) return '';
+    final String locale = Localizations.localeOf(context).toString();
+    return DateFormat.yMd(locale).format(this!);
+  }
+
+  String formatDateLong(BuildContext context) {
+    if (this == null) return '';
+    final String locale = Localizations.localeOf(context).toString();
+    return DateFormat.yMMMMd(locale).format(this!);
+  }
 }

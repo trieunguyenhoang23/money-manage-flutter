@@ -17,6 +17,7 @@ export 'package:money_manage_flutter/shared/widget/component/btn_main_widget.dar
 
 // Text Input
 export 'package:money_manage_flutter/shared/widget/text_input/text_input_edit_widget.dart';
+export 'package:money_manage_flutter/shared/widget/text_input/text_input_number_widget.dart';
 
 // Builder
 export 'package:money_manage_flutter/shared/widget/builder/grid_view_builder.dart';

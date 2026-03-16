@@ -27,7 +27,7 @@ class GridViewBuilder extends StatelessWidget {
     return GridView.builder(
       // cacheExtent: double.infinity,
       scrollDirection: isScrollHorizontal ? Axis.horizontal : Axis.vertical,
-      clipBehavior: Clip.none,
+      // clipBehavior: Clip.none,
       controller: scrollController,
       padding: EdgeInsets.zero,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

@@ -1,5 +1,5 @@
 import 'package:money_manage_flutter/export/ui_external.dart';
-import '../../../main_features/transactions/domain/enums/transaction_type.dart';
+import '../../../../core/enum/transaction_type.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/core.dart';
 

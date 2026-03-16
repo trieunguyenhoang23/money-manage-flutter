@@ -1,4 +1,5 @@
 import 'package:isar_community/isar.dart';
+import 'package:money_manage_flutter/core/enum/transaction_type.dart';
 import 'package:money_manage_flutter/export/core_external.dart';
 import '../../../../../core/utils/size_app_utils.dart';
 import '../../model/local/category_local_model.dart';
@@ -16,6 +17,20 @@ class CategoryLocalDatasource {
   Future<List<CategoryLocalModel>> loadByPage(int page, int limitCount) async {
     return await _isar.categoryLocalModels
         .where()
+        .sortByCreatedAtDesc()
+        .offset(page * limitCount)
+        .limit(limitCount)
+        .findAll();
+  }
+
+  Future<List<CategoryLocalModel>> loadByType(
+    int page,
+    int limitCount,
+    TransactionType type,
+  ) async {
+    return await _isar.categoryLocalModels
+        .filter()
+        .typeEqualTo(type)
         .sortByCreatedAtDesc()
         .offset(page * limitCount)
         .limit(limitCount)

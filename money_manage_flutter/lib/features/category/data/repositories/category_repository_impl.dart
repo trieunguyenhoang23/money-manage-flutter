@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 import '../../../main_features/profile/data/datasource/local/user_local_datasource.dart';
-import '../../../main_features/transactions/domain/enums/transaction_type.dart';
+import '../../../../core/enum/transaction_type.dart';
 import '../../domain/repositories/category_repository.dart';
 import '../datasource/local/category_local_datasource.dart';
 import '../datasource/remote/category_remote_datasource.dart';
@@ -27,6 +27,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
   int limitCount = SizeAppUtils().isTablet ? 20 : 10;
 
   /// CRUD
+  ///POST
   @override
   Future<Either<Failure, CategoryLocalModel>> createCategory(
     String name,
@@ -56,6 +57,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
     }
   }
 
+  /// GET
   @override
   Future<List<CategoryLocalModel>> loadCategoryByPage(int page) async {
     var localData = await _localDatasource.loadByPage(page, limitCount);
@@ -80,6 +82,34 @@ class CategoryRepositoryImpl implements CategoryRepository {
     return localData;
   }
 
+  @override
+  Future<List<CategoryLocalModel>> loadCategoryByType(
+    int page,
+    TransactionType type,
+  ) async {
+    var localData = await _localDatasource.loadByType(page, limitCount, type);
+
+    if (await _checkIsLogin() && localData.isEmpty) {
+      final remoteData = await _remoteDatasource.loadCateByPage(
+        page,
+        limitCount,
+      );
+      if (remoteData.isSuccess) {
+        final localModels = await parseListJsonIsolate(
+          CategoryLocalModel.fromJson,
+          remoteData.data,
+        );
+
+        // Save to local Isar
+        await _localDatasource.saveAll(localModels);
+        localData = await _localDatasource.loadByType(page, limitCount, type);
+      }
+    }
+
+    return localData;
+  }
+
+  /// PATCH
   @override
   Future<Either<Failure, CategoryLocalModel>> editCategory(
     String name,

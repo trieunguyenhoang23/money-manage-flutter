@@ -26,50 +26,49 @@ class AppBarWidget extends StatelessWidget implements PreferredSize {
 
   @override
   Widget build(BuildContext context) {
+    double icSize = (20 / 812).sh.clamp(20, 50);
+    double horizontalPadding = 0.04.sw;
+
     return AppBar(
       //Tránh đổi màu khi scroll
       surfaceTintColor: Colors.transparent,
       automaticallyImplyLeading: false,
       backgroundColor: Colors.transparent,
-      centerTitle: true,
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          if (isSetting)
-            BtnAppbarWidget(
-              icPath: IcPathConstant.icMenu,
-              onTap: () => Scaffold.of(context).openDrawer(),
-            )
-          else
-            BtnAppbarWidget(
-              icPath: IcPathConstant.icLeading,
-              onTap: () {
-                if (onTapLeading != null) {
-                  onTapLeading!();
-                } else {
-                  Navigator.pop(context);
-                }
-              },
-            ),
-          if (!isCentralTitle) SizedBox(width: 0.025.sw),
-          Expanded(
-            child: Container(
-              alignment: isCentralTitle
-                  ? Alignment.center
-                  : Alignment.centerLeft,
-              child: TextGGStyle(
-                title,
-                0.05.sw.clamp(7, 20),
-                fontWeight: FontWeight.w900,
-                color: ColorConstant.primary,
+      centerTitle: isCentralTitle,
+      titleSpacing: horizontalPadding,
+      leadingWidth: icSize + horizontalPadding,
+      leading: Padding(
+        padding: EdgeInsets.only(left: horizontalPadding),
+        child: isSetting
+            ? BtnAppbarWidget(
+                icPath: IcPathConstant.icMenu,
+                onTap: () => Scaffold.of(context).openDrawer(),
+              )
+            : BtnAppbarWidget(
+                icPath: IcPathConstant.icLeading,
+                onTap: () {
+                  if (onTapLeading != null) {
+                    onTapLeading!();
+                  } else {
+                    Navigator.pop(context);
+                  }
+                },
               ),
-            ),
-          ),
-
-          if (actionBtn != null) ...actionBtn! else SizedBox(width: 0.0175.sw),
-        ],
       ),
+      title: TextGGStyle(
+        title,
+        0.05.sw.clamp(7, 20),
+        fontWeight: FontWeight.w900,
+        color: ColorConstant.primary,
+      ),
+      actions: [
+        if (actionBtn != null) ...[
+          ...actionBtn!,
+          SizedBox(width: horizontalPadding),
+        ] else ...[
+          SizedBox(width: horizontalPadding),
+        ],
+      ],
     );
   }
 

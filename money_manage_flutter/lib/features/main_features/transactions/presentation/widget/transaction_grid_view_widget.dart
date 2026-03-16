@@ -1,37 +1,24 @@
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import 'package:money_manage_flutter/export/core.dart';
-import '../../data/model/local/category_local_model.dart';
-import '../category_routes.dart';
-import 'category_item_widget.dart';
-import 'package:hooks_riverpod/legacy.dart';
+import '../../data/model/local/transaction_local_model.dart';
+import '../provider/transaction_provider.dart';
+import 'transaction_item_widget.dart';
 
-class CategoryGridViewWidget extends ConsumerStatefulWidget {
-  final StateNotifierProvider<
-    PullToRefreshNotifier<CategoryLocalModel>,
-    PullToRefreshState<CategoryLocalModel>
-  >
-  provider;
-
-  final bool isPickedCate;
-
-  const CategoryGridViewWidget({
-    super.key,
-    required this.provider,
-    this.isPickedCate = false,
-  });
+class TransactionGridViewWidget extends ConsumerStatefulWidget {
+  const TransactionGridViewWidget({super.key});
 
   @override
-  ConsumerState<CategoryGridViewWidget> createState() =>
-      _CategoryGridViewWidgetState();
+  ConsumerState<TransactionGridViewWidget> createState() =>
+      _TransactionGridViewWidgetState();
 }
 
-class _CategoryGridViewWidgetState
-    extends ConsumerState<CategoryGridViewWidget> {
+class _TransactionGridViewWidgetState
+    extends ConsumerState<TransactionGridViewWidget> {
   ScrollController scrollController = ScrollController();
   late final ProviderSubscription refListener;
 
-  get provider => widget.provider;
+  final provider = loadingTransactionProvider;
 
   @override
   void initState() {
@@ -105,7 +92,7 @@ class _CategoryGridViewWidgetState
         await notifier.refresh();
       },
       child: state.visibleList.isEmpty && state.isLoading
-          ? const Center(child: LoadingWidget())
+          ? const Center(child: CircularProgressIndicator())
           : NotificationListener<ScrollNotification>(
               onNotification: (ScrollNotification scrollInfo) {
                 if (scrollInfo.metrics.pixels >=
@@ -121,22 +108,12 @@ class _CategoryGridViewWidgetState
                 crossAxisCount: SizeAppUtils().isTablet ? 2 : 1,
                 itemCount: state.visibleList.length,
                 itemBuilder: (context, index) {
-                  CategoryLocalModel item = state.visibleList[index];
+                  TransactionLocalModel item = state.visibleList[index];
 
-                  return InkWell(
-                    onTap: () {
-                      if (widget.isPickedCate) {
-                        /// Return data
-                        Navigator.pop(context, item);
-                      } else {
-                        NavigatorRouter.pushNamed(
-                          context,
-                          CategoryRoutes.editCateName,
-                          extra: item,
-                        );
-                      }
+                  return LayoutBuilder(
+                    builder: (context, cc) {
+                      return TransactionItemWidget(item: item);
                     },
-                    child: CategoryItemWidget(item: item),
                   );
                 },
                 childAspectRatio: 275 / 85,

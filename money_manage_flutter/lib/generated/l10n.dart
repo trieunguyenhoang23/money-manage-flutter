@@ -79,6 +79,11 @@ class S {
     return Intl.message('Retry', name: 'retry', desc: '', args: []);
   }
 
+  /// `Note`
+  String get note {
+    return Intl.message('Note', name: 'note', desc: '', args: []);
+  }
+
   /// `Create at:`
   String get created_at {
     return Intl.message('Create at:', name: 'created_at', desc: '', args: []);
@@ -126,6 +131,26 @@ class S {
     return Intl.message(
       'Expense',
       name: 'transactions_expense',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `New Transaction`
+  String get transaction_create_new {
+    return Intl.message(
+      'New Transaction',
+      name: 'transaction_create_new',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please enter an amount`
+  String get transaction_validator_empty_amount {
+    return Intl.message(
+      'Please enter an amount',
+      name: 'transaction_validator_empty_amount',
       desc: '',
       args: [],
     );

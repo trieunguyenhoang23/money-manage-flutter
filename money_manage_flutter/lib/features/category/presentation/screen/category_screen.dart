@@ -2,7 +2,9 @@ import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/router.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
-import 'package:money_manage_flutter/features/category/presentation/widget/category_grid_view_widget.dart';
+
+import '../provider/category_provider.dart';
+import '../widget/category_grid_view_widget.dart';
 
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});
@@ -29,8 +31,14 @@ class _CategoryScreenState extends State<CategoryScreen> {
           ),
         ],
       ),
-      body: const PaddingStyle(
-        child: Column(children: [Expanded(child: CategoryGridViewWidget())]),
+      body: PaddingStyle(
+        child: Column(
+          children: [
+            Expanded(
+              child: CategoryGridViewWidget(provider: loadingCategoryProvider),
+            ),
+          ],
+        ),
       ),
     );
   }

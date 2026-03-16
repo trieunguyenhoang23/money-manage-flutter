@@ -36,6 +36,17 @@ class _MainShellScreenState extends State<MainShellScreen> {
           isCentralTitle: true,
           actionBtn: [
             BtnAppbarWidget(
+              widget: const Icon(Icons.add, color: ColorConstant.primary),
+              onTap: () {
+                NavigatorRouter.pushNamed(
+                  context,
+                  TransactionsRoutes.createNewTransactionName,
+                  pathParameters: {},
+                );
+              },
+            ),
+            SizedBox(width: 0.025.sw),
+            BtnAppbarWidget(
               widget: const Icon(
                 Icons.category_outlined,
                 color: ColorConstant.primary,
@@ -76,7 +87,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
                   final isSelected =
                       widget.navigationShell.currentIndex == index;
 
-                  double wItem = (1.sw / bottomTabBars.length).clamp(55, 65);
+                  double wItem = (1.sw / bottomTabBars.length).clamp(75, 100);
                   double hItem = ((41 / 80) * hBottomBar).clamp(50, 60);
 
                   return InkWell(
