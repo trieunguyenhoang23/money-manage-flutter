@@ -23,7 +23,7 @@ class SplashProvider extends AsyncNotifier<double> {
   Future<void> initialize() async {
     List<Future<void> Function()> tasks = [_initFirebase];
 
-    if(kDebugMode){
+    if (kDebugMode) {
       String accessToken = await secureStorage.read(key: tokenKey) ?? 'Empty';
       print('============== Access Token: $accessToken ==============');
     }

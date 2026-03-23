@@ -39,6 +39,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "created_at": MessageLookupByLibrary.simpleMessage("Create at:"),
     "description": MessageLookupByLibrary.simpleMessage("Description"),
     "expense": MessageLookupByLibrary.simpleMessage("Expense"),
+    "file": MessageLookupByLibrary.simpleMessage("File"),
+    "gallery": MessageLookupByLibrary.simpleMessage("Gallery"),
+    "image": MessageLookupByLibrary.simpleMessage("Image"),
     "income": MessageLookupByLibrary.simpleMessage("Income"),
     "name": MessageLookupByLibrary.simpleMessage("Name"),
     "note": MessageLookupByLibrary.simpleMessage("Note"),
@@ -47,12 +50,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "profile_logout": MessageLookupByLibrary.simpleMessage("Logout"),
     "retry": MessageLookupByLibrary.simpleMessage("Retry"),
     "transaction": MessageLookupByLibrary.simpleMessage("Transaction"),
+    "transaction_at": MessageLookupByLibrary.simpleMessage("Transaction At:"),
     "transaction_create_new": MessageLookupByLibrary.simpleMessage(
       "New Transaction",
     ),
     "transaction_validator_empty_amount": MessageLookupByLibrary.simpleMessage(
       "Please enter an amount",
     ),
+    "transaction_validator_empty_category":
+        MessageLookupByLibrary.simpleMessage("Please choose one category"),
     "transactions_expense": MessageLookupByLibrary.simpleMessage("Expense"),
     "transactions_income": MessageLookupByLibrary.simpleMessage("Income"),
     "update": MessageLookupByLibrary.simpleMessage("Update"),

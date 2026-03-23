@@ -25,7 +25,7 @@ class CreateCategoryUseCase {
       return Left(ValidationFailure(ValidationCode.descriptionEmpty));
     }
 
-    // 2. If valid, proceed to repository
+    // If valid, proceed to repository
     return await repository.createCategory(name, desc, type);
   }
 }

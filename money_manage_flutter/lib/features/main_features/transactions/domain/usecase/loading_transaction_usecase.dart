@@ -9,7 +9,6 @@ class LoadingTransactionUseCase {
   LoadingTransactionUseCase(this._repository);
 
   Future<List<TransactionLocalModel>> execute(int page) async {
-    // return await _repository.loadCategoryByPage(page);
-    return [];
+    return await _repository.loadTransByPage(page);
   }
 }

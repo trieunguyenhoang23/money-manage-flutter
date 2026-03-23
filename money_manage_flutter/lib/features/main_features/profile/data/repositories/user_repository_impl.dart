@@ -1,11 +1,12 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 import 'package:dartz/dartz.dart';
+import '../../../../../core/constant/string_constant.dart';
 import '../../../../../core/error/failure.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../datasource/local/user_local_datasource.dart';
 import '../datasource/remote/user_remote_datasource.dart';
 import 'package:money_manage_flutter/export/infrastructure.dart';
-
 import '../model/local/user_local_model.dart';
 
 @LazySingleton(as: UserRepository)
@@ -13,11 +14,16 @@ class UserRepositoryImpl implements UserRepository {
   final UserLocalDatasource _localDatasource;
   final UserRemoteDatasource _remoteDatasource;
   final SocialAuthFactory _socialAuthFactory;
+  final UserLocalDatasource _userLocalDatasource;
+  final FlutterSecureStorage _secureStorage;
 
   UserRepositoryImpl(
     this._localDatasource,
     this._remoteDatasource,
     this._socialAuthFactory,
+
+    this._userLocalDatasource,
+    this._secureStorage,
   );
 
   @override
@@ -57,5 +63,20 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<void> clearSession() async {
     await _localDatasource.clearSession();
+  }
+
+  @override
+  Future<bool> checkIsLogin() async {
+    final bool availableAccessToken =
+        (await _secureStorage.read(key: tokenKey)) != null;
+    final bool availableLocalUser =
+        (await _userLocalDatasource.getCurrentUser()) != null;
+    return availableAccessToken && availableLocalUser;
+  }
+
+  @override
+  Future<String> getCurrentUserId() async {
+    final localUser = await _localDatasource.getCurrentUser();
+    return localUser?.idServer ?? '';
   }
 }

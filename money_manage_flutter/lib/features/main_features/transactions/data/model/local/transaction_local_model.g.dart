@@ -39,30 +39,40 @@ const TransactionLocalModelSchema = CollectionSchema(
       name: r'idServer',
       type: IsarType.string,
     ),
-    r'imageDescription': PropertySchema(
+    r'imageBytes': PropertySchema(
       id: 5,
-      name: r'imageDescription',
+      name: r'imageBytes',
+      type: IsarType.longList,
+    ),
+    r'imageUrl': PropertySchema(
+      id: 6,
+      name: r'imageUrl',
       type: IsarType.string,
     ),
-    r'isSynced': PropertySchema(id: 6, name: r'isSynced', type: IsarType.bool),
-    r'note': PropertySchema(id: 7, name: r'note', type: IsarType.string),
+    r'isSynced': PropertySchema(id: 7, name: r'isSynced', type: IsarType.bool),
+    r'note': PropertySchema(id: 8, name: r'note', type: IsarType.string),
     r'reminderId': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'reminderId',
       type: IsarType.string,
     ),
+    r'transactionAt': PropertySchema(
+      id: 10,
+      name: r'transactionAt',
+      type: IsarType.dateTime,
+    ),
     r'type': PropertySchema(
-      id: 9,
+      id: 11,
       name: r'type',
       type: IsarType.string,
       enumMap: _TransactionLocalModeltypeEnumValueMap,
     ),
     r'updatedAt': PropertySchema(
-      id: 10,
+      id: 12,
       name: r'updatedAt',
       type: IsarType.dateTime,
     ),
-    r'userId': PropertySchema(id: 11, name: r'userId', type: IsarType.string),
+    r'userId': PropertySchema(id: 13, name: r'userId', type: IsarType.string),
   },
 
   estimateSize: _transactionLocalModelEstimateSize,
@@ -109,13 +119,19 @@ int _transactionLocalModelEstimateSize(
   var bytesCount = offsets.last;
   bytesCount += 3 + object.categoryId.length * 3;
   bytesCount += 3 + object.currency.length * 3;
+  bytesCount += 3 + object.idServer.length * 3;
   {
-    final value = object.idServer;
+    final value = object.imageBytes;
+    if (value != null) {
+      bytesCount += 3 + value.length * 8;
+    }
+  }
+  {
+    final value = object.imageUrl;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
     }
   }
-  bytesCount += 3 + object.imageDescription.length * 3;
   bytesCount += 3 + object.note.length * 3;
   {
     final value = object.reminderId;
@@ -124,7 +140,12 @@ int _transactionLocalModelEstimateSize(
     }
   }
   bytesCount += 3 + object.type.name.length * 3;
-  bytesCount += 3 + object.userId.length * 3;
+  {
+    final value = object.userId;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   return bytesCount;
 }
 
@@ -139,13 +160,15 @@ void _transactionLocalModelSerialize(
   writer.writeDateTime(offsets[2], object.createdAt);
   writer.writeString(offsets[3], object.currency);
   writer.writeString(offsets[4], object.idServer);
-  writer.writeString(offsets[5], object.imageDescription);
-  writer.writeBool(offsets[6], object.isSynced);
-  writer.writeString(offsets[7], object.note);
-  writer.writeString(offsets[8], object.reminderId);
-  writer.writeString(offsets[9], object.type.name);
-  writer.writeDateTime(offsets[10], object.updatedAt);
-  writer.writeString(offsets[11], object.userId);
+  writer.writeLongList(offsets[5], object.imageBytes);
+  writer.writeString(offsets[6], object.imageUrl);
+  writer.writeBool(offsets[7], object.isSynced);
+  writer.writeString(offsets[8], object.note);
+  writer.writeString(offsets[9], object.reminderId);
+  writer.writeDateTime(offsets[10], object.transactionAt);
+  writer.writeString(offsets[11], object.type.name);
+  writer.writeDateTime(offsets[12], object.updatedAt);
+  writer.writeString(offsets[13], object.userId);
 }
 
 TransactionLocalModel _transactionLocalModelDeserialize(
@@ -160,18 +183,20 @@ TransactionLocalModel _transactionLocalModelDeserialize(
   object.createdAt = reader.readDateTime(offsets[2]);
   object.currency = reader.readString(offsets[3]);
   object.id = id;
-  object.idServer = reader.readStringOrNull(offsets[4]);
-  object.imageDescription = reader.readString(offsets[5]);
-  object.isSynced = reader.readBool(offsets[6]);
-  object.note = reader.readString(offsets[7]);
-  object.reminderId = reader.readStringOrNull(offsets[8]);
+  object.idServer = reader.readString(offsets[4]);
+  object.imageBytes = reader.readLongList(offsets[5]);
+  object.imageUrl = reader.readStringOrNull(offsets[6]);
+  object.isSynced = reader.readBool(offsets[7]);
+  object.note = reader.readString(offsets[8]);
+  object.reminderId = reader.readStringOrNull(offsets[9]);
+  object.transactionAt = reader.readDateTime(offsets[10]);
   object.type =
       _TransactionLocalModeltypeValueEnumMap[reader.readStringOrNull(
-        offsets[9],
+        offsets[11],
       )] ??
       TransactionType.INCOME;
-  object.updatedAt = reader.readDateTime(offsets[10]);
-  object.userId = reader.readString(offsets[11]);
+  object.updatedAt = reader.readDateTime(offsets[12]);
+  object.userId = reader.readStringOrNull(offsets[13]);
   return object;
 }
 
@@ -191,25 +216,29 @@ P _transactionLocalModelDeserializeProp<P>(
     case 3:
       return (reader.readString(offset)) as P;
     case 4:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 5:
-      return (reader.readString(offset)) as P;
+      return (reader.readLongList(offset)) as P;
     case 6:
-      return (reader.readBool(offset)) as P;
-    case 7:
-      return (reader.readString(offset)) as P;
-    case 8:
       return (reader.readStringOrNull(offset)) as P;
+    case 7:
+      return (reader.readBool(offset)) as P;
+    case 8:
+      return (reader.readString(offset)) as P;
     case 9:
+      return (reader.readStringOrNull(offset)) as P;
+    case 10:
+      return (reader.readDateTime(offset)) as P;
+    case 11:
       return (_TransactionLocalModeltypeValueEnumMap[reader.readStringOrNull(
                 offset,
               )] ??
               TransactionType.INCOME)
           as P;
-    case 10:
+    case 12:
       return (reader.readDateTime(offset)) as P;
-    case 11:
-      return (reader.readString(offset)) as P;
+    case 13:
+      return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -250,42 +279,42 @@ void _transactionLocalModelAttach(
 
 extension TransactionLocalModelByIndex
     on IsarCollection<TransactionLocalModel> {
-  Future<TransactionLocalModel?> getByIdServer(String? idServer) {
+  Future<TransactionLocalModel?> getByIdServer(String idServer) {
     return getByIndex(r'idServer', [idServer]);
   }
 
-  TransactionLocalModel? getByIdServerSync(String? idServer) {
+  TransactionLocalModel? getByIdServerSync(String idServer) {
     return getByIndexSync(r'idServer', [idServer]);
   }
 
-  Future<bool> deleteByIdServer(String? idServer) {
+  Future<bool> deleteByIdServer(String idServer) {
     return deleteByIndex(r'idServer', [idServer]);
   }
 
-  bool deleteByIdServerSync(String? idServer) {
+  bool deleteByIdServerSync(String idServer) {
     return deleteByIndexSync(r'idServer', [idServer]);
   }
 
   Future<List<TransactionLocalModel?>> getAllByIdServer(
-    List<String?> idServerValues,
+    List<String> idServerValues,
   ) {
     final values = idServerValues.map((e) => [e]).toList();
     return getAllByIndex(r'idServer', values);
   }
 
   List<TransactionLocalModel?> getAllByIdServerSync(
-    List<String?> idServerValues,
+    List<String> idServerValues,
   ) {
     final values = idServerValues.map((e) => [e]).toList();
     return getAllByIndexSync(r'idServer', values);
   }
 
-  Future<int> deleteAllByIdServer(List<String?> idServerValues) {
+  Future<int> deleteAllByIdServer(List<String> idServerValues) {
     final values = idServerValues.map((e) => [e]).toList();
     return deleteAllByIndex(r'idServer', values);
   }
 
-  int deleteAllByIdServerSync(List<String?> idServerValues) {
+  int deleteAllByIdServerSync(List<String> idServerValues) {
     final values = idServerValues.map((e) => [e]).toList();
     return deleteAllByIndexSync(r'idServer', values);
   }
@@ -395,30 +424,7 @@ extension TransactionLocalModelQueryWhere
   }
 
   QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterWhereClause>
-  idServerIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IndexWhereClause.equalTo(indexName: r'idServer', value: [null]),
-      );
-    });
-  }
-
-  QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterWhereClause>
-  idServerIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IndexWhereClause.between(
-          indexName: r'idServer',
-          lower: [null],
-          includeLower: false,
-          upper: [],
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterWhereClause>
-  idServerEqualTo(String? idServer) {
+  idServerEqualTo(String idServer) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         IndexWhereClause.equalTo(indexName: r'idServer', value: [idServer]),
@@ -427,7 +433,7 @@ extension TransactionLocalModelQueryWhere
   }
 
   QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterWhereClause>
-  idServerNotEqualTo(String? idServer) {
+  idServerNotEqualTo(String idServer) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -1077,33 +1083,7 @@ extension TransactionLocalModelQueryFilter
     TransactionLocalModel,
     QAfterFilterCondition
   >
-  idServerIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNull(property: r'idServer'),
-      );
-    });
-  }
-
-  QueryBuilder<
-    TransactionLocalModel,
-    TransactionLocalModel,
-    QAfterFilterCondition
-  >
-  idServerIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNotNull(property: r'idServer'),
-      );
-    });
-  }
-
-  QueryBuilder<
-    TransactionLocalModel,
-    TransactionLocalModel,
-    QAfterFilterCondition
-  >
-  idServerEqualTo(String? value, {bool caseSensitive = true}) {
+  idServerEqualTo(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.equalTo(
@@ -1121,7 +1101,7 @@ extension TransactionLocalModelQueryFilter
     QAfterFilterCondition
   >
   idServerGreaterThan(
-    String? value, {
+    String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -1143,7 +1123,7 @@ extension TransactionLocalModelQueryFilter
     QAfterFilterCondition
   >
   idServerLessThan(
-    String? value, {
+    String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -1165,8 +1145,8 @@ extension TransactionLocalModelQueryFilter
     QAfterFilterCondition
   >
   idServerBetween(
-    String? lower,
-    String? upper, {
+    String lower,
+    String upper, {
     bool includeLower = true,
     bool includeUpper = true,
     bool caseSensitive = true,
@@ -1284,11 +1264,211 @@ extension TransactionLocalModelQueryFilter
     TransactionLocalModel,
     QAfterFilterCondition
   >
-  imageDescriptionEqualTo(String value, {bool caseSensitive = true}) {
+  imageBytesIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'imageBytes'),
+      );
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  imageBytesIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'imageBytes'),
+      );
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  imageBytesElementEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'imageBytes', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  imageBytesElementGreaterThan(int value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'imageBytes',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  imageBytesElementLessThan(int value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'imageBytes',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  imageBytesElementBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'imageBytes',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  imageBytesLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(r'imageBytes', length, true, length, true);
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  imageBytesIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(r'imageBytes', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  imageBytesIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(r'imageBytes', 0, false, 999999, true);
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  imageBytesLengthLessThan(int length, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(r'imageBytes', 0, true, length, include);
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  imageBytesLengthGreaterThan(int length, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(r'imageBytes', length, include, 999999, true);
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  imageBytesLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'imageBytes',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  imageUrlIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'imageUrl'),
+      );
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  imageUrlIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'imageUrl'),
+      );
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  imageUrlEqualTo(String? value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.equalTo(
-          property: r'imageDescription',
+          property: r'imageUrl',
           value: value,
           caseSensitive: caseSensitive,
         ),
@@ -1301,8 +1481,8 @@ extension TransactionLocalModelQueryFilter
     TransactionLocalModel,
     QAfterFilterCondition
   >
-  imageDescriptionGreaterThan(
-    String value, {
+  imageUrlGreaterThan(
+    String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -1310,7 +1490,7 @@ extension TransactionLocalModelQueryFilter
       return query.addFilterCondition(
         FilterCondition.greaterThan(
           include: include,
-          property: r'imageDescription',
+          property: r'imageUrl',
           value: value,
           caseSensitive: caseSensitive,
         ),
@@ -1323,8 +1503,8 @@ extension TransactionLocalModelQueryFilter
     TransactionLocalModel,
     QAfterFilterCondition
   >
-  imageDescriptionLessThan(
-    String value, {
+  imageUrlLessThan(
+    String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -1332,7 +1512,7 @@ extension TransactionLocalModelQueryFilter
       return query.addFilterCondition(
         FilterCondition.lessThan(
           include: include,
-          property: r'imageDescription',
+          property: r'imageUrl',
           value: value,
           caseSensitive: caseSensitive,
         ),
@@ -1345,9 +1525,9 @@ extension TransactionLocalModelQueryFilter
     TransactionLocalModel,
     QAfterFilterCondition
   >
-  imageDescriptionBetween(
-    String lower,
-    String upper, {
+  imageUrlBetween(
+    String? lower,
+    String? upper, {
     bool includeLower = true,
     bool includeUpper = true,
     bool caseSensitive = true,
@@ -1355,7 +1535,7 @@ extension TransactionLocalModelQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.between(
-          property: r'imageDescription',
+          property: r'imageUrl',
           lower: lower,
           includeLower: includeLower,
           upper: upper,
@@ -1371,11 +1551,11 @@ extension TransactionLocalModelQueryFilter
     TransactionLocalModel,
     QAfterFilterCondition
   >
-  imageDescriptionStartsWith(String value, {bool caseSensitive = true}) {
+  imageUrlStartsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.startsWith(
-          property: r'imageDescription',
+          property: r'imageUrl',
           value: value,
           caseSensitive: caseSensitive,
         ),
@@ -1388,11 +1568,11 @@ extension TransactionLocalModelQueryFilter
     TransactionLocalModel,
     QAfterFilterCondition
   >
-  imageDescriptionEndsWith(String value, {bool caseSensitive = true}) {
+  imageUrlEndsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.endsWith(
-          property: r'imageDescription',
+          property: r'imageUrl',
           value: value,
           caseSensitive: caseSensitive,
         ),
@@ -1405,11 +1585,11 @@ extension TransactionLocalModelQueryFilter
     TransactionLocalModel,
     QAfterFilterCondition
   >
-  imageDescriptionContains(String value, {bool caseSensitive = true}) {
+  imageUrlContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.contains(
-          property: r'imageDescription',
+          property: r'imageUrl',
           value: value,
           caseSensitive: caseSensitive,
         ),
@@ -1422,11 +1602,11 @@ extension TransactionLocalModelQueryFilter
     TransactionLocalModel,
     QAfterFilterCondition
   >
-  imageDescriptionMatches(String pattern, {bool caseSensitive = true}) {
+  imageUrlMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.matches(
-          property: r'imageDescription',
+          property: r'imageUrl',
           wildcard: pattern,
           caseSensitive: caseSensitive,
         ),
@@ -1439,10 +1619,10 @@ extension TransactionLocalModelQueryFilter
     TransactionLocalModel,
     QAfterFilterCondition
   >
-  imageDescriptionIsEmpty() {
+  imageUrlIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'imageDescription', value: ''),
+        FilterCondition.equalTo(property: r'imageUrl', value: ''),
       );
     });
   }
@@ -1452,10 +1632,10 @@ extension TransactionLocalModelQueryFilter
     TransactionLocalModel,
     QAfterFilterCondition
   >
-  imageDescriptionIsNotEmpty() {
+  imageUrlIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'imageDescription', value: ''),
+        FilterCondition.greaterThan(property: r'imageUrl', value: ''),
       );
     });
   }
@@ -1866,6 +2046,77 @@ extension TransactionLocalModelQueryFilter
     TransactionLocalModel,
     QAfterFilterCondition
   >
+  transactionAtEqualTo(DateTime value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'transactionAt', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  transactionAtGreaterThan(DateTime value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'transactionAt',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  transactionAtLessThan(DateTime value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'transactionAt',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  transactionAtBetween(
+    DateTime lower,
+    DateTime upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'transactionAt',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
   typeEqualTo(TransactionType value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
@@ -2118,7 +2369,33 @@ extension TransactionLocalModelQueryFilter
     TransactionLocalModel,
     QAfterFilterCondition
   >
-  userIdEqualTo(String value, {bool caseSensitive = true}) {
+  userIdIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'userId'),
+      );
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  userIdIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'userId'),
+      );
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  userIdEqualTo(String? value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.equalTo(
@@ -2136,7 +2413,7 @@ extension TransactionLocalModelQueryFilter
     QAfterFilterCondition
   >
   userIdGreaterThan(
-    String value, {
+    String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -2158,7 +2435,7 @@ extension TransactionLocalModelQueryFilter
     QAfterFilterCondition
   >
   userIdLessThan(
-    String value, {
+    String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -2180,8 +2457,8 @@ extension TransactionLocalModelQueryFilter
     QAfterFilterCondition
   >
   userIdBetween(
-    String lower,
-    String upper, {
+    String? lower,
+    String? upper, {
     bool includeLower = true,
     bool includeUpper = true,
     bool caseSensitive = true,
@@ -2406,16 +2683,16 @@ extension TransactionLocalModelQuerySortBy
   }
 
   QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterSortBy>
-  sortByImageDescription() {
+  sortByImageUrl() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'imageDescription', Sort.asc);
+      return query.addSortBy(r'imageUrl', Sort.asc);
     });
   }
 
   QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterSortBy>
-  sortByImageDescriptionDesc() {
+  sortByImageUrlDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'imageDescription', Sort.desc);
+      return query.addSortBy(r'imageUrl', Sort.desc);
     });
   }
 
@@ -2458,6 +2735,20 @@ extension TransactionLocalModelQuerySortBy
   sortByReminderIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'reminderId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterSortBy>
+  sortByTransactionAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'transactionAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterSortBy>
+  sortByTransactionAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'transactionAt', Sort.desc);
     });
   }
 
@@ -2591,16 +2882,16 @@ extension TransactionLocalModelQuerySortThenBy
   }
 
   QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterSortBy>
-  thenByImageDescription() {
+  thenByImageUrl() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'imageDescription', Sort.asc);
+      return query.addSortBy(r'imageUrl', Sort.asc);
     });
   }
 
   QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterSortBy>
-  thenByImageDescriptionDesc() {
+  thenByImageUrlDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'imageDescription', Sort.desc);
+      return query.addSortBy(r'imageUrl', Sort.desc);
     });
   }
 
@@ -2643,6 +2934,20 @@ extension TransactionLocalModelQuerySortThenBy
   thenByReminderIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'reminderId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterSortBy>
+  thenByTransactionAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'transactionAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterSortBy>
+  thenByTransactionAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'transactionAt', Sort.desc);
     });
   }
 
@@ -2727,12 +3032,16 @@ extension TransactionLocalModelQueryWhereDistinct
   }
 
   QueryBuilder<TransactionLocalModel, TransactionLocalModel, QDistinct>
-  distinctByImageDescription({bool caseSensitive = true}) {
+  distinctByImageBytes() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(
-        r'imageDescription',
-        caseSensitive: caseSensitive,
-      );
+      return query.addDistinctBy(r'imageBytes');
+    });
+  }
+
+  QueryBuilder<TransactionLocalModel, TransactionLocalModel, QDistinct>
+  distinctByImageUrl({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'imageUrl', caseSensitive: caseSensitive);
     });
   }
 
@@ -2754,6 +3063,13 @@ extension TransactionLocalModelQueryWhereDistinct
   distinctByReminderId({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'reminderId', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<TransactionLocalModel, TransactionLocalModel, QDistinct>
+  distinctByTransactionAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'transactionAt');
     });
   }
 
@@ -2820,17 +3136,24 @@ extension TransactionLocalModelQueryProperty
     });
   }
 
-  QueryBuilder<TransactionLocalModel, String?, QQueryOperations>
+  QueryBuilder<TransactionLocalModel, String, QQueryOperations>
   idServerProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'idServer');
     });
   }
 
-  QueryBuilder<TransactionLocalModel, String, QQueryOperations>
-  imageDescriptionProperty() {
+  QueryBuilder<TransactionLocalModel, List<int>?, QQueryOperations>
+  imageBytesProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'imageDescription');
+      return query.addPropertyName(r'imageBytes');
+    });
+  }
+
+  QueryBuilder<TransactionLocalModel, String?, QQueryOperations>
+  imageUrlProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'imageUrl');
     });
   }
 
@@ -2854,6 +3177,13 @@ extension TransactionLocalModelQueryProperty
     });
   }
 
+  QueryBuilder<TransactionLocalModel, DateTime, QQueryOperations>
+  transactionAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'transactionAt');
+    });
+  }
+
   QueryBuilder<TransactionLocalModel, TransactionType, QQueryOperations>
   typeProperty() {
     return QueryBuilder.apply(this, (query) {
@@ -2868,7 +3198,7 @@ extension TransactionLocalModelQueryProperty
     });
   }
 
-  QueryBuilder<TransactionLocalModel, String, QQueryOperations>
+  QueryBuilder<TransactionLocalModel, String?, QQueryOperations>
   userIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'userId');

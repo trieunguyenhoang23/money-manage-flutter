@@ -28,6 +28,7 @@ dependencies:
   lottie: ^3.3.2
   flutter_svg: ^2.2.4
   extended_nested_scroll_view: ^6.2.1
+  extended_image: ^9.1.0
 
   # Monitoring & Analytics
   firebase_core: 4.5.0
@@ -75,6 +76,13 @@ dependencies:
   # Utils
   dartz: ^0.10.1
   uuid: ^4.5.3
+  tuple: ^2.0.2
+
+  # Image
+  file_picker: 10.3.7
+  image_picker: 1.2.1
+  image_cropper: ^11.0.0
+  flutter_image_compress: ^2.4.0
 
 dev_dependencies:
   flutter_test:

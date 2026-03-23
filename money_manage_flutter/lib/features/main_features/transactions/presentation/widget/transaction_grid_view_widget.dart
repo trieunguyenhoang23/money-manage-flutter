@@ -116,7 +116,7 @@ class _TransactionGridViewWidgetState
                     },
                   );
                 },
-                childAspectRatio: 275 / 85,
+                childAspectRatio: 2.5,
               ),
             ),
     );

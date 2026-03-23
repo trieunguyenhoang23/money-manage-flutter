@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
+import 'package:money_manage_flutter/features/main_features/profile/domain/repositories/user_repository.dart';
 import '../../../main_features/profile/data/datasource/local/user_local_datasource.dart';
 import '../../../../core/enum/transaction_type.dart';
 import '../../domain/repositories/category_repository.dart';
@@ -14,14 +15,12 @@ import 'package:money_manage_flutter/export/core.dart';
 class CategoryRepositoryImpl implements CategoryRepository {
   final CategoryRemoteDatasource _remoteDatasource;
   final CategoryLocalDatasource _localDatasource;
-  final UserLocalDatasource _userLocalDatasource;
-  final FlutterSecureStorage _secureStorage;
+  final UserRepository _userRepository;
 
   CategoryRepositoryImpl(
     this._remoteDatasource,
     this._localDatasource,
-    this._userLocalDatasource,
-    this._secureStorage,
+    this._userRepository,
   );
 
   int limitCount = SizeAppUtils().isTablet ? 20 : 10;
@@ -35,7 +34,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
     TransactionType type,
   ) async {
     try {
-      bool isLogin = await _checkIsLogin();
+      bool isLogin = await _userRepository.checkIsLogin();
 
       CategoryLocalModel categoryLocalModel = CategoryLocalModel.fromJson({
         'name': name,
@@ -62,7 +61,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
   Future<List<CategoryLocalModel>> loadCategoryByPage(int page) async {
     var localData = await _localDatasource.loadByPage(page, limitCount);
 
-    if (await _checkIsLogin() && localData.isEmpty) {
+    if (await _userRepository.checkIsLogin() && localData.isEmpty) {
       final remoteData = await _remoteDatasource.loadCateByPage(
         page,
         limitCount,
@@ -89,7 +88,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
   ) async {
     var localData = await _localDatasource.loadByType(page, limitCount, type);
 
-    if (await _checkIsLogin() && localData.isEmpty) {
+    if (await _userRepository.checkIsLogin() && localData.isEmpty) {
       final remoteData = await _remoteDatasource.loadCateByPage(
         page,
         limitCount,
@@ -128,7 +127,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
 
       ///Handle logic for server
       ///Parse data local
-      if (await _checkIsLogin()) {
+      if (await _userRepository.checkIsLogin()) {
         await _remoteDatasource.updateCategory(
           oldItem.toJson(),
           id: oldItem.idServer,
@@ -144,13 +143,5 @@ class CategoryRepositoryImpl implements CategoryRepository {
   @override
   Future<void> clearAllData() async {
     await _localDatasource.clearAll();
-  }
-
-  Future<bool> _checkIsLogin() async {
-    final bool availableAccessToken =
-        (await _secureStorage.read(key: tokenKey)) != null;
-    final bool availableLocalUser =
-        (await _userLocalDatasource.getCurrentUser()) != null;
-    return availableAccessToken && availableLocalUser;
   }
 }

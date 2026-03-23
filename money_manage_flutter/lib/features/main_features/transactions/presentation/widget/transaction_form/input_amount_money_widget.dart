@@ -1,15 +1,23 @@
 import 'package:money_manage_flutter/core/extension/context_extension.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
+import '../../provider/transaction_form_provider.dart';
 
 class InputAmountMoneyWidget extends HookConsumerWidget {
-  final Function(double amount) onChangeData;
-
-  const InputAmountMoneyWidget({super.key, required this.onChangeData});
+  const InputAmountMoneyWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final inputController = useTextEditingController();
+    final inputAmountMoneyState = ref.watch(
+      transactionFormProvider.select((s) => s.amount),
+    );
+    final inputAmountMoneyNotifier = ref.watch(
+      transactionFormProvider.notifier,
+    );
+
+    final inputController = useTextEditingController(
+      text: inputAmountMoneyState.toString(),
+    );
 
     useListenable(inputController);
 
@@ -39,9 +47,7 @@ class InputAmountMoneyWidget extends HookConsumerWidget {
 
                   if (cleanValue.isNotEmpty) {
                     final amount = double.tryParse(cleanValue) ?? 0;
-                    onChangeData(amount);
-                  } else {
-                    onChangeData(0);
+                    inputAmountMoneyNotifier.updateAmount(amount);
                   }
                 },
                 onSubmit: (value) {},

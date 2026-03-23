@@ -28,3 +28,6 @@ export 'package:money_manage_flutter/core/error/failure.dart';
 /// Enum
 export 'package:money_manage_flutter/core/enum/auth_enum.dart';
 export 'package:money_manage_flutter/core/enum/transaction_type.dart';
+
+/// DI
+export 'package:money_manage_flutter/core/di/di_shortcuts.dart';

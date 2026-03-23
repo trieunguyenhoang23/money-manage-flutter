@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:intl/intl.dart';
 
 class StringUtils {
   static String handleDioError(DioException e) {
@@ -10,5 +11,14 @@ class StringUtils {
       default:
         return "Something went wrong. Please try again.";
     }
+  }
+
+  static String formatPrice(String price, String currencyCode) {
+    final format = NumberFormat.simpleCurrency(
+      name: currencyCode,
+      decimalDigits: 0,
+    );
+    final parsedPrice = double.parse(price);
+    return format.format(parsedPrice);
   }
 }

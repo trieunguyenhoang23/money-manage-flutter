@@ -99,6 +99,16 @@ class S {
     );
   }
 
+  /// `Transaction At:`
+  String get transaction_at {
+    return Intl.message(
+      'Transaction At:',
+      name: 'transaction_at',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Income`
   String get income {
     return Intl.message('Income', name: 'income', desc: '', args: []);
@@ -107,6 +117,21 @@ class S {
   /// `Expense`
   String get expense {
     return Intl.message('Expense', name: 'expense', desc: '', args: []);
+  }
+
+  /// `Image`
+  String get image {
+    return Intl.message('Image', name: 'image', desc: '', args: []);
+  }
+
+  /// `Gallery`
+  String get gallery {
+    return Intl.message('Gallery', name: 'gallery', desc: '', args: []);
+  }
+
+  /// `File`
+  String get file {
+    return Intl.message('File', name: 'file', desc: '', args: []);
   }
 
   // skipped getter for the '//TRANSACTIONS' key
@@ -151,6 +176,16 @@ class S {
     return Intl.message(
       'Please enter an amount',
       name: 'transaction_validator_empty_amount',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please choose one category`
+  String get transaction_validator_empty_category {
+    return Intl.message(
+      'Please choose one category',
+      name: 'transaction_validator_empty_category',
       desc: '',
       args: [],
     );

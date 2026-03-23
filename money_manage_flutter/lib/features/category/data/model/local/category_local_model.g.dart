@@ -54,7 +54,21 @@ const CategoryLocalModelSchema = CollectionSchema(
   deserialize: _categoryLocalModelDeserialize,
   deserializeProp: _categoryLocalModelDeserializeProp,
   idName: r'id',
-  indexes: {},
+  indexes: {
+    r'idServer': IndexSchema(
+      id: 2504112552765302450,
+      name: r'idServer',
+      unique: true,
+      replace: true,
+      properties: [
+        IndexPropertySchema(
+          name: r'idServer',
+          type: IndexType.hash,
+          caseSensitive: true,
+        ),
+      ],
+    ),
+  },
   links: {},
   embeddedSchemas: {},
 
@@ -192,6 +206,65 @@ void _categoryLocalModelAttach(
   object.id = id;
 }
 
+extension CategoryLocalModelByIndex on IsarCollection<CategoryLocalModel> {
+  Future<CategoryLocalModel?> getByIdServer(String idServer) {
+    return getByIndex(r'idServer', [idServer]);
+  }
+
+  CategoryLocalModel? getByIdServerSync(String idServer) {
+    return getByIndexSync(r'idServer', [idServer]);
+  }
+
+  Future<bool> deleteByIdServer(String idServer) {
+    return deleteByIndex(r'idServer', [idServer]);
+  }
+
+  bool deleteByIdServerSync(String idServer) {
+    return deleteByIndexSync(r'idServer', [idServer]);
+  }
+
+  Future<List<CategoryLocalModel?>> getAllByIdServer(
+    List<String> idServerValues,
+  ) {
+    final values = idServerValues.map((e) => [e]).toList();
+    return getAllByIndex(r'idServer', values);
+  }
+
+  List<CategoryLocalModel?> getAllByIdServerSync(List<String> idServerValues) {
+    final values = idServerValues.map((e) => [e]).toList();
+    return getAllByIndexSync(r'idServer', values);
+  }
+
+  Future<int> deleteAllByIdServer(List<String> idServerValues) {
+    final values = idServerValues.map((e) => [e]).toList();
+    return deleteAllByIndex(r'idServer', values);
+  }
+
+  int deleteAllByIdServerSync(List<String> idServerValues) {
+    final values = idServerValues.map((e) => [e]).toList();
+    return deleteAllByIndexSync(r'idServer', values);
+  }
+
+  Future<Id> putByIdServer(CategoryLocalModel object) {
+    return putByIndex(r'idServer', object);
+  }
+
+  Id putByIdServerSync(CategoryLocalModel object, {bool saveLinks = true}) {
+    return putByIndexSync(r'idServer', object, saveLinks: saveLinks);
+  }
+
+  Future<List<Id>> putAllByIdServer(List<CategoryLocalModel> objects) {
+    return putAllByIndex(r'idServer', objects);
+  }
+
+  List<Id> putAllByIdServerSync(
+    List<CategoryLocalModel> objects, {
+    bool saveLinks = true,
+  }) {
+    return putAllByIndexSync(r'idServer', objects, saveLinks: saveLinks);
+  }
+}
+
 extension CategoryLocalModelQueryWhereSort
     on QueryBuilder<CategoryLocalModel, CategoryLocalModel, QWhere> {
   QueryBuilder<CategoryLocalModel, CategoryLocalModel, QAfterWhere> anyId() {
@@ -267,6 +340,58 @@ extension CategoryLocalModelQueryWhere
           includeUpper: includeUpper,
         ),
       );
+    });
+  }
+
+  QueryBuilder<CategoryLocalModel, CategoryLocalModel, QAfterWhereClause>
+  idServerEqualTo(String idServer) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        IndexWhereClause.equalTo(indexName: r'idServer', value: [idServer]),
+      );
+    });
+  }
+
+  QueryBuilder<CategoryLocalModel, CategoryLocalModel, QAfterWhereClause>
+  idServerNotEqualTo(String idServer) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'idServer',
+                lower: [],
+                upper: [idServer],
+                includeUpper: false,
+              ),
+            )
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'idServer',
+                lower: [idServer],
+                includeLower: false,
+                upper: [],
+              ),
+            );
+      } else {
+        return query
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'idServer',
+                lower: [idServer],
+                includeLower: false,
+                upper: [],
+              ),
+            )
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'idServer',
+                lower: [],
+                upper: [idServer],
+                includeUpper: false,
+              ),
+            );
+      }
     });
   }
 }

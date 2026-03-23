@@ -1,10 +1,10 @@
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import 'package:money_manage_flutter/export/core.dart';
-import '../../../../category/data/model/local/category_local_model.dart';
-import '../../../../category/presentation/provider/category_provider.dart';
-import '../../../../category/presentation/widget/category_grid_view_widget.dart';
-import '../provider/transaction_provider.dart';
+import '../../../../../category/data/model/local/category_local_model.dart';
+import '../../../../../category/presentation/provider/category_provider.dart';
+import '../../../../../category/presentation/widget/category_grid_view_widget.dart';
+import '../../provider/transaction_form_provider.dart';
 
 class CategoryPickedWidget extends HookConsumerWidget {
   const CategoryPickedWidget({super.key});
@@ -13,11 +13,8 @@ class CategoryPickedWidget extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tabController = useTabController(initialLength: 2);
 
-    final incomeCategoriesAsync = ref.watch(
-      quickSelectCategoryProvider(TransactionType.INCOME),
-    );
-    final expenseCategoriesAsync = ref.watch(
-      quickSelectCategoryProvider(TransactionType.EXPENSE),
+    final selectedCategory = ref.watch(
+      transactionFormProvider.select((s) => s.category),
     );
 
     return SizedBox(
@@ -44,15 +41,15 @@ class CategoryPickedWidget extends HookConsumerWidget {
                 child: TabBarView(
                   controller: tabController,
                   children: [
-                    _buildCategoryGrid(
-                      ref,
-                      incomeCategoriesAsync,
-                      TransactionType.INCOME,
+                    _CategoryGridSection(
+                      type: TransactionType.INCOME,
+                      tabController: tabController,
+                      selectedId: selectedCategory?.idServer,
                     ),
-                    _buildCategoryGrid(
-                      ref,
-                      expenseCategoriesAsync,
-                      TransactionType.EXPENSE,
+                    _CategoryGridSection(
+                      type: TransactionType.EXPENSE,
+                      tabController: tabController,
+                      selectedId: selectedCategory?.idServer,
                     ),
                   ],
                 ),
@@ -63,41 +60,24 @@ class CategoryPickedWidget extends HookConsumerWidget {
       ),
     );
   }
+}
 
-  void _showAllCategories(
-    BuildContext context,
-    TransactionType type,
-    WidgetRef ref,
-    AsyncValue<List<CategoryLocalModel>> asyncCategories,
-  ) async {
-    final catePick = await showModalBottomSheet<CategoryLocalModel>(
-      context: context,
-      backgroundColor: Colors.white,
-      builder: (context) {
-        return PaddingStyle(
-          child: CategoryGridViewWidget(
-            provider: loadingCategoryByTypeProvider(type),
-            isPickedCate: true,
-          ),
-        );
-      },
-    );
+class _CategoryGridSection extends ConsumerWidget {
+  final TransactionType type;
+  final TabController tabController;
+  final String? selectedId;
 
-    if (catePick != null) {
-      ref.read(selectedCategoryProvider.notifier).state = catePick;
-      ref
-          .read(quickSelectCategoryProvider(type).notifier)
-          .addCategory(catePick);
-    }
-  }
+  const _CategoryGridSection({
+    required this.type,
+    required this.tabController,
+    this.selectedId,
+  });
 
-  Widget _buildCategoryGrid(
-    WidgetRef ref,
-    AsyncValue<List<CategoryLocalModel>> asyncCategories,
-    TransactionType type,
-  ) {
-    final selectedCategory = ref.watch(selectedCategoryProvider);
-    return asyncCategories.when(
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final categoriesAsync = ref.watch(quickSelectCategoryProvider(type));
+
+    return categoriesAsync.when(
       loading: () => const Center(child: LoadingWidget()),
       error: (e, st) => Center(child: Text(e.toString())),
       data: (categories) => GridView.builder(
@@ -106,33 +86,53 @@ class CategoryPickedWidget extends HookConsumerWidget {
           crossAxisCount: SizeAppUtils().isTablet ? 3 : 2,
           mainAxisSpacing: 10,
           crossAxisSpacing: 10,
-          childAspectRatio: 1 / 2,
+          childAspectRatio: 0.5,
         ),
         itemCount: categories.length + 1,
         itemBuilder: (context, index) {
-          final isFirstItem = index == 0;
-
-          if (isFirstItem) {
+          if (index == 0) {
             return _CategoryItem(
-              category: null,
               isAddItem: true,
-              onTap: () =>
-                  _showAllCategories(context, type, ref, asyncCategories),
+              onTap: () => _handlePickCategory(context, ref),
             );
           }
           final item = categories[index - 1];
-          final isSelected = selectedCategory?.idServer == item.idServer;
           return _CategoryItem(
             category: item,
-            isAddItem: false,
-            isSelected: isSelected,
-            onTap: () {
-              ref.read(selectedCategoryProvider.notifier).state = item;
-            },
+            isSelected: selectedId == item.idServer,
+            onTap: () =>
+                ref.read(transactionFormProvider.notifier).updateCategory(item),
           );
         },
       ),
     );
+  }
+
+  void _handlePickCategory(BuildContext context, WidgetRef ref) async {
+    final catePick = await showModalBottomSheet<CategoryLocalModel>(
+      context: context,
+      builder: (context) => PaddingStyle(
+        isVerticalPadding: true,
+        child: CategoryGridViewWidget(
+          provider: loadingCategoryProvider,
+          isPickedCate: true,
+        ),
+      ),
+    );
+
+    if (catePick != null) {
+      final notifier = ref.read(transactionFormProvider.notifier);
+      notifier.updateCategory(catePick);
+
+      // Cập nhật danh sách chọn nhanh
+      final type = catePick.type ?? TransactionType.EXPENSE;
+      ref
+          .read(quickSelectCategoryProvider(type).notifier)
+          .addCategory(catePick);
+
+      // Chuyển tab nếu cần
+      tabController.animateTo(type == TransactionType.INCOME ? 0 : 1);
+    }
   }
 }
 

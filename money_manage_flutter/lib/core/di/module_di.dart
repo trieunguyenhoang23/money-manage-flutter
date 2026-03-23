@@ -1,15 +1,17 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:isar_community/isar.dart';
 import 'package:money_manage_flutter/export/core.dart';
-import 'package:money_manage_flutter/features/main_features/profile/data/model/local/user_local_model.dart';
-import 'package:money_manage_flutter/features/main_features/transactions/data/model/local/transaction_local_model.dart';
 import '../../export/core_external.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/category/data/model/local/category_local_model.dart';
+import '../../features/main_features/profile/data/model/local/user_local_model.dart';
+import '../../features/main_features/transactions/data/model/local/transaction_local_model.dart';
 import '../network/auth_interceptor.dart';
 
 @module
@@ -63,6 +65,12 @@ abstract class ModuleDI {
 
     return await Isar.open(schemas, directory: dir.path, inspector: kDebugMode);
   }
+
+  @lazySingleton
+  ImagePicker get imagePicker => ImagePicker();
+
+  @lazySingleton
+  Connectivity get connectivity => Connectivity();
 
   // @lazySingleton
   // List<NotificationHandler> provideNotificationHandlers(

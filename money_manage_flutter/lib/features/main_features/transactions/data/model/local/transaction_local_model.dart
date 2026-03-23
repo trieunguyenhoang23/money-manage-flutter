@@ -1,5 +1,7 @@
+import 'dart:typed_data';
 import 'package:isar_community/isar.dart';
 import 'package:money_manage_flutter/features/category/data/model/local/category_local_model.dart';
+import 'package:uuid/uuid.dart';
 import '../../../../../../core/enum/transaction_type.dart';
 
 part 'transaction_local_model.g.dart';
@@ -11,7 +13,7 @@ class TransactionLocalModel {
 
   // The UUID from your Server/Remote model
   @Index(unique: true, replace: true)
-  String? idServer;
+  String idServer = const Uuid().v4();
 
   @Enumerated(EnumType.name)
   late TransactionType type;
@@ -19,10 +21,12 @@ class TransactionLocalModel {
   late double amount;
   late String currency;
   late String note;
-  late String imageDescription;
+  String? imageUrl;
+  List<int>? imageBytes;
+  late DateTime transactionAt;
   late DateTime createdAt;
   late DateTime updatedAt;
-  late String userId;
+  String? userId;
   late String categoryId;
   final category = IsarLink<CategoryLocalModel>();
   String? reminderId;
@@ -37,7 +41,7 @@ class TransactionLocalModel {
       ..amount = remote.amount
       ..currency = remote.currency
       ..note = remote.note
-      ..imageDescription = remote.transactionDate
+      ..imageUrl = remote.transactionDate
       ..createdAt = remote.createdAt
       ..updatedAt = remote.updatedAt
       ..userId = remote.userId
@@ -54,7 +58,7 @@ class TransactionLocalModel {
       'amount': amount,
       'currency': currency,
       'note': note,
-      'image_description': imageDescription,
+      'image_description': imageUrl,
       'created_at': createdAt.toUtc().toIso8601String(),
       'updated_at': updatedAt.toUtc().toIso8601String(),
       'user_id': userId,

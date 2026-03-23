@@ -10,6 +10,18 @@ class TransactionsLocalDatasource {
 
   TransactionsLocalDatasource(this._isar);
 
+  Future<List<TransactionLocalModel>> loadByPage(
+    int page,
+    int limitCount,
+  ) async {
+    return await _isar.transactionLocalModels
+        .where()
+        .sortByCreatedAtDesc()
+        .offset(page * limitCount)
+        .limit(limitCount)
+        .findAll();
+  }
+
   Future<List<CategoryLocalModel>> getRecentActiveCategories(
     int range,
     TransactionType type,
@@ -38,14 +50,22 @@ class TransactionsLocalDatasource {
     }
 
     //Fallback
-    if (categories.isEmpty) {
-      return await _isar.categoryLocalModels
+    if (categories.isEmpty || categoryIds.length - range < 0) {
+      final moreLoadingCate = await _isar.categoryLocalModels
           .filter()
           .typeEqualTo(type)
           .limit(range)
           .findAll();
+
+      categories.addAll(moreLoadingCate);
     }
 
     return categories;
+  }
+
+  Future<void> addTransaction(TransactionLocalModel transaction) async {
+    _isar.writeTxn(() async {
+      await _isar.transactionLocalModels.put(transaction);
+    });
   }
 }

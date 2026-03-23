@@ -1,15 +1,18 @@
 import 'package:money_manage_flutter/core/extension/context_extension.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
+import '../../provider/transaction_form_provider.dart';
 
 class InputNoteWidget extends HookConsumerWidget {
-  final Function(String note) onChangeData;
-
-  const InputNoteWidget({super.key, required this.onChangeData});
+  const InputNoteWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final noteController = useTextEditingController();
+    final inputNoteState = ref.watch(
+      transactionFormProvider.select((s) => s.note),
+    );
+    final inputNoteNotifier = ref.watch(transactionFormProvider.notifier);
+    final noteController = useTextEditingController(text: inputNoteState);
 
     return SizedBox(
       width: 1.sw,
@@ -31,7 +34,7 @@ class InputNoteWidget extends HookConsumerWidget {
                   hintText: context.lang.note,
                   textController: noteController,
                   onChange: (value) {
-                    onChangeData(value);
+                    inputNoteNotifier.updateNote(value);
                   },
                   onSubmit: (value) {},
                   onClearText: () {},
