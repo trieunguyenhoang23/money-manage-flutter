@@ -23,6 +23,7 @@ class MessageLookup extends MessageLookupByLibrary {
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "analytics": MessageLookupByLibrary.simpleMessage("Analysis"),
+    "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
     "category": MessageLookupByLibrary.simpleMessage("Category"),
     "category_create_new": MessageLookupByLibrary.simpleMessage("New category"),
     "category_edit": MessageLookupByLibrary.simpleMessage("Edit Category"),
@@ -35,6 +36,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "category_error_server": MessageLookupByLibrary.simpleMessage(
       "Something went wrong on our end",
     ),
+    "confirm": MessageLookupByLibrary.simpleMessage("Confirm"),
     "create": MessageLookupByLibrary.simpleMessage("Create"),
     "created_at": MessageLookupByLibrary.simpleMessage("Create at:"),
     "description": MessageLookupByLibrary.simpleMessage("Description"),
@@ -54,11 +56,23 @@ class MessageLookup extends MessageLookupByLibrary {
     "transaction_create_new": MessageLookupByLibrary.simpleMessage(
       "New Transaction",
     ),
+    "transaction_delete_item_content": MessageLookupByLibrary.simpleMessage(
+      "Once deleted, you won\'t be able to recover this record",
+    ),
+    "transaction_delete_item_title": MessageLookupByLibrary.simpleMessage(
+      "Delete this transaction?",
+    ),
+    "transaction_update": MessageLookupByLibrary.simpleMessage(
+      "Update Transaction",
+    ),
     "transaction_validator_empty_amount": MessageLookupByLibrary.simpleMessage(
       "Please enter an amount",
     ),
     "transaction_validator_empty_category":
         MessageLookupByLibrary.simpleMessage("Please choose one category"),
+    "transaction_validator_no_change": MessageLookupByLibrary.simpleMessage(
+      "No changes detected.",
+    ),
     "transactions_expense": MessageLookupByLibrary.simpleMessage("Expense"),
     "transactions_income": MessageLookupByLibrary.simpleMessage("Income"),
     "update": MessageLookupByLibrary.simpleMessage("Update"),

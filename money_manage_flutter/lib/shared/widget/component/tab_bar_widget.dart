@@ -23,12 +23,14 @@ class _TabBarWidgetState extends State<TabBarWidget>
   List<String> get listType => widget.listType;
 
   TabController get tabController => widget.tabController;
-  ValueNotifier<int> onPageChangeNotifier = ValueNotifier(0);
+  late ValueNotifier<int> onPageChangeNotifier;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    onPageChangeNotifier = ValueNotifier(tabController.index);
+
     tabController.animation?.addListener(() {
       final value = tabController.animation!.value.round();
       onPageChangeNotifier.value = value;

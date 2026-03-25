@@ -2,7 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
-import '../provider/transaction_form_provider.dart';
+import '../provider/transaction_create_provider.dart';
 import '../provider/transaction_provider.dart';
 import '../widget/transaction_form/category_picked_widget.dart';
 import '../widget/transaction_form/date_picked_widget.dart';
@@ -33,19 +33,24 @@ class _CreateTransactionScreenState
       _buildSubmitButton(),
     ];
 
-    return Scaffold(
-      appBar: AppBarWidget(title: context.lang.transaction_create_new),
-      body: PaddingStyle(
-        child: Form(
-          key: _formKey,
-          child: CustomScrollView(
-            slivers: [
-              for (var item in items) ...[
+    return ProviderScope(
+      overrides: [
+        currentTransactionProvider.overrideWithValue(transactionCreateProvider),
+      ],
+      child: Scaffold(
+        appBar: AppBarWidget(title: context.lang.transaction_create_new),
+        body: PaddingStyle(
+          child: Form(
+            key: _formKey,
+            child: CustomScrollView(
+              slivers: [
+                for (var item in items) ...[
+                  const SliverToBoxAdapter(child: SpacingStyle()),
+                  SliverToBoxAdapter(child: item),
+                ],
                 const SliverToBoxAdapter(child: SpacingStyle()),
-                SliverToBoxAdapter(child: item),
               ],
-              const SliverToBoxAdapter(child: SpacingStyle()),
-            ],
+            ),
           ),
         ),
       ),
@@ -54,42 +59,7 @@ class _CreateTransactionScreenState
 
   Widget _buildSubmitButton() {
     return BtnMainWidget(
-      onTap: () async {
-        if (_formKey.currentState!.validate()) {
-          DialogUtils.loading(context);
-          await ref.read(transactionFormProvider.notifier).submit().then((
-            result,
-          ) {
-            if (result == null) {
-              if (mounted) {
-                ToastUtils.showToastFailed(
-                  context.lang.transaction_validator_empty_category,
-                );
-
-                /// Pop dialog loading
-                context.pop();
-              }
-              return;
-            }
-
-            result.fold(
-              (error) {
-                /// Pop dialog loading
-                context.pop();
-                ToastUtils.showToastFailed(error.message);
-              },
-              (transactionLocal) {
-                ref
-                    .read(loadingTransactionProvider.notifier)
-                    .addToFirst(transactionLocal);
-
-                /// Pop until reaching main screen & switch to transaction tab
-                NavigatorRouter.popAndSwitchTabMainBranch(context, 0);
-              },
-            );
-          });
-        }
-      },
+      onTap: _onCreate,
       color: ColorConstant.primary,
       child: TextGGStyle(
         context.lang.create,
@@ -98,5 +68,41 @@ class _CreateTransactionScreenState
         fontWeight: FontWeight.bold,
       ),
     );
+  }
+
+  Future<void> _onCreate() async {
+    if (_formKey.currentState!.validate()) {
+      DialogUtils.loading(context);
+      final notifier = ref.read(transactionCreateProvider.notifier);
+      await notifier.submit().then((result) {
+        if (result == null) {
+          if (mounted) {
+            ToastUtils.showToastFailed(
+              context.lang.transaction_validator_empty_category,
+            );
+
+            /// Pop dialog loading
+            context.pop();
+          }
+          return;
+        }
+
+        result.fold(
+          (error) {
+            /// Pop dialog loading
+            context.pop();
+            ToastUtils.showToastFailed(error.message);
+          },
+          (transactionLocal) {
+            ref
+                .read(loadingTransactionProvider.notifier)
+                .addToFirst(transactionLocal);
+
+            /// Pop until reaching main screen & switch to transaction tab
+            NavigatorRouter.popAndSwitchTabMainBranch(context, 0);
+          },
+        );
+      });
+    }
   }
 }

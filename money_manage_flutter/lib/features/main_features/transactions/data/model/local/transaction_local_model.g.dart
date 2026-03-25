@@ -119,7 +119,12 @@ int _transactionLocalModelEstimateSize(
   var bytesCount = offsets.last;
   bytesCount += 3 + object.categoryId.length * 3;
   bytesCount += 3 + object.currency.length * 3;
-  bytesCount += 3 + object.idServer.length * 3;
+  {
+    final value = object.idServer;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   {
     final value = object.imageBytes;
     if (value != null) {
@@ -177,26 +182,27 @@ TransactionLocalModel _transactionLocalModelDeserialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = TransactionLocalModel();
-  object.amount = reader.readDouble(offsets[0]);
-  object.categoryId = reader.readString(offsets[1]);
-  object.createdAt = reader.readDateTime(offsets[2]);
-  object.currency = reader.readString(offsets[3]);
+  final object = TransactionLocalModel(
+    amount: reader.readDoubleOrNull(offsets[0]) ?? 0.0,
+    categoryId: reader.readStringOrNull(offsets[1]) ?? '',
+    createdAt: reader.readDateTime(offsets[2]),
+    currency: reader.readStringOrNull(offsets[3]) ?? 'VND',
+    idServer: reader.readStringOrNull(offsets[4]),
+    imageBytes: reader.readLongList(offsets[5]),
+    imageUrl: reader.readStringOrNull(offsets[6]),
+    isSynced: reader.readBoolOrNull(offsets[7]) ?? false,
+    note: reader.readStringOrNull(offsets[8]) ?? '',
+    reminderId: reader.readStringOrNull(offsets[9]),
+    transactionAt: reader.readDateTime(offsets[10]),
+    type:
+        _TransactionLocalModeltypeValueEnumMap[reader.readStringOrNull(
+          offsets[11],
+        )] ??
+        TransactionType.EXPENSE,
+    updatedAt: reader.readDateTime(offsets[12]),
+    userId: reader.readStringOrNull(offsets[13]),
+  );
   object.id = id;
-  object.idServer = reader.readString(offsets[4]);
-  object.imageBytes = reader.readLongList(offsets[5]);
-  object.imageUrl = reader.readStringOrNull(offsets[6]);
-  object.isSynced = reader.readBool(offsets[7]);
-  object.note = reader.readString(offsets[8]);
-  object.reminderId = reader.readStringOrNull(offsets[9]);
-  object.transactionAt = reader.readDateTime(offsets[10]);
-  object.type =
-      _TransactionLocalModeltypeValueEnumMap[reader.readStringOrNull(
-        offsets[11],
-      )] ??
-      TransactionType.INCOME;
-  object.updatedAt = reader.readDateTime(offsets[12]);
-  object.userId = reader.readStringOrNull(offsets[13]);
   return object;
 }
 
@@ -208,23 +214,23 @@ P _transactionLocalModelDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readDoubleOrNull(offset) ?? 0.0) as P;
     case 1:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset) ?? '') as P;
     case 2:
       return (reader.readDateTime(offset)) as P;
     case 3:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset) ?? 'VND') as P;
     case 4:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 5:
       return (reader.readLongList(offset)) as P;
     case 6:
       return (reader.readStringOrNull(offset)) as P;
     case 7:
-      return (reader.readBool(offset)) as P;
+      return (reader.readBoolOrNull(offset) ?? false) as P;
     case 8:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset) ?? '') as P;
     case 9:
       return (reader.readStringOrNull(offset)) as P;
     case 10:
@@ -233,7 +239,7 @@ P _transactionLocalModelDeserializeProp<P>(
       return (_TransactionLocalModeltypeValueEnumMap[reader.readStringOrNull(
                 offset,
               )] ??
-              TransactionType.INCOME)
+              TransactionType.EXPENSE)
           as P;
     case 12:
       return (reader.readDateTime(offset)) as P;
@@ -279,42 +285,42 @@ void _transactionLocalModelAttach(
 
 extension TransactionLocalModelByIndex
     on IsarCollection<TransactionLocalModel> {
-  Future<TransactionLocalModel?> getByIdServer(String idServer) {
+  Future<TransactionLocalModel?> getByIdServer(String? idServer) {
     return getByIndex(r'idServer', [idServer]);
   }
 
-  TransactionLocalModel? getByIdServerSync(String idServer) {
+  TransactionLocalModel? getByIdServerSync(String? idServer) {
     return getByIndexSync(r'idServer', [idServer]);
   }
 
-  Future<bool> deleteByIdServer(String idServer) {
+  Future<bool> deleteByIdServer(String? idServer) {
     return deleteByIndex(r'idServer', [idServer]);
   }
 
-  bool deleteByIdServerSync(String idServer) {
+  bool deleteByIdServerSync(String? idServer) {
     return deleteByIndexSync(r'idServer', [idServer]);
   }
 
   Future<List<TransactionLocalModel?>> getAllByIdServer(
-    List<String> idServerValues,
+    List<String?> idServerValues,
   ) {
     final values = idServerValues.map((e) => [e]).toList();
     return getAllByIndex(r'idServer', values);
   }
 
   List<TransactionLocalModel?> getAllByIdServerSync(
-    List<String> idServerValues,
+    List<String?> idServerValues,
   ) {
     final values = idServerValues.map((e) => [e]).toList();
     return getAllByIndexSync(r'idServer', values);
   }
 
-  Future<int> deleteAllByIdServer(List<String> idServerValues) {
+  Future<int> deleteAllByIdServer(List<String?> idServerValues) {
     final values = idServerValues.map((e) => [e]).toList();
     return deleteAllByIndex(r'idServer', values);
   }
 
-  int deleteAllByIdServerSync(List<String> idServerValues) {
+  int deleteAllByIdServerSync(List<String?> idServerValues) {
     final values = idServerValues.map((e) => [e]).toList();
     return deleteAllByIndexSync(r'idServer', values);
   }
@@ -424,7 +430,30 @@ extension TransactionLocalModelQueryWhere
   }
 
   QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterWhereClause>
-  idServerEqualTo(String idServer) {
+  idServerIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        IndexWhereClause.equalTo(indexName: r'idServer', value: [null]),
+      );
+    });
+  }
+
+  QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterWhereClause>
+  idServerIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        IndexWhereClause.between(
+          indexName: r'idServer',
+          lower: [null],
+          includeLower: false,
+          upper: [],
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterWhereClause>
+  idServerEqualTo(String? idServer) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         IndexWhereClause.equalTo(indexName: r'idServer', value: [idServer]),
@@ -433,7 +462,7 @@ extension TransactionLocalModelQueryWhere
   }
 
   QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterWhereClause>
-  idServerNotEqualTo(String idServer) {
+  idServerNotEqualTo(String? idServer) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -1083,7 +1112,33 @@ extension TransactionLocalModelQueryFilter
     TransactionLocalModel,
     QAfterFilterCondition
   >
-  idServerEqualTo(String value, {bool caseSensitive = true}) {
+  idServerIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'idServer'),
+      );
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  idServerIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'idServer'),
+      );
+    });
+  }
+
+  QueryBuilder<
+    TransactionLocalModel,
+    TransactionLocalModel,
+    QAfterFilterCondition
+  >
+  idServerEqualTo(String? value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.equalTo(
@@ -1101,7 +1156,7 @@ extension TransactionLocalModelQueryFilter
     QAfterFilterCondition
   >
   idServerGreaterThan(
-    String value, {
+    String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -1123,7 +1178,7 @@ extension TransactionLocalModelQueryFilter
     QAfterFilterCondition
   >
   idServerLessThan(
-    String value, {
+    String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -1145,8 +1200,8 @@ extension TransactionLocalModelQueryFilter
     QAfterFilterCondition
   >
   idServerBetween(
-    String lower,
-    String upper, {
+    String? lower,
+    String? upper, {
     bool includeLower = true,
     bool includeUpper = true,
     bool caseSensitive = true,
@@ -3136,7 +3191,7 @@ extension TransactionLocalModelQueryProperty
     });
   }
 
-  QueryBuilder<TransactionLocalModel, String, QQueryOperations>
+  QueryBuilder<TransactionLocalModel, String?, QQueryOperations>
   idServerProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'idServer');

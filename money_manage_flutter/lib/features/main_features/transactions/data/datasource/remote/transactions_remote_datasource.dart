@@ -1,9 +1,69 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
 import 'package:injectable/injectable.dart';
 import 'package:money_manage_flutter/export/infrastructure.dart';
+import 'package:money_manage_flutter/export/core.dart';
 
 @LazySingleton()
 class TransactionsRemoteDatasource {
   final DioService _dioService;
 
   TransactionsRemoteDatasource(this._dioService);
+
+  Future<ApiResult> uploadTransaction(
+    Map<String, dynamic> jsonBodyRequest, {
+    Uint8List? image_description_buffer,
+    String? image_name,
+  }) async {
+    FormData formData = FormData.fromMap(jsonBodyRequest);
+
+    if (image_description_buffer != null && image_name != null) {
+      formData.files.add(
+        MapEntryUtils.getMapEntry(
+          'image_bytes',
+          image_description_buffer,
+          image_name,
+        ),
+      );
+    }
+
+    final response = await _dioService.post(
+      TransactionAPI.post_transactions,
+      formData,
+    );
+
+    return response;
+  }
+
+  Future<ApiResult> updateTransaction(
+    Map<String, dynamic> jsonBodyRequest, {
+    required String id,
+    Uint8List? image_description_buffer,
+    String? image_name,
+  }) async {
+    FormData formData = FormData.fromMap(jsonBodyRequest);
+
+    if (image_description_buffer != null && image_name != null) {
+      formData.files.add(
+        MapEntryUtils.getMapEntry(
+          'image_bytes',
+          image_description_buffer,
+          image_name,
+        ),
+      );
+    }
+
+    final response = await _dioService.patch(
+      '${TransactionAPI.patch_transactions}/$id',
+      formData,
+    );
+
+    return response;
+  }
+
+  Future<ApiResult> removeTransaction(String id) async {
+    return await _dioService.delete(
+      '${TransactionAPI.delete_transactions}/$id',
+    );
+  }
 }

@@ -1,118 +1,170 @@
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:money_manage_flutter/core/utils/string_utils.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/router.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import 'package:money_manage_flutter/export/shared.dart';
+import '../../../../../core/di/injection.dart';
 import '../../data/model/local/transaction_local_model.dart';
+import '../../domain/usecase/remove_transaction_usecase.dart';
+import '../provider/transaction_provider.dart';
 
-class TransactionItemWidget extends StatelessWidget {
+class TransactionItemWidget extends ConsumerWidget {
   final TransactionLocalModel item;
 
   const TransactionItemWidget({super.key, required this.item});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return PaddingStyle(
-      child: InkWell(
-        onTap: () {
-          NavigatorRouter.pushNamed(
-            context,
-            TransactionsRoutes.editTransactionName,
-            extra: item,
-          );
-        },
-        child: LayoutBuilder(
-          builder: (context, cc) {
-            return Container(
-              decoration: BoxDecoration(
-                color: ColorConstant.neutral200,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(cc.maxHeight * 0.1),
-                ),
-                boxShadow: [shadowStyle(Colors.black12, const Offset(0, 2), 5)],
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  vertical: cc.maxHeight * 0.05,
-                  horizontal: cc.maxWidth * 0.025,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      child: LayoutBuilder(
+        builder: (context, cc) {
+          Radius radius = Radius.circular(cc.maxHeight * 0.1);
+          return RepaintBoundary(
+            child: ClipRRect(
+              borderRadius: BorderRadius.all(radius),
+              child: Slidable(
+                key: ValueKey(item.idServer),
+
+                endActionPane: ActionPane(
+                  motion: const BehindMotion(),
+                  extentRatio: 0.25,
                   children: [
-                    Expanded(
-                      flex: 4,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Consumer(
+                      builder: (context, ref, _) {
+                        return SlidableAction(
+                          onPressed: (context) async =>
+                              await _onDelete(context, ref),
+                          backgroundColor: Colors.red,
+                          foregroundColor: ColorConstant.neutral200,
+                          icon: Icons.delete,
+                          padding: EdgeInsets.zero,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                child: InkWell(
+                  ///Navigate to detail screen
+                  onTap: () {
+                    NavigatorRouter.pushNamed(
+                      context,
+                      TransactionsRoutes.editTransactionName,
+                      extra: item,
+                    );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: ColorConstant.neutral200,
+                      boxShadow: [
+                        shadowStyle(Colors.black12, const Offset(0, 2), 5),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: cc.maxHeight * 0.05,
+                        horizontal: cc.maxWidth * 0.025,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: TextGGStyle(
-                              StringUtils.formatPrice(
-                                item.amount.toString(),
-                                item.currency,
-                              ),
-                              cc.maxWidth * 0.05,
-                              fontWeight: FontWeight.w600,
+                          Expanded(
+                            flex: 4,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: TextGGStyle(
+                                    StringUtils.formatPrice(
+                                      item.amount.toString(),
+                                      item.currency,
+                                    ),
+                                    cc.maxWidth * 0.05,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                TextGGStyle(
+                                  item.type.displayTitle(context),
+                                  cc.maxWidth * 0.035,
+                                  color: item.type.color,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ],
                             ),
                           ),
-                          TextGGStyle(
-                            item.type.displayTitle(context),
-                            cc.maxWidth * 0.035,
-                            color: item.type.color,
-                            fontWeight: FontWeight.w600,
+                          Expanded(
+                            flex: 3,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextGGStyle(
+                                item.note,
+                                cc.maxWidth * 0.035,
+                                color: ColorConstant.neutral400,
+                                maxLines: 2,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 3,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  alignment: Alignment.centerLeft,
+                                  child: TextGGStyle(
+                                    item.transactionAt.formatDate(context),
+                                    cc.maxWidth * 0.035,
+                                    color: ColorConstant.neutral400,
+                                    maxLines: 2,
+                                  ),
+                                ),
+                                Icon(
+                                  item.isSynced
+                                      ? Icons.cloud
+                                      : Icons.downloading_sharp,
+                                  color: ColorConstant.warning700,
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
                     ),
-                    Expanded(
-                      flex: 3,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextGGStyle(
-                          item.note,
-                          cc.maxWidth * 0.035,
-                          color: ColorConstant.neutral400,
-                          maxLines: 2,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextGGStyle(
-                          '${context.lang.transaction_at} ${item.transactionAt.formatFull(context)}',
-                          cc.maxWidth * 0.035,
-                          color: ColorConstant.neutral400,
-                          maxLines: 2,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: TextGGStyle(
-                        '${context.lang.created_at} ${item.createdAt.formatFull(context)}',
-                        cc.maxWidth * 0.035,
-                        color: ColorConstant.neutral400,
-                        maxLines: 2,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: TextGGStyle(
-                        '${context.lang.updated_at} ${item.updatedAt.formatFull(context)}',
-                        cc.maxWidth * 0.035,
-                        color: ColorConstant.neutral400,
-                        maxLines: 2,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
+    );
+  }
+
+  Future<void> _onDelete(BuildContext context, WidgetRef ref) async {
+    final transactionNotifier = ref.read(loadingTransactionProvider.notifier);
+
+    final title = context.lang.transaction_delete_item_title;
+    final content = context.lang.transaction_delete_item_content;
+
+    DialogUtils.handleDecision(
+      context,
+      title: title,
+      content: content,
+      onConfirm: () async {
+        final result = await getIt<RemoveTransactionUseCase>().execute(item);
+
+        result.fold(
+          (error) {
+            if (context.mounted) {
+              DialogUtils.handleDecision(context, title: error.message);
+            }
+          },
+          (isSuccess) {
+            transactionNotifier.removeItem(item);
+          },
+        );
+      },
     );
   }
 }

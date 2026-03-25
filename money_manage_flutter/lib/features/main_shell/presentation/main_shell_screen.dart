@@ -36,7 +36,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
           isCentralTitle: true,
           actionBtn: [
             BtnAppbarWidget(
-              widget: const Icon(Icons.add, color: ColorConstant.primary),
+              widget: const Icon(Icons.sort, color: ColorConstant.primary),
               onTap: () {
                 NavigatorRouter.pushNamed(
                   context,

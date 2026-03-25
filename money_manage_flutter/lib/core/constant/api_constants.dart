@@ -29,3 +29,17 @@ class CategoryAPI {
   static String get patch_category_by_id =>
       '${APIConstants.bareUrl}/patch/categories';
 }
+
+class TransactionAPI {
+  /// POST
+  static String get post_transactions =>
+      '${APIConstants.bareUrl}/post/transactions';
+
+  /// PATCH
+  static String get patch_transactions =>
+      '${APIConstants.bareUrl}/patch/transactions';
+
+  /// DELETE
+  static String get delete_transactions =>
+      '${APIConstants.bareUrl}/delete/transactions';
+}

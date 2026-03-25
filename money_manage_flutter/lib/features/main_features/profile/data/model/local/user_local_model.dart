@@ -1,5 +1,4 @@
 import 'package:isar_community/isar.dart';
-import '../remote/user_remote_model.dart';
 
 part 'user_local_model.g.dart';
 

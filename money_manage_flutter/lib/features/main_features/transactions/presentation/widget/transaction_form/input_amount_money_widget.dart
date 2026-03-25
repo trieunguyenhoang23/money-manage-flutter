@@ -1,22 +1,25 @@
 import 'package:money_manage_flutter/core/extension/context_extension.dart';
+import 'package:money_manage_flutter/core/utils/currency_formatter_utils.dart';
+import 'package:money_manage_flutter/core/utils/string_utils.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
-import '../../provider/transaction_form_provider.dart';
+import '../../../data/model/local/transaction_local_model.dart';
+import '../../provider/transaction_provider.dart';
 
 class InputAmountMoneyWidget extends HookConsumerWidget {
-  const InputAmountMoneyWidget({super.key});
+  final TransactionLocalModel? updateTrans;
+
+  const InputAmountMoneyWidget({super.key, this.updateTrans});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final inputAmountMoneyState = ref.watch(
-      transactionFormProvider.select((s) => s.amount),
-    );
-    final inputAmountMoneyNotifier = ref.watch(
-      transactionFormProvider.notifier,
-    );
+    final provider = ref.read(currentTransactionProvider);
+
+    final amountNotifier = ref.read(provider.notifier);
+    final amountState = ref.read(provider.select((s) => s.amount));
 
     final inputController = useTextEditingController(
-      text: inputAmountMoneyState.toString(),
+      text: StringUtils.formatNumber(amountState.toString()),
     );
 
     useListenable(inputController);
@@ -47,7 +50,7 @@ class InputAmountMoneyWidget extends HookConsumerWidget {
 
                   if (cleanValue.isNotEmpty) {
                     final amount = double.tryParse(cleanValue) ?? 0;
-                    inputAmountMoneyNotifier.updateAmount(amount);
+                    amountNotifier.updateAmount(amount);
                   }
                 },
                 onSubmit: (value) {},

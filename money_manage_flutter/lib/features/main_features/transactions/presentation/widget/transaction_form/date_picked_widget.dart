@@ -1,34 +1,34 @@
-import 'package:money_manage_flutter/core/constant/color_constant.dart';
-import 'package:money_manage_flutter/core/extension/date_extension.dart';
+import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
-import '../../provider/transaction_form_provider.dart';
+import '../../provider/transaction_provider.dart';
 
 class DatePickedWidget extends ConsumerWidget {
   const DatePickedWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dateState = ref.watch(
-      transactionFormProvider.select((s) => s.transactionAt),
-    );
-    final dateNotifier = ref.read(transactionFormProvider.notifier);
+    final provider = ref.read(currentTransactionProvider);
+    final dateNotifier = ref.read(provider.notifier);
+    final dateState = ref.read(provider.select((s) => s.transactionAt));
+    DateTime datePicked = dateState;
 
     return StatefulBuilder(
       builder: (context, ss) {
         return InkWell(
           onTap: () async {
-            final DateTime? datePicked = await showDatePicker(
+            final DateTime? datePickedTemp = await showDatePicker(
               context: context,
               initialDate: DateTime.now(),
               firstDate: DateTime(2000),
               lastDate: DateTime.now(),
             );
 
-            if (datePicked != null) {
+            if (datePickedTemp != null) {
               ss(() {
-                dateNotifier.updateDate(datePicked);
+                datePicked = datePickedTemp;
               });
+              dateNotifier.updateDate(datePicked);
             }
           },
           child: SizedBox(
@@ -37,7 +37,7 @@ class DatePickedWidget extends ConsumerWidget {
               children: [
                 const Icon(Icons.calendar_month, color: ColorConstant.primary),
                 SizedBox(width: 0.05.sw),
-                TextGGStyle(dateState.formatDate(context), 0.04.sw),
+                TextGGStyle(datePicked.formatDate(context), 0.04.sw),
               ],
             ),
           ),

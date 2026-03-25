@@ -1,6 +1,5 @@
 import 'package:dartz/dartz.dart';
-import 'package:money_manage_flutter/core/enum/transaction_type.dart';
-import '../../../../../core/error/failure.dart';
+import 'package:money_manage_flutter/export/core.dart';
 import '../../../../../infrastructure/file/models/file_picked.dart';
 import '../../../../category/data/model/local/category_local_model.dart';
 import '../../data/model/local/transaction_local_model.dart';
@@ -18,6 +17,17 @@ abstract class TransactionRepository {
     required String note,
     required CategoryLocalModel category,
     required DateTime transactionAt,
-    FilePicked? image,
+    FilePicked? imageFile,
+  });
+
+  Future<Either<Failure, TransactionLocalModel>> updateTransaction({
+    required Map<String, dynamic> updateJsonRequestBody,
+    required TransactionLocalModel oldItem,
+    required CategoryLocalModel newCate,
+    FilePicked? imageFile,
+  });
+
+  Future<Either<Failure, bool>> removeTransaction({
+    required TransactionLocalModel transaction,
   });
 }

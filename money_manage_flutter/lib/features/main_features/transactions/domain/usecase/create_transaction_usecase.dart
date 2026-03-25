@@ -17,14 +17,14 @@ class CreateTransactionUseCase {
     required String note,
     required CategoryLocalModel category,
     required DateTime transactionAt,
-     FilePicked? image,
+     FilePicked? imageFile,
   }) async {
     return await _repository.addTransaction(
       amount: amount,
       note: note,
       category: category,
       transactionAt: transactionAt,
-      image: image,
+      imageFile: imageFile,
     );
   }
 }

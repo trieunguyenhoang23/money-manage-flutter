@@ -134,6 +134,16 @@ class S {
     return Intl.message('File', name: 'file', desc: '', args: []);
   }
 
+  /// `Cancel`
+  String get cancel {
+    return Intl.message('Cancel', name: 'cancel', desc: '', args: []);
+  }
+
+  /// `Confirm`
+  String get confirm {
+    return Intl.message('Confirm', name: 'confirm', desc: '', args: []);
+  }
+
   // skipped getter for the '//TRANSACTIONS' key
 
   /// `Transaction`
@@ -171,6 +181,16 @@ class S {
     );
   }
 
+  /// `Update Transaction`
+  String get transaction_update {
+    return Intl.message(
+      'Update Transaction',
+      name: 'transaction_update',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Please enter an amount`
   String get transaction_validator_empty_amount {
     return Intl.message(
@@ -186,6 +206,36 @@ class S {
     return Intl.message(
       'Please choose one category',
       name: 'transaction_validator_empty_category',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No changes detected.`
+  String get transaction_validator_no_change {
+    return Intl.message(
+      'No changes detected.',
+      name: 'transaction_validator_no_change',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete this transaction?`
+  String get transaction_delete_item_title {
+    return Intl.message(
+      'Delete this transaction?',
+      name: 'transaction_delete_item_title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Once deleted, you won't be able to recover this record`
+  String get transaction_delete_item_content {
+    return Intl.message(
+      'Once deleted, you won\'t be able to recover this record',
+      name: 'transaction_delete_item_content',
       desc: '',
       args: [],
     );

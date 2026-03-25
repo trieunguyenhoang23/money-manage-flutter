@@ -1,8 +1,8 @@
-import 'package:money_manage_flutter/shared/widget/dialog/ui/dialog_pick_file_widget.dart';
-
 import '../../../export/core.dart';
 import '../../../export/ui_external.dart';
 import '../../../infrastructure/file/models/file_picked.dart';
+import 'ui/dialog_handle_decision_widget.dart';
+import 'ui/dialog_pick_file_widget.dart';
 
 class DialogUtils {
   static loading(BuildContext context) {
@@ -31,6 +31,30 @@ class DialogUtils {
       builder: (context) {
         return const DialogPickFileWidget();
       },
+    );
+  }
+
+  static Future<T?> handleDecision<T>(
+    BuildContext context, {
+    required String title,
+    String? content,
+     String? confirmLabel,
+     VoidCallback? onConfirm,
+    String? cancelLabel,
+    VoidCallback? onCancel,
+    Color? confirmColor,
+  }) {
+    return showDialog<T>(
+      context: context,
+      builder: (context) => DecisionDialog(
+        title: title,
+        content: content,
+        confirmLabel: confirmLabel,
+        onConfirm: onConfirm,
+        cancelLabel: cancelLabel,
+        onCancel: onCancel,
+        confirmColor: confirmColor,
+      ),
     );
   }
 }

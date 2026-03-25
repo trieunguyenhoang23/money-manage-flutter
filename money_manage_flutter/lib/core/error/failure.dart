@@ -14,7 +14,13 @@ class CacheFailure extends Failure {
   const CacheFailure(super.message);
 }
 
-enum ValidationCode { nameTooShort, descriptionEmpty, invalidAmount }
+enum ValidationCode {
+  nameTooShort,
+  descriptionEmpty,
+  invalidAmount,
+  notPickCategory,
+  notChangeFormEdit,
+}
 
 class ValidationFailure extends Failure {
   final ValidationCode code;

@@ -1,17 +1,18 @@
 import 'package:money_manage_flutter/core/extension/context_extension.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
-import '../../provider/transaction_form_provider.dart';
+import 'package:money_manage_flutter/features/main_features/transactions/presentation/provider/transaction_provider.dart';
+import 'package:money_manage_flutter/features/main_features/transactions/presentation/provider/transaction_provider.dart';
+import '../../provider/transaction_create_provider.dart';
 
 class InputNoteWidget extends HookConsumerWidget {
   const InputNoteWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final inputNoteState = ref.watch(
-      transactionFormProvider.select((s) => s.note),
-    );
-    final inputNoteNotifier = ref.watch(transactionFormProvider.notifier);
+    final provider = ref.read(currentTransactionProvider);
+    final inputNoteState = ref.read(provider.select((s) => s.note));
+    final inputNoteNotifier = ref.read(provider.notifier);
     final noteController = useTextEditingController(text: inputNoteState);
 
     return SizedBox(

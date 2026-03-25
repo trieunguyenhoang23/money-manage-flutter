@@ -1,5 +1,4 @@
 import 'package:money_manage_flutter/export/core.dart';
-import 'package:money_manage_flutter/export/router.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import '../../data/model/local/category_local_model.dart';

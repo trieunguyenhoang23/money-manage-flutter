@@ -8,6 +8,7 @@ export 'package:money_manage_flutter/core/utils/toast_utils.dart';
 export 'package:money_manage_flutter/core/utils/scroll_utils.dart';
 export 'package:money_manage_flutter/core/utils/json_parse_utils.dart';
 export 'package:money_manage_flutter/core/utils/currency_formatter_utils.dart';
+export 'package:money_manage_flutter/core/utils/map_entry_utils.dart';
 
 /// Constant
 export 'package:money_manage_flutter/core/constant/color_constant.dart';
@@ -21,6 +22,7 @@ export 'package:money_manage_flutter/core/extension/date_extension.dart';
 
 /// Network
 export 'package:money_manage_flutter/core/network/api_result.dart';
+export 'package:money_manage_flutter/core/network/sync_manager.dart';
 
 /// Failure
 export 'package:money_manage_flutter/core/error/failure.dart';

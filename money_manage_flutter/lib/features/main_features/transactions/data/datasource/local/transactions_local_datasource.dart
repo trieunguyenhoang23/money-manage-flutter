@@ -26,46 +26,70 @@ class TransactionsLocalDatasource {
     int range,
     TransactionType type,
   ) async {
-    // Get the latest transactions
     final transactions = await _isar.transactionLocalModels
         .filter()
         .typeEqualTo(type)
         .sortByCreatedAtDesc()
-        .limit(range)
+        .limit(range * 3) // Take extra to avoid a lack of uniqueness
         .findAll();
 
-    final categories = <CategoryLocalModel>[];
-    final categoryIds = <String>{};
+    final result = <CategoryLocalModel>[];
+    final seen = <String>{};
 
-    for (var tx in transactions) {
-      await tx.category.load();
-
+    // Priority get Cate from transaction
+    for (final tx in transactions) {
       final category = tx.category.value;
-      if (category != null && !categoryIds.contains(category.idServer)) {
-        categories.add(category);
-        categoryIds.add(category.idServer);
+
+      if (category == null) continue;
+
+      final id = category.idServer;
+      if (seen.contains(id)) continue;
+
+      seen.add(id);
+      result.add(category);
+
+      if (result.length >= range) {
+        return result;
       }
-
-      if (categories.length >= range) break;
     }
 
-    //Fallback
-    if (categories.isEmpty || categoryIds.length - range < 0) {
-      final moreLoadingCate = await _isar.categoryLocalModels
-          .filter()
-          .typeEqualTo(type)
-          .limit(range)
-          .findAll();
+    // fallback if needing additional data
+    final fallback = await _isar.categoryLocalModels
+        .filter()
+        .typeEqualTo(type)
+        .findAll();
 
-      categories.addAll(moreLoadingCate);
+    for (final cate in fallback) {
+      final id = cate.idServer;
+      if (seen.contains(id)) continue;
+
+      seen.add(id);
+      result.add(cate);
+
+      if (result.length >= range) break;
     }
 
-    return categories;
+    return result;
   }
 
-  Future<void> addTransaction(TransactionLocalModel transaction) async {
+  Future<void> putTransaction(
+    TransactionLocalModel transaction,
+    CategoryLocalModel category,
+  ) async {
     _isar.writeTxn(() async {
       await _isar.transactionLocalModels.put(transaction);
+
+      // Link the category
+      transaction.category.value = category;
+
+      // Save the link
+      await transaction.category.save();
+    });
+  }
+
+  Future<void> removeTransaction(TransactionLocalModel transaction) async {
+    _isar.writeTxn(() async {
+      await _isar.transactionLocalModels.delete(transaction.id);
     });
   }
 }

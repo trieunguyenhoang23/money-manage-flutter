@@ -29,6 +29,7 @@ dependencies:
   flutter_svg: ^2.2.4
   extended_nested_scroll_view: ^6.2.1
   extended_image: ^9.1.0
+  flutter_slidable: ^4.0.3
 
   # Monitoring & Analytics
   firebase_core: 4.5.0
@@ -51,6 +52,7 @@ dependencies:
   # Platform Service
   connectivity_plus: 7.0.0
   path_provider: ^2.1.5
+  workmanager: ^0.9.0+3
 
   # State Manager
   flutter_hooks: 0.21.3+1

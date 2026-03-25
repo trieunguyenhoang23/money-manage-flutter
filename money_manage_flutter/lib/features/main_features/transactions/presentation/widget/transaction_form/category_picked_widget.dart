@@ -4,17 +4,24 @@ import 'package:money_manage_flutter/export/core.dart';
 import '../../../../../category/data/model/local/category_local_model.dart';
 import '../../../../../category/presentation/provider/category_provider.dart';
 import '../../../../../category/presentation/widget/category_grid_view_widget.dart';
-import '../../provider/transaction_form_provider.dart';
+import '../../provider/base_transaction_provider.dart';
+import '../../provider/quick_select_cate_provider.dart';
+import '../../provider/transaction_provider.dart';
 
-class CategoryPickedWidget extends HookConsumerWidget {
+class CategoryPickedWidget<T extends BaseTransactionState>
+    extends HookConsumerWidget {
   const CategoryPickedWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tabController = useTabController(initialLength: 2);
+    final provider = ref.read(currentTransactionProvider);
+    final cateState = ref.read(provider.select((s) => s.category));
+    final type = cateState != null ? cateState.type : TransactionType.INCOME;
+    final initTab = type == TransactionType.INCOME ? 0 : 1;
 
-    final selectedCategory = ref.watch(
-      transactionFormProvider.select((s) => s.category),
+    final tabController = useTabController(
+      initialLength: 2,
+      initialIndex: initTab,
     );
 
     return SizedBox(
@@ -38,20 +45,22 @@ class CategoryPickedWidget extends HookConsumerWidget {
               ),
               spacingHeight,
               Expanded(
-                child: TabBarView(
-                  controller: tabController,
-                  children: [
-                    _CategoryGridSection(
-                      type: TransactionType.INCOME,
-                      tabController: tabController,
-                      selectedId: selectedCategory?.idServer,
-                    ),
-                    _CategoryGridSection(
-                      type: TransactionType.EXPENSE,
-                      tabController: tabController,
-                      selectedId: selectedCategory?.idServer,
-                    ),
-                  ],
+                child: Consumer(
+                  builder: (context, ref, _) {
+                    return TabBarView(
+                      controller: tabController,
+                      children: [
+                        _CategoryGridSection(
+                          type: TransactionType.INCOME,
+                          tabController: tabController,
+                        ),
+                        _CategoryGridSection(
+                          type: TransactionType.EXPENSE,
+                          tabController: tabController,
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ],
@@ -62,16 +71,12 @@ class CategoryPickedWidget extends HookConsumerWidget {
   }
 }
 
-class _CategoryGridSection extends ConsumerWidget {
+class _CategoryGridSection<T extends BaseTransactionState>
+    extends ConsumerWidget {
   final TransactionType type;
   final TabController tabController;
-  final String? selectedId;
 
-  const _CategoryGridSection({
-    required this.type,
-    required this.tabController,
-    this.selectedId,
-  });
+  const _CategoryGridSection({required this.type, required this.tabController});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -96,13 +101,9 @@ class _CategoryGridSection extends ConsumerWidget {
               onTap: () => _handlePickCategory(context, ref),
             );
           }
+
           final item = categories[index - 1];
-          return _CategoryItem(
-            category: item,
-            isSelected: selectedId == item.idServer,
-            onTap: () =>
-                ref.read(transactionFormProvider.notifier).updateCategory(item),
-          );
+          return _CategoryGridItemWrapper(item: item);
         },
       ),
     );
@@ -121,18 +122,41 @@ class _CategoryGridSection extends ConsumerWidget {
     );
 
     if (catePick != null) {
-      final notifier = ref.read(transactionFormProvider.notifier);
+      final provider = ref.read(currentTransactionProvider);
+      final notifier = ref.read(provider.notifier);
       notifier.updateCategory(catePick);
 
-      // Cập nhật danh sách chọn nhanh
       final type = catePick.type ?? TransactionType.EXPENSE;
       ref
           .read(quickSelectCategoryProvider(type).notifier)
-          .addCategory(catePick);
+          .addCategoryIfNeeded(catePick);
 
       // Chuyển tab nếu cần
       tabController.animateTo(type == TransactionType.INCOME ? 0 : 1);
     }
+  }
+}
+
+class _CategoryGridItemWrapper<T extends BaseTransactionState>
+    extends ConsumerWidget {
+  final CategoryLocalModel item;
+
+  const _CategoryGridItemWrapper({required this.item});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = ref.read(currentTransactionProvider);
+    final isSelected = ref.watch(
+      provider.select((state) => state.category?.idServer == item.idServer),
+    );
+
+    final notifier = ref.read(provider.notifier);
+
+    return _CategoryItem(
+      category: item,
+      isSelected: isSelected,
+      onTap: () => notifier.updateCategory(item),
+    );
   }
 }
 

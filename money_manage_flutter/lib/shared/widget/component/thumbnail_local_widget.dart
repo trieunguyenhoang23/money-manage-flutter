@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:money_manage_flutter/export/ui_external.dart';
 
 class ThumbnailLocalWidget extends StatelessWidget {
@@ -24,7 +26,6 @@ class ThumbnailLocalWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: borderRadius ?? BorderRadius.all(Radius.circular(radius)),
       ),
       clipBehavior: Clip.hardEdge,
@@ -37,13 +38,20 @@ class ThumbnailLocalWidget extends StatelessWidget {
               filterQuality: FilterQuality.none,
               gaplessPlayback: true,
             )
-          : Image.memory(
-              imgUrl,
-              width: w,
-              height: h,
-              fit: boxFit,
-              filterQuality: FilterQuality.none,
-              gaplessPlayback: true,
+          : Builder(
+              builder: (context) {
+                Uint8List bytes = imgUrl is List<int>
+                    ? Uint8List.fromList(imgUrl)
+                    : imgUrl;
+                return Image.memory(
+                  bytes,
+                  width: w,
+                  height: h,
+                  fit: boxFit,
+                  filterQuality: FilterQuality.none,
+                  gaplessPlayback: true,
+                );
+              },
             ),
     );
   }

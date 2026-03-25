@@ -21,4 +21,11 @@ class StringUtils {
     final parsedPrice = double.parse(price);
     return format.format(parsedPrice);
   }
+
+  static String formatNumber(String price) {
+    final parsedPrice = double.parse(price);
+
+    final format = NumberFormat.decimalPattern('vi_VN');
+    return format.format(parsedPrice.toInt());
+  }
 }
