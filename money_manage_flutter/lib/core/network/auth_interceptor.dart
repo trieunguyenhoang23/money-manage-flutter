@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 import 'package:money_manage_flutter/core/di/injection.dart';
@@ -28,44 +29,77 @@ class AuthInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
+      // Prevent Infinite Loops: If the refresh call ITSELF failed with 401, stop.
+      if (err.requestOptions.path.contains(UserAuthAPI.post_refresh_token)) {
+        await getIt<UserLocalDatasource>().clearSession();
+        return handler.next(err);
+      }
+
       final refreshToken = await _secureStorage.read(key: refreshTokenKey);
 
       if (refreshToken != null) {
         try {
-          // Use the internal refreshDio to avoid triggering this interceptor again
+          // Use validateStatus so 401 doesn't throw an exception here
           final response = await _innerDio.post(
             UserAuthAPI.post_refresh_token,
             data: {'refreshToken': refreshToken},
+            options: Options(validateStatus: (status) => status! < 500),
           );
 
+          // Debug: See what the server actually says
+          if (kDebugMode) {
+            debugPrint('Refresh Response: ${response.data}');
+          }
+
           if (response.statusCode == 200) {
-            final newToken = response.data[tokenKey];
+            // Match keys exactly with your logs
+            final newToken =
+                response.data['accessToken']; // Matches your log JSON
             final newRefreshToken = response.data['refreshToken'];
 
-            await _secureStorage.write(key: tokenKey, value: newToken);
-            await _secureStorage.write(
-              key: refreshTokenKey,
-              value: newRefreshToken,
-            );
+            if (newToken != null) {
+              // Save new credentials
+              await _secureStorage.write(key: tokenKey, value: newToken);
+              if (newRefreshToken != null) {
+                await _secureStorage.write(
+                  key: refreshTokenKey,
+                  value: newRefreshToken,
+                );
+              }
 
-            final requestOptions = err.requestOptions;
-            requestOptions.headers['Authorization'] = 'Bearer $newToken';
+              // Retry the original request with the new token
+              final requestOptions = err.requestOptions;
 
-            final cloneReq = await _innerDio.request(
-              requestOptions.path,
-              options: Options(
-                method: requestOptions.method,
-                headers: requestOptions.headers,
-                contentType: requestOptions.contentType,
-              ),
-              data: requestOptions.data,
-              queryParameters: requestOptions.queryParameters,
-            );
+              // Check if data is FormData and clone it if necessary
+              dynamic data = requestOptions.data;
+              if (data is FormData) {
+                data = data.clone(); // This creates a fresh copy for the retry
+              }
 
-            return handler.resolve(cloneReq);
+              final cloneReq = await _innerDio.request(
+                requestOptions.path,
+                data: data, // Use the (potentially cloned) data
+                queryParameters: requestOptions.queryParameters,
+                options: Options(
+                  method: requestOptions.method,
+                  headers: {
+                    ...requestOptions.headers,
+                    'Authorization': 'Bearer $newToken',
+                  },
+                  contentType: requestOptions.contentType,
+                ),
+              );
+
+              return handler.resolve(cloneReq);
+            }
+          } else {
+            // If status is 401/403, the refresh token is dead
+            debugPrint('Refresh token expired or invalid server-side');
+            await getIt<UserLocalDatasource>().clearSession();
           }
         } catch (e) {
-          getIt<UserLocalDatasource>().clearSession();
+          debugPrint('Interception Logic Error: $e');
+          await getIt<UserLocalDatasource>().clearSession();
         }
       }
     }

@@ -1,6 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 import 'package:isar_community/isar.dart';
+import 'package:money_manage_flutter/features/main_features/transactions/data/model/local/transaction_local_model.dart';
 import '../../../../../../core/constant/string_constant.dart';
 import '../../model/local/user_local_model.dart';
 
@@ -31,6 +32,7 @@ class UserLocalDatasource {
     await _secureStorage.deleteAll();
     await _isar.writeTxn(() async {
       await _isar.userLocalModels.clear();
+      await _isar.transactionLocalModels.clear();
     });
   }
 }

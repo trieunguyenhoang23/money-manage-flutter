@@ -41,8 +41,9 @@ class ProfileNotifier extends Notifier<ProfileState> {
       (userLocal) async {
         state = state.copyWith(userLocal);
 
-        ///Refresh category to loading from server
+        /// Refresh data to loading from server
         await ref.read(loadingCategoryProvider.notifier).refresh();
+        await ref.read(loadingTransactionProvider.notifier).refresh();
       },
     );
   }

@@ -49,7 +49,6 @@ class TransactionLocalModel {
     idServer ??= const Uuid().v4();
   }
 
-  // Factory để map từ Remote Data (API)
   factory TransactionLocalModel.fromRemote(Map<String, dynamic> remote) {
     return TransactionLocalModel(
       idServer: remote['id'],

@@ -188,6 +188,7 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i1013.TransactionsLocalDatasource>(),
         gh<_i858.SyncManager>(),
         gh<_i287.SyncStateDatasource>(),
+        gh<_i197.CategoryLocalDatasource>(),
       ),
     );
     gh.lazySingleton<_i869.CategoryRepository>(

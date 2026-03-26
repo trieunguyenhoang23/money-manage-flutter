@@ -70,7 +70,7 @@ class CategoryLocalModel {
       'description': description,
       'type': type?.name,
       'created_at': createdAt?.toUtc().toIso8601String(),
-      'updated_at': updatedAt?.toUtc().toIso8601String(),
+      if (updatedAt != null) 'updated_at': updatedAt?.toUtc().toIso8601String(),
     };
   }
 

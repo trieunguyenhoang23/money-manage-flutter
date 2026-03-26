@@ -3,6 +3,7 @@ import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/core_external.dart';
 import '../../../../../core/data/datasource/sync_state_datasource.dart';
 import '../../../../../infrastructure/file/models/file_picked.dart';
+import '../../../../category/data/datasource/local/category_local_datasource.dart';
 import '../../../../category/data/model/local/category_local_model.dart';
 import '../../domain/repositories/transaction_repository.dart';
 import '../datasource/local/transactions_local_datasource.dart';
@@ -15,12 +16,14 @@ class TransactionRepositoryImpl implements TransactionRepository {
   final TransactionsLocalDatasource _localDatasource;
   final SyncManager _syncManager;
   final SyncStateDatasource _syncStateDatasource;
+  final CategoryLocalDatasource _categoryLocalDatasource;
 
   TransactionRepositoryImpl(
     this._remoteDatasource,
     this._localDatasource,
     this._syncManager,
     this._syncStateDatasource,
+    this._categoryLocalDatasource,
   );
 
   int limitCount = SizeAppUtils().isTablet ? 20 : 10;
@@ -111,16 +114,31 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
           /// Set last page if data is empty
           if (result.data.isEmpty) {
-            await _syncStateDatasource.setReachedEnd(SyncSchema.transaction, true,);
+            await _syncStateDatasource.setReachedEnd(
+              SyncSchema.transaction,
+              true,
+            );
             return;
           }
 
           /// Save lastest fetching page
-          await _syncStateDatasource.setLastPage(SyncSchema.transaction, nextPage,);
+          await _syncStateDatasource.setLastPage(
+            SyncSchema.transaction,
+            nextPage,
+          );
+
           final localModels = await parseListJsonIsolate(
             TransactionLocalModel.fromRemote,
             result.data,
           );
+
+          // Save category to local
+          for (var item in result.data) {
+            final localCategory = CategoryLocalModel.fromRemote(
+              item['category'],
+            );
+            await _categoryLocalDatasource.save(localCategory);
+          }
 
           // Save to local Isar
           await _localDatasource.saveAll(localModels);
@@ -147,15 +165,15 @@ class TransactionRepositoryImpl implements TransactionRepository {
         return;
       }
 
-      final result = await _remoteDatasource.removeTransaction(
-        transaction.idServer!,
-      );
-
-      if (result.isFailure) {
-        syncResult = Fail(result);
-        return;
-      }
-      syncResult = true;
+      await _remoteDatasource.removeTransaction(transaction.idServer!).then((
+        result,
+      ) {
+        if (result.isFailure) {
+          syncResult = Fail(result);
+          return;
+        }
+        syncResult = true;
+      });
     });
 
     if (syncResult) {
@@ -189,21 +207,23 @@ class TransactionRepositoryImpl implements TransactionRepository {
       ) async {
         String imageName =
             '${currentActiveUserId}_${DateTime.now().millisecondsSinceEpoch}.${imageFile?.extension}';
-        // Update Transaction to Server
-        final result = await _remoteDatasource.updateTransaction(
-          id: oldItem.idServer ?? '',
-          updateJsonRequestBody,
-          image_description_buffer: imageFile?.bytes,
-          image_name: imageName,
-        );
 
-        if (result.isSuccess) {
-          oldItem
-            ..imageUrl = result.data['image_description']
-            ..imageBytes = null
-            ..userId = currentActiveUserId
-            ..isSynced = true;
-        }
+        // Update Transaction to Server
+        await _remoteDatasource
+            .updateTransaction(
+              id: oldItem.idServer ?? '',
+              updateJsonRequestBody,
+              image_description_buffer: imageFile?.bytes,
+              image_name: imageName,
+            )
+            .then((result) async {
+              if (result.isFailure) return;
+              oldItem
+                ..imageUrl = result.data['image_description']
+                ..imageBytes = null
+                ..userId = currentActiveUserId
+                ..isSynced = true;
+            });
       });
       await _localDatasource.putTransaction(oldItem, newCate);
     }
