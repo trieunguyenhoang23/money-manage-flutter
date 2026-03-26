@@ -265,6 +265,26 @@ class S {
     return Intl.message('Logout', name: 'profile_logout', desc: '', args: []);
   }
 
+  /// `Currency`
+  String get profile_currency {
+    return Intl.message(
+      'Currency',
+      name: 'profile_currency',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Theme`
+  String get profile_theme {
+    return Intl.message('Theme', name: 'profile_theme', desc: '', args: []);
+  }
+
+  /// `Remind`
+  String get profile_remind {
+    return Intl.message('Remind', name: 'profile_remind', desc: '', args: []);
+  }
+
   // skipped getter for the '//CATEGORY' key
 
   /// `Category`

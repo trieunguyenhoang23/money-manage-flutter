@@ -15,7 +15,6 @@ class TransactionLocalModel {
   @Enumerated(EnumType.name)
   TransactionType type;
   double amount;
-  String currency;
   String note;
   String? imageUrl;
   List<int>? imageBytes;
@@ -34,7 +33,6 @@ class TransactionLocalModel {
     this.idServer,
     this.type = TransactionType.EXPENSE,
     this.amount = 0.0,
-    this.currency = 'VND',
     this.note = '',
     this.imageUrl,
     this.imageBytes,
@@ -54,7 +52,6 @@ class TransactionLocalModel {
       idServer: remote['id'],
       type: _parseTransactionType(remote['type']),
       amount: (remote['amount'] as num?)?.toDouble() ?? 0.0,
-      currency: remote['currency'] ?? 'VND',
       note: remote['note'] ?? '',
       imageUrl: remote['image_description'],
       transactionAt: DateTime.parse(remote['transaction_at']),
@@ -83,7 +80,6 @@ class TransactionLocalModel {
       'id': idServer,
       'type': type.name,
       'amount': amount,
-      'currency': currency,
       'note': note,
       'transaction_at': transactionAt.toUtc().toIso8601String(),
       'created_at': createdAt.toUtc().toIso8601String(),

@@ -6,6 +6,6 @@ import 'package:dartz/dartz.dart';
 abstract class UserRepository {
   Future<Either<Failure, UserLocalModel>> signIn(AuthMethod method);
   Future<void> clearSession();
-  Future<bool> checkIsLogin();
   Future<String> getCurrentUserId();
+  Future<bool> updateCurrency(String newCurrency);
 }

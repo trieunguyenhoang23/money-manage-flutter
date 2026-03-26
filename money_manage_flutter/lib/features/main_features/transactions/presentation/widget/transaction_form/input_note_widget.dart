@@ -1,9 +1,7 @@
 import 'package:money_manage_flutter/core/extension/context_extension.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
-import 'package:money_manage_flutter/features/main_features/transactions/presentation/provider/transaction_provider.dart';
-import 'package:money_manage_flutter/features/main_features/transactions/presentation/provider/transaction_provider.dart';
-import '../../provider/transaction_create_provider.dart';
+import '../../provider/transaction_provider.dart';
 
 class InputNoteWidget extends HookConsumerWidget {
   const InputNoteWidget({super.key});

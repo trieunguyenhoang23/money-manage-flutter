@@ -11,6 +11,11 @@ class UserAuthAPI {
       '${APIConstants.bareUrl}/post/user-auth/refresh_token';
 }
 
+class UserBaseAPI {
+  /// PATCH
+  static String get patch_user => '${APIConstants.bareUrl}/patch/users';
+}
+
 class SyncAPI {
   /// POST
   static String get post_sync_user_data =>

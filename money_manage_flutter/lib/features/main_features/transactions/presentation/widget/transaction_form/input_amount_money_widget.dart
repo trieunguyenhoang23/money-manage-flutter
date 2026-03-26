@@ -1,6 +1,4 @@
-import 'package:money_manage_flutter/core/extension/context_extension.dart';
-import 'package:money_manage_flutter/core/utils/currency_formatter_utils.dart';
-import 'package:money_manage_flutter/core/utils/string_utils.dart';
+import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import '../../../data/model/local/transaction_local_model.dart';
@@ -64,7 +62,7 @@ class InputAmountMoneyWidget extends HookConsumerWidget {
               ),
             ),
             SizedBox(width: 0.025.sw),
-            TextGGStyle('VND', 0.05.sw, maxLines: 1),
+            CurrencyWidget(textSize: 0.05.sw),
           ],
         ),
       ),

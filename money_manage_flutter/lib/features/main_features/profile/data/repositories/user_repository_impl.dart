@@ -1,6 +1,7 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 import 'package:dartz/dartz.dart';
+import 'package:money_manage_flutter/core/network/sync_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../core/constant/string_constant.dart';
 import '../../../../../core/error/failure.dart';
 import '../../domain/repositories/user_repository.dart';
@@ -14,16 +15,15 @@ class UserRepositoryImpl implements UserRepository {
   final UserLocalDatasource _localDatasource;
   final UserRemoteDatasource _remoteDatasource;
   final SocialAuthFactory _socialAuthFactory;
-  final UserLocalDatasource _userLocalDatasource;
-  final FlutterSecureStorage _secureStorage;
+  final SyncManager _syncManager;
+  final SharedPreferences _preferences;
 
   UserRepositoryImpl(
     this._localDatasource,
     this._remoteDatasource,
     this._socialAuthFactory,
-
-    this._userLocalDatasource,
-    this._secureStorage,
+    this._syncManager,
+    this._preferences,
   );
 
   @override
@@ -52,7 +52,7 @@ class UserRepositoryImpl implements UserRepository {
       await _localDatasource.saveTokens(accessToken, refreshToken);
 
       // Map JSON to Local Model and Save to Isar
-      final userLocalModel = UserLocalModel.fromDomain(userData);
+      final userLocalModel = UserLocalModel.fromRemote(userData);
       await _localDatasource.saveUser(userLocalModel);
       return Right(userLocalModel);
     } catch (e) {
@@ -66,17 +66,29 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<bool> checkIsLogin() async {
-    final bool availableAccessToken =
-        (await _secureStorage.read(key: tokenKey)) != null;
-    final bool availableLocalUser =
-        (await _userLocalDatasource.getCurrentUser()) != null;
-    return availableAccessToken && availableLocalUser;
-  }
-
-  @override
   Future<String> getCurrentUserId() async {
     final localUser = await _localDatasource.getCurrentUser();
     return localUser?.idServer ?? '';
+  }
+
+  @override
+  Future<bool> updateCurrency(String newCurrency) async {
+    await _preferences.setString(currencyKey, newCurrency);
+
+    await _syncManager.runIfMeetStandard((currentUserId, networkStatus) async {
+      final localUser = await _localDatasource.getCurrentUser();
+      if (localUser != null) {
+        await _remoteDatasource
+            .updateUserProperties({'currency': newCurrency})
+            .then((result) async {
+              if (result.isFailure) return;
+
+              localUser.currency = newCurrency;
+              await _localDatasource.saveUser(localUser);
+            });
+      }
+    });
+
+    return _preferences.getString(currencyKey) != null;
   }
 }

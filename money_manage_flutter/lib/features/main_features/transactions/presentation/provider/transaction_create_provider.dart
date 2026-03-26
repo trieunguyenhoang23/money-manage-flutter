@@ -40,13 +40,14 @@ class TransactionCreateState implements BaseTransactionState {
     DateTime? transactionAt,
     FilePicked? imageFile,
     String? imageOriginal,
+    bool isForeRemoveImageFile = false,
   }) {
     return TransactionCreateState(
       amount: amount ?? this.amount,
       note: note ?? this.note,
       category: category ?? this.category,
       transactionAt: transactionAt ?? this.transactionAt,
-      imageFile: imageFile,
+      imageFile: isForeRemoveImageFile ? null : imageFile ?? this.imageFile,
       imageOriginal: imageOriginal,
     );
   }
@@ -73,8 +74,11 @@ class TransactionCreateNotifier
   void updateDate(DateTime date) => state = state.copyWith(transactionAt: date);
 
   @override
-  void updateImage(FilePicked? img) =>
-      state = state.copyWith(imageFile: img, imageOriginal: null);
+  void updateImage(FilePicked? img) => state = state.copyWith(
+    imageFile: img,
+    imageOriginal: null,
+    isForeRemoveImageFile: img == null,
+  );
 
   @override
   Future<Either<Failure, TransactionLocalModel>?> submit() async {

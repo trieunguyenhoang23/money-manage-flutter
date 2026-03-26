@@ -55,7 +55,6 @@ class TransactionRepositoryImpl implements TransactionRepository {
       createdAt: now,
       updatedAt: now,
       imageBytes: imageFile?.bytes,
-      currency: 'VND',
       isSynced: false,
     );
 
@@ -219,7 +218,8 @@ class TransactionRepositoryImpl implements TransactionRepository {
             .then((result) async {
               if (result.isFailure) return;
               oldItem
-                ..imageUrl = result.data['image_description']
+                ..imageUrl =
+                    result.data['image_description'] ?? oldItem.imageUrl
                 ..imageBytes = null
                 ..userId = currentActiveUserId
                 ..isSynced = true;

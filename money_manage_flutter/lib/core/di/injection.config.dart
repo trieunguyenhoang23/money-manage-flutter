@@ -46,6 +46,8 @@ import '../../features/main_features/profile/domain/usecase/auth_usecase.dart'
     as _i429;
 import '../../features/main_features/profile/domain/usecase/logout_usecase.dart'
     as _i100;
+import '../../features/main_features/profile/domain/usecase/update_currency_usecase.dart'
+    as _i870;
 import '../../features/main_features/transactions/data/datasource/local/transactions_local_datasource.dart'
     as _i1013;
 import '../../features/main_features/transactions/data/datasource/remote/transactions_remote_datasource.dart'
@@ -149,6 +151,13 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i361.Dio>(instanceName: 'dioNoCache'),
       ),
     );
+    gh.lazySingleton<_i848.SyncManager>(
+      () => _i848.SyncManager(
+        gh<_i436.NetworkInfo>(),
+        gh<_i809.UserLocalDatasource>(),
+        gh<_i558.FlutterSecureStorage>(),
+      ),
+    );
     gh.lazySingleton<_i702.CategoryRemoteDatasource>(
       () => _i702.CategoryRemoteDatasource(gh<_i989.DioService>()),
     );
@@ -172,14 +181,8 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i809.UserLocalDatasource>(),
         gh<_i1026.UserRemoteDatasource>(),
         gh<_i989.SocialAuthFactory>(),
-        gh<_i809.UserLocalDatasource>(),
-        gh<_i558.FlutterSecureStorage>(),
-      ),
-    );
-    gh.lazySingleton<_i848.SyncManager>(
-      () => _i848.SyncManager(
-        gh<_i436.NetworkInfo>(),
-        gh<_i168.UserRepository>(),
+        gh<_i848.SyncManager>(),
+        gh<_i460.SharedPreferences>(),
       ),
     );
     gh.lazySingleton<_i874.TransactionRepository>(
@@ -198,6 +201,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i858.SyncManager>(),
         gh<_i287.SyncStateDatasource>(),
       ),
+    );
+    gh.lazySingleton<_i870.UpdateCurrencyUseCase>(
+      () => _i870.UpdateCurrencyUseCase(gh<_i168.UserRepository>()),
     );
     gh.lazySingleton<_i1069.LoadingCategoryUseCase>(
       () => _i1069.LoadingCategoryUseCase(gh<_i869.CategoryRepository>()),

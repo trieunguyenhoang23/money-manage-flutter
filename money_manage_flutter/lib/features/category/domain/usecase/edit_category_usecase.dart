@@ -1,6 +1,5 @@
 import 'package:injectable/injectable.dart';
 import 'package:money_manage_flutter/export/core.dart';
-import '../../../../core/enum/transaction_type.dart';
 import '../../data/model/local/category_local_model.dart';
 import '../repositories/category_repository.dart';
 import 'package:dartz/dartz.dart';
@@ -24,7 +23,6 @@ class EditCategoryUseCase {
       return Left(ValidationFailure(ValidationCode.descriptionEmpty));
     }
 
-    // 2. If valid, proceed to repository
     return await repository.editCategory(updatedJson,oldItem);
   }
 }

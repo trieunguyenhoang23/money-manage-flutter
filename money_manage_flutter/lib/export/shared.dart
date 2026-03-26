@@ -12,6 +12,7 @@ export 'package:money_manage_flutter/shared/widget/component/tab_bar_widget.dart
 export 'package:money_manage_flutter/shared/widget/component/keep_alive_widget.dart';
 export 'package:money_manage_flutter/shared/widget/component/thumbnail_network_widget.dart';
 export 'package:money_manage_flutter/shared/widget/component/thumbnail_local_widget.dart';
+export 'package:money_manage_flutter/shared/widget/component/currency_widget.dart';
 
 // Btn
 export 'package:money_manage_flutter/shared/widget/btn/btn_appbar_widget.dart';

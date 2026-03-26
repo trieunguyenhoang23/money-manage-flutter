@@ -1,10 +1,10 @@
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:money_manage_flutter/core/utils/string_utils.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/router.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import '../../../../../core/di/injection.dart';
+import '../../../profile/presentation/provider/currency_provider.dart';
 import '../../data/model/local/transaction_local_model.dart';
 import '../../domain/usecase/remove_transaction_usecase.dart';
 import '../provider/transaction_provider.dart';
@@ -73,17 +73,39 @@ class TransactionItemWidget extends ConsumerWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
+                                /// Amount
                                 Align(
                                   alignment: Alignment.centerLeft,
-                                  child: TextGGStyle(
-                                    StringUtils.formatPrice(
-                                      item.amount.toString(),
-                                      item.currency,
-                                    ),
-                                    cc.maxWidth * 0.05,
-                                    fontWeight: FontWeight.w600,
+                                  child: Consumer(
+                                    builder: (context, ref, _) {
+                                      final currencyState = ref.watch(
+                                        currencyProvider,
+                                      );
+
+                                      return currencyState.when(
+                                        data: (currency) {
+                                          return TextGGStyle(
+                                            StringUtils.formatPrice(
+                                              item.amount.toString(),
+                                              currency,
+                                            ),
+                                            cc.maxWidth * 0.05,
+                                            fontWeight: FontWeight.w600,
+                                          );
+                                        },
+                                        error: (err, stack) {
+                                          return TextGGStyle(
+                                            err.toString(),
+                                            cc.maxWidth * 0.05,
+                                          );
+                                        },
+                                        loading: () => const LoadingWidget(),
+                                      );
+                                    },
                                   ),
                                 ),
+
+                                /// Title
                                 TextGGStyle(
                                   item.type.displayTitle(context),
                                   cc.maxWidth * 0.035,

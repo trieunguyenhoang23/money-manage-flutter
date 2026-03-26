@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
-import 'package:money_manage_flutter/features/category/domain/repositories/category_repository.dart';
 import '../../../../../core/error/failure.dart';
 import '../../../../../infrastructure/social_auth/social_auth_factory.dart';
+import '../../../../category/domain/repositories/category_repository.dart';
 import '../../../../sync/domain/repositories/sync_repository.dart';
 import '../../data/model/local/user_local_model.dart';
 import '../repositories/user_repository.dart';

@@ -29,50 +29,45 @@ const TransactionLocalModelSchema = CollectionSchema(
       name: r'createdAt',
       type: IsarType.dateTime,
     ),
-    r'currency': PropertySchema(
-      id: 3,
-      name: r'currency',
-      type: IsarType.string,
-    ),
     r'idServer': PropertySchema(
-      id: 4,
+      id: 3,
       name: r'idServer',
       type: IsarType.string,
     ),
     r'imageBytes': PropertySchema(
-      id: 5,
+      id: 4,
       name: r'imageBytes',
       type: IsarType.longList,
     ),
     r'imageUrl': PropertySchema(
-      id: 6,
+      id: 5,
       name: r'imageUrl',
       type: IsarType.string,
     ),
-    r'isSynced': PropertySchema(id: 7, name: r'isSynced', type: IsarType.bool),
-    r'note': PropertySchema(id: 8, name: r'note', type: IsarType.string),
+    r'isSynced': PropertySchema(id: 6, name: r'isSynced', type: IsarType.bool),
+    r'note': PropertySchema(id: 7, name: r'note', type: IsarType.string),
     r'reminderId': PropertySchema(
-      id: 9,
+      id: 8,
       name: r'reminderId',
       type: IsarType.string,
     ),
     r'transactionAt': PropertySchema(
-      id: 10,
+      id: 9,
       name: r'transactionAt',
       type: IsarType.dateTime,
     ),
     r'type': PropertySchema(
-      id: 11,
+      id: 10,
       name: r'type',
       type: IsarType.string,
       enumMap: _TransactionLocalModeltypeEnumValueMap,
     ),
     r'updatedAt': PropertySchema(
-      id: 12,
+      id: 11,
       name: r'updatedAt',
       type: IsarType.dateTime,
     ),
-    r'userId': PropertySchema(id: 13, name: r'userId', type: IsarType.string),
+    r'userId': PropertySchema(id: 12, name: r'userId', type: IsarType.string),
   },
 
   estimateSize: _transactionLocalModelEstimateSize,
@@ -118,7 +113,6 @@ int _transactionLocalModelEstimateSize(
 ) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.categoryId.length * 3;
-  bytesCount += 3 + object.currency.length * 3;
   {
     final value = object.idServer;
     if (value != null) {
@@ -163,17 +157,16 @@ void _transactionLocalModelSerialize(
   writer.writeDouble(offsets[0], object.amount);
   writer.writeString(offsets[1], object.categoryId);
   writer.writeDateTime(offsets[2], object.createdAt);
-  writer.writeString(offsets[3], object.currency);
-  writer.writeString(offsets[4], object.idServer);
-  writer.writeLongList(offsets[5], object.imageBytes);
-  writer.writeString(offsets[6], object.imageUrl);
-  writer.writeBool(offsets[7], object.isSynced);
-  writer.writeString(offsets[8], object.note);
-  writer.writeString(offsets[9], object.reminderId);
-  writer.writeDateTime(offsets[10], object.transactionAt);
-  writer.writeString(offsets[11], object.type.name);
-  writer.writeDateTime(offsets[12], object.updatedAt);
-  writer.writeString(offsets[13], object.userId);
+  writer.writeString(offsets[3], object.idServer);
+  writer.writeLongList(offsets[4], object.imageBytes);
+  writer.writeString(offsets[5], object.imageUrl);
+  writer.writeBool(offsets[6], object.isSynced);
+  writer.writeString(offsets[7], object.note);
+  writer.writeString(offsets[8], object.reminderId);
+  writer.writeDateTime(offsets[9], object.transactionAt);
+  writer.writeString(offsets[10], object.type.name);
+  writer.writeDateTime(offsets[11], object.updatedAt);
+  writer.writeString(offsets[12], object.userId);
 }
 
 TransactionLocalModel _transactionLocalModelDeserialize(
@@ -186,21 +179,20 @@ TransactionLocalModel _transactionLocalModelDeserialize(
     amount: reader.readDoubleOrNull(offsets[0]) ?? 0.0,
     categoryId: reader.readStringOrNull(offsets[1]) ?? '',
     createdAt: reader.readDateTime(offsets[2]),
-    currency: reader.readStringOrNull(offsets[3]) ?? 'VND',
-    idServer: reader.readStringOrNull(offsets[4]),
-    imageBytes: reader.readLongList(offsets[5]),
-    imageUrl: reader.readStringOrNull(offsets[6]),
-    isSynced: reader.readBoolOrNull(offsets[7]) ?? false,
-    note: reader.readStringOrNull(offsets[8]) ?? '',
-    reminderId: reader.readStringOrNull(offsets[9]),
-    transactionAt: reader.readDateTime(offsets[10]),
+    idServer: reader.readStringOrNull(offsets[3]),
+    imageBytes: reader.readLongList(offsets[4]),
+    imageUrl: reader.readStringOrNull(offsets[5]),
+    isSynced: reader.readBoolOrNull(offsets[6]) ?? false,
+    note: reader.readStringOrNull(offsets[7]) ?? '',
+    reminderId: reader.readStringOrNull(offsets[8]),
+    transactionAt: reader.readDateTime(offsets[9]),
     type:
         _TransactionLocalModeltypeValueEnumMap[reader.readStringOrNull(
-          offsets[11],
+          offsets[10],
         )] ??
         TransactionType.EXPENSE,
-    updatedAt: reader.readDateTime(offsets[12]),
-    userId: reader.readStringOrNull(offsets[13]),
+    updatedAt: reader.readDateTime(offsets[11]),
+    userId: reader.readStringOrNull(offsets[12]),
   );
   object.id = id;
   return object;
@@ -220,30 +212,28 @@ P _transactionLocalModelDeserializeProp<P>(
     case 2:
       return (reader.readDateTime(offset)) as P;
     case 3:
-      return (reader.readStringOrNull(offset) ?? 'VND') as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 4:
-      return (reader.readStringOrNull(offset)) as P;
-    case 5:
       return (reader.readLongList(offset)) as P;
+    case 5:
+      return (reader.readStringOrNull(offset)) as P;
     case 6:
-      return (reader.readStringOrNull(offset)) as P;
-    case 7:
       return (reader.readBoolOrNull(offset) ?? false) as P;
-    case 8:
+    case 7:
       return (reader.readStringOrNull(offset) ?? '') as P;
-    case 9:
+    case 8:
       return (reader.readStringOrNull(offset)) as P;
-    case 10:
+    case 9:
       return (reader.readDateTime(offset)) as P;
-    case 11:
+    case 10:
       return (_TransactionLocalModeltypeValueEnumMap[reader.readStringOrNull(
                 offset,
               )] ??
               TransactionType.EXPENSE)
           as P;
-    case 12:
+    case 11:
       return (reader.readDateTime(offset)) as P;
-    case 13:
+    case 12:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -851,187 +841,6 @@ extension TransactionLocalModelQueryFilter
           upper: upper,
           includeUpper: includeUpper,
         ),
-      );
-    });
-  }
-
-  QueryBuilder<
-    TransactionLocalModel,
-    TransactionLocalModel,
-    QAfterFilterCondition
-  >
-  currencyEqualTo(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'currency',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<
-    TransactionLocalModel,
-    TransactionLocalModel,
-    QAfterFilterCondition
-  >
-  currencyGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'currency',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<
-    TransactionLocalModel,
-    TransactionLocalModel,
-    QAfterFilterCondition
-  >
-  currencyLessThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'currency',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<
-    TransactionLocalModel,
-    TransactionLocalModel,
-    QAfterFilterCondition
-  >
-  currencyBetween(
-    String lower,
-    String upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'currency',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<
-    TransactionLocalModel,
-    TransactionLocalModel,
-    QAfterFilterCondition
-  >
-  currencyStartsWith(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'currency',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<
-    TransactionLocalModel,
-    TransactionLocalModel,
-    QAfterFilterCondition
-  >
-  currencyEndsWith(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'currency',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<
-    TransactionLocalModel,
-    TransactionLocalModel,
-    QAfterFilterCondition
-  >
-  currencyContains(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'currency',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<
-    TransactionLocalModel,
-    TransactionLocalModel,
-    QAfterFilterCondition
-  >
-  currencyMatches(String pattern, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'currency',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<
-    TransactionLocalModel,
-    TransactionLocalModel,
-    QAfterFilterCondition
-  >
-  currencyIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'currency', value: ''),
-      );
-    });
-  }
-
-  QueryBuilder<
-    TransactionLocalModel,
-    TransactionLocalModel,
-    QAfterFilterCondition
-  >
-  currencyIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'currency', value: ''),
       );
     });
   }
@@ -2710,20 +2519,6 @@ extension TransactionLocalModelQuerySortBy
   }
 
   QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterSortBy>
-  sortByCurrency() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'currency', Sort.asc);
-    });
-  }
-
-  QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterSortBy>
-  sortByCurrencyDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'currency', Sort.desc);
-    });
-  }
-
-  QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterSortBy>
   sortByIdServer() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'idServer', Sort.asc);
@@ -2895,20 +2690,6 @@ extension TransactionLocalModelQuerySortThenBy
   }
 
   QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterSortBy>
-  thenByCurrency() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'currency', Sort.asc);
-    });
-  }
-
-  QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterSortBy>
-  thenByCurrencyDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'currency', Sort.desc);
-    });
-  }
-
-  QueryBuilder<TransactionLocalModel, TransactionLocalModel, QAfterSortBy>
   thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -3073,13 +2854,6 @@ extension TransactionLocalModelQueryWhereDistinct
   }
 
   QueryBuilder<TransactionLocalModel, TransactionLocalModel, QDistinct>
-  distinctByCurrency({bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'currency', caseSensitive: caseSensitive);
-    });
-  }
-
-  QueryBuilder<TransactionLocalModel, TransactionLocalModel, QDistinct>
   distinctByIdServer({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'idServer', caseSensitive: caseSensitive);
@@ -3181,13 +2955,6 @@ extension TransactionLocalModelQueryProperty
   createdAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'createdAt');
-    });
-  }
-
-  QueryBuilder<TransactionLocalModel, String, QQueryOperations>
-  currencyProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'currency');
     });
   }
 

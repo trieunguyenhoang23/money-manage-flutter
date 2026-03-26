@@ -1,10 +1,11 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:money_manage_flutter/core/enum/transaction_type.dart';
 import 'package:money_manage_flutter/core/utils/toast_utils.dart';
-import 'package:money_manage_flutter/export/infrastructure.dart';
-import 'package:money_manage_flutter/features/main_features/transactions/presentation/provider/transaction_provider.dart';
+import 'package:money_manage_flutter/features/main_features/profile/presentation/provider/currency_provider.dart';
 import '../../../../../core/di/injection.dart';
+import '../../../../../infrastructure/social_auth/social_auth_factory.dart';
 import '../../../../category/presentation/provider/category_provider.dart';
+import '../../../transactions/presentation/provider/transaction_provider.dart';
 import '../../data/datasource/local/user_local_datasource.dart';
 import '../../data/model/local/user_local_model.dart';
 import '../../domain/usecase/auth_usecase.dart';
@@ -15,50 +16,55 @@ class ProfileState {
 
   ProfileState({this.userLocalModel});
 
-  ProfileState copyWith(UserLocalModel? userProfile) {
-    return ProfileState(userLocalModel: userProfile);
+  ProfileState copyWith({UserLocalModel? userLocalModel}) {
+    return ProfileState(userLocalModel: userLocalModel ?? this.userLocalModel);
   }
 }
 
-class ProfileNotifier extends Notifier<ProfileState> {
+class ProfileNotifier extends AsyncNotifier<ProfileState> {
   @override
-  ProfileState build() {
-    _init();
-    return ProfileState();
-  }
-
-  Future<void> _init() async {
+  Future<ProfileState> build() async {
     final user = await getIt<UserLocalDatasource>().getCurrentUser();
-    state = state.copyWith(user);
+    return ProfileState(userLocalModel: user);
   }
 
-  void onSignIn() async {
+  Future<void> onSignIn() async {
     final result = await getIt<AuthUseCase>().execute(AuthMethod.google);
-    await result.fold(
-      (error) {
-        ToastUtils.showToastFailed(error.message);
-      },
-      (userLocal) async {
-        state = state.copyWith(userLocal);
 
-        /// Refresh data to loading from server
-        await ref.read(loadingCategoryProvider.notifier).refresh();
-        await ref.read(loadingTransactionProvider.notifier).refresh();
-      },
-    );
+    result.fold((error) => ToastUtils.showToastFailed(error.message), (
+      userLocal,
+    ) async {
+      // Cập nhật state bằng AsyncData
+      state = AsyncData(state.value!.copyWith(userLocalModel: userLocal));
+
+      /// Refresh data từ server
+      await ref.read(loadingCategoryProvider.notifier).refresh();
+      await ref.read(loadingTransactionProvider.notifier).refresh();
+
+      /// Update UI only => isSyncData: false
+      await ref
+          .read(currencyProvider.notifier)
+          .updateCurrency(
+            state.value?.userLocalModel?.currency ?? 'VND',
+            isSyncData: false,
+          );
+    });
   }
 
   Future<void> onLogout() async {
-    await getIt<LogoutUseCase>().execute().then((_) async {
-      ref.invalidate(loadingCategoryProvider);
-      ref.invalidate(loadingTransactionProvider);
-      ref.invalidate(loadingCategoryByTypeProvider(TransactionType.INCOME));
-      ref.invalidate(loadingCategoryByTypeProvider(TransactionType.EXPENSE));
-      state = state.copyWith(null);
-    });
+    await getIt<LogoutUseCase>().execute();
+
+    ref.invalidate(loadingCategoryProvider);
+    ref.invalidate(loadingTransactionProvider);
+    ref.invalidate(loadingCategoryByTypeProvider(TransactionType.INCOME));
+    ref.invalidate(loadingCategoryByTypeProvider(TransactionType.EXPENSE));
+
+    state = AsyncData(ProfileState(userLocalModel: null));
   }
 }
 
-final profileProvider = NotifierProvider<ProfileNotifier, ProfileState>(() {
-  return ProfileNotifier();
-});
+final profileProvider = AsyncNotifierProvider<ProfileNotifier, ProfileState>(
+  () {
+    return ProfileNotifier();
+  },
+);

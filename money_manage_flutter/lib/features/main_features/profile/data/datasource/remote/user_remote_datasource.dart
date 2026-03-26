@@ -1,5 +1,6 @@
 import 'package:injectable/injectable.dart';
 import 'package:money_manage_flutter/core/constant/api_constants.dart';
+import 'package:money_manage_flutter/core/network/api_result.dart';
 import 'package:money_manage_flutter/export/infrastructure.dart';
 
 @LazySingleton()
@@ -21,5 +22,11 @@ class UserRemoteDatasource {
     }
 
     return response.data;
+  }
+
+  Future<ApiResult> updateUserProperties(
+    Map<String, dynamic> jsonBodyRequest,
+  ) async {
+    return await _dioService.patch(UserBaseAPI.patch_user, jsonBodyRequest);
   }
 }

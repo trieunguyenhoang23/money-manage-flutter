@@ -27,19 +27,24 @@ const UserLocalModelSchema = CollectionSchema(
       name: r'createdAt',
       type: IsarType.dateTime,
     ),
-    r'displayName': PropertySchema(
+    r'currency': PropertySchema(
       id: 2,
+      name: r'currency',
+      type: IsarType.string,
+    ),
+    r'displayName': PropertySchema(
+      id: 3,
       name: r'displayName',
       type: IsarType.string,
     ),
     r'idServer': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'idServer',
       type: IsarType.string,
     ),
-    r'isSynced': PropertySchema(id: 4, name: r'isSynced', type: IsarType.bool),
+    r'isSynced': PropertySchema(id: 5, name: r'isSynced', type: IsarType.bool),
     r'primaryEmail': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'primaryEmail',
       type: IsarType.string,
     ),
@@ -87,6 +92,12 @@ int _userLocalModelEstimateSize(
     }
   }
   {
+    final value = object.currency;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
     final value = object.displayName;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
@@ -115,10 +126,11 @@ void _userLocalModelSerialize(
 ) {
   writer.writeString(offsets[0], object.avatarUrl);
   writer.writeDateTime(offsets[1], object.createdAt);
-  writer.writeString(offsets[2], object.displayName);
-  writer.writeString(offsets[3], object.idServer);
-  writer.writeBool(offsets[4], object.isSynced);
-  writer.writeString(offsets[5], object.primaryEmail);
+  writer.writeString(offsets[2], object.currency);
+  writer.writeString(offsets[3], object.displayName);
+  writer.writeString(offsets[4], object.idServer);
+  writer.writeBool(offsets[5], object.isSynced);
+  writer.writeString(offsets[6], object.primaryEmail);
 }
 
 UserLocalModel _userLocalModelDeserialize(
@@ -130,11 +142,12 @@ UserLocalModel _userLocalModelDeserialize(
   final object = UserLocalModel();
   object.avatarUrl = reader.readStringOrNull(offsets[0]);
   object.createdAt = reader.readDateTimeOrNull(offsets[1]);
-  object.displayName = reader.readStringOrNull(offsets[2]);
+  object.currency = reader.readStringOrNull(offsets[2]);
+  object.displayName = reader.readStringOrNull(offsets[3]);
   object.id = id;
-  object.idServer = reader.readStringOrNull(offsets[3]);
-  object.isSynced = reader.readBool(offsets[4]);
-  object.primaryEmail = reader.readStringOrNull(offsets[5]);
+  object.idServer = reader.readStringOrNull(offsets[4]);
+  object.isSynced = reader.readBool(offsets[5]);
+  object.primaryEmail = reader.readStringOrNull(offsets[6]);
   return object;
 }
 
@@ -154,8 +167,10 @@ P _userLocalModelDeserializeProp<P>(
     case 3:
       return (reader.readStringOrNull(offset)) as P;
     case 4:
-      return (reader.readBool(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 5:
+      return (reader.readBool(offset)) as P;
+    case 6:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -624,6 +639,165 @@ extension UserLocalModelQueryFilter
           upper: upper,
           includeUpper: includeUpper,
         ),
+      );
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterFilterCondition>
+  currencyIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'currency'),
+      );
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterFilterCondition>
+  currencyIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'currency'),
+      );
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterFilterCondition>
+  currencyEqualTo(String? value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'currency',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterFilterCondition>
+  currencyGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'currency',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterFilterCondition>
+  currencyLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'currency',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterFilterCondition>
+  currencyBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'currency',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterFilterCondition>
+  currencyStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'currency',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterFilterCondition>
+  currencyEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'currency',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterFilterCondition>
+  currencyContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'currency',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterFilterCondition>
+  currencyMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'currency',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterFilterCondition>
+  currencyIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'currency', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterFilterCondition>
+  currencyIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'currency', value: ''),
       );
     });
   }
@@ -1204,6 +1378,19 @@ extension UserLocalModelQuerySortBy
     });
   }
 
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterSortBy> sortByCurrency() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'currency', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterSortBy>
+  sortByCurrencyDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'currency', Sort.desc);
+    });
+  }
+
   QueryBuilder<UserLocalModel, UserLocalModel, QAfterSortBy>
   sortByDisplayName() {
     return QueryBuilder.apply(this, (query) {
@@ -1284,6 +1471,19 @@ extension UserLocalModelQuerySortThenBy
   thenByCreatedAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterSortBy> thenByCurrency() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'currency', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterSortBy>
+  thenByCurrencyDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'currency', Sort.desc);
     });
   }
 
@@ -1371,6 +1571,14 @@ extension UserLocalModelQueryWhereDistinct
     });
   }
 
+  QueryBuilder<UserLocalModel, UserLocalModel, QDistinct> distinctByCurrency({
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'currency', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<UserLocalModel, UserLocalModel, QDistinct>
   distinctByDisplayName({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1418,6 +1626,12 @@ extension UserLocalModelQueryProperty
   createdAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'createdAt');
+    });
+  }
+
+  QueryBuilder<UserLocalModel, String?, QQueryOperations> currencyProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'currency');
     });
   }
 
