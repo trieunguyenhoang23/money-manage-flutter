@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
-import '../../../main_features/profile/domain/repositories/user_repository.dart';
+import '../../../../core/data/datasource/sync_state_datasource.dart';
 import '../../domain/repositories/category_repository.dart';
 import '../datasource/local/category_local_datasource.dart';
 import '../datasource/remote/category_remote_datasource.dart';
@@ -11,12 +11,14 @@ import 'package:money_manage_flutter/export/core.dart';
 class CategoryRepositoryImpl implements CategoryRepository {
   final CategoryRemoteDatasource _remoteDatasource;
   final CategoryLocalDatasource _localDatasource;
-  final UserRepository _userRepository;
+  final SyncManager _syncManager;
+  final SyncStateDatasource _syncStateDatasource;
 
   CategoryRepositoryImpl(
     this._remoteDatasource,
     this._localDatasource,
-    this._userRepository,
+    this._syncManager,
+    this._syncStateDatasource,
   );
 
   int limitCount = SizeAppUtils().isTablet ? 20 : 10;
@@ -30,21 +32,30 @@ class CategoryRepositoryImpl implements CategoryRepository {
     TransactionType type,
   ) async {
     try {
-      bool isLogin = await _userRepository.checkIsLogin();
+      CategoryLocalModel categoryLocalModel = CategoryLocalModel(
+        name: name,
+        description: desc,
+        type: type,
+        createdAt: DateTime.now(),
+      );
 
-      CategoryLocalModel categoryLocalModel = CategoryLocalModel.fromJson({
-        'name': name,
-        'description': desc,
-        'type': type,
-        'created_at': DateTime.now().toIso8601String(),
+      // Upload data to server if isLogin = true
+      await _syncManager.runIfMeetStandard((
+        currentActiveUserId,
+        networkStatus,
+      ) async {
+        await _remoteDatasource
+            .uploadCategory(categoryLocalModel.toJson())
+            .then((result) {
+              if (result.isSuccess) {
+                categoryLocalModel
+                  ..isSynced = true
+                  ..userId = currentActiveUserId;
+              }
+            });
       });
 
       await _localDatasource.save(categoryLocalModel);
-
-      // Upload data to server if isLogin = true
-      if (isLogin) {
-        await _remoteDatasource.uploadCategory(categoryLocalModel.toJson());
-      }
 
       return Right(categoryLocalModel);
     } catch (e) {
@@ -57,22 +68,45 @@ class CategoryRepositoryImpl implements CategoryRepository {
   Future<List<CategoryLocalModel>> loadCategoryByPage(int page) async {
     var localData = await _localDatasource.loadByPage(page, limitCount);
 
-    if (await _userRepository.checkIsLogin() && localData.isEmpty) {
-      final remoteData = await _remoteDatasource.loadCateByPage(
-        page,
-        limitCount,
-      );
-      if (remoteData.isSuccess) {
-        final localModels = await parseListJsonIsolate(
-          CategoryLocalModel.fromJson,
-          remoteData.data,
-        );
+    await _syncManager.runIfMeetStandard((
+      currentActiveUserId,
+      networkStatus,
+    ) async {
+      if (_syncStateDatasource.hasReachedEnd(SyncSchema.category)) return;
 
-        // Save to local Isar
-        await _localDatasource.saveAll(localModels);
-        localData = await _localDatasource.loadByPage(page, limitCount);
+      bool isPartialPage = localData.length < limitCount;
+
+      /// If local data in this page doesn't meet limitCount
+      if (isPartialPage) {
+        /// Get last page to continue fetching dat from server
+        int lastFetched = _syncStateDatasource.getLastPage(SyncSchema.category);
+        int nextPage = lastFetched + 1;
+
+        await _remoteDatasource.loadCateByPage(page, limitCount).then((
+          result,
+        ) async {
+          if (result.isFailure) return;
+
+          /// Set last page if data is empty
+          if (result.data.isEmpty) {
+            await _syncStateDatasource.setReachedEnd(SyncSchema.category, true);
+            return;
+          }
+
+          /// Save lastest fetching page
+          await _syncStateDatasource.setLastPage(SyncSchema.category, nextPage);
+          final localModels = await parseListJsonIsolate(
+            CategoryLocalModel.fromRemote,
+            result.data,
+          );
+
+          // Save to local Isar
+          await _localDatasource.saveAll(localModels);
+          // Re-fetch from local to get the unified list
+          localData = await _localDatasource.loadByPage(page, limitCount);
+        });
       }
-    }
+    });
 
     return localData;
   }
@@ -84,22 +118,29 @@ class CategoryRepositoryImpl implements CategoryRepository {
   ) async {
     var localData = await _localDatasource.loadByType(page, limitCount, type);
 
-    if (await _userRepository.checkIsLogin() && localData.isEmpty) {
-      final remoteData = await _remoteDatasource.loadCateByPage(
-        page,
-        limitCount,
-      );
-      if (remoteData.isSuccess) {
-        final localModels = await parseListJsonIsolate(
-          CategoryLocalModel.fromJson,
-          remoteData.data,
-        );
+    await _syncManager.runIfMeetStandard((
+      currentActiveUserId,
+      networkStatus,
+    ) async {
+      bool isPartialPage = localData.length < limitCount;
+      if (isPartialPage) {
+        // Fetch data from server
+        await _remoteDatasource.loadCateByPage(page, limitCount).then((
+          result,
+        ) async {
+          if (result.isFailure) return;
 
-        // Save to local Isar
-        await _localDatasource.saveAll(localModels);
-        localData = await _localDatasource.loadByType(page, limitCount, type);
+          final localModels = await parseListJsonIsolate(
+            CategoryLocalModel.fromRemote,
+            result.data,
+          );
+
+          // Save to local Isar
+          await _localDatasource.saveAll(localModels);
+          localData = await _localDatasource.loadByType(page, limitCount, type);
+        });
       }
-    }
+    });
 
     return localData;
   }
@@ -107,27 +148,31 @@ class CategoryRepositoryImpl implements CategoryRepository {
   /// PATCH
   @override
   Future<Either<Failure, CategoryLocalModel>> editCategory(
-    String name,
-    String desc,
-    TransactionType type,
+    Map<String, dynamic> updatedJson,
     CategoryLocalModel oldItem,
   ) async {
     try {
-      oldItem
-        ..name = name
-        ..description = desc
-        ..type = type
-        ..updatedAt = DateTime.now();
+      bool hasChanged = oldItem.merge(
+        newName: updatedJson['name'],
+        newDescription: updatedJson['description'],
+        newType: updatedJson['type'],
+      );
 
-      await _localDatasource.save(oldItem);
-
-      ///Handle logic for server
-      ///Parse data local
-      if (await _userRepository.checkIsLogin()) {
-        await _remoteDatasource.updateCategory(
-          oldItem.toJson(),
-          id: oldItem.idServer,
-        );
+      /// Just update if any properties change
+      if (hasChanged) {
+        await _syncManager.runIfMeetStandard((
+          currentActiveUserId,
+          networkStatus,
+        ) async {
+          await _remoteDatasource
+              .updateCategory(updatedJson, id: oldItem.idServer!)
+              .then((result) {
+                oldItem
+                  ..userId = currentActiveUserId
+                  ..isSynced = true;
+              });
+        });
+        await _localDatasource.save(oldItem);
       }
 
       return Right(oldItem);

@@ -1,6 +1,8 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:money_manage_flutter/core/enum/transaction_type.dart';
 import 'package:money_manage_flutter/core/utils/toast_utils.dart';
 import 'package:money_manage_flutter/export/infrastructure.dart';
+import 'package:money_manage_flutter/features/main_features/transactions/presentation/provider/transaction_provider.dart';
 import '../../../../../core/di/injection.dart';
 import '../../../../category/presentation/provider/category_provider.dart';
 import '../../data/datasource/local/user_local_datasource.dart';
@@ -45,10 +47,13 @@ class ProfileNotifier extends Notifier<ProfileState> {
     );
   }
 
-  void onLogout() async {
+  Future<void> onLogout() async {
     await getIt<LogoutUseCase>().execute().then((_) async {
+      ref.invalidate(loadingCategoryProvider);
+      ref.invalidate(loadingTransactionProvider);
+      ref.invalidate(loadingCategoryByTypeProvider(TransactionType.INCOME));
+      ref.invalidate(loadingCategoryByTypeProvider(TransactionType.EXPENSE));
       state = state.copyWith(null);
-      await ref.read(loadingCategoryProvider.notifier).refresh();
     });
   }
 }

@@ -123,9 +123,11 @@ class _EditCategoryScreenState extends ConsumerState<EditCategoryScreen> {
     final useCase = getIt<EditCategoryUseCase>();
 
     final result = await useCase.execute(
-      nameTextController.text,
-      descTextController.text,
-      selectedType,
+      widget.item.toUpdateJson(
+        nameTemp: nameTextController.text,
+        descTemp: descTextController.text,
+        typeTemp: selectedType,
+      ),
       item,
     );
 

@@ -50,24 +50,33 @@ class TransactionLocalModel {
   }
 
   // Factory để map từ Remote Data (API)
-  factory TransactionLocalModel.fromRemote(dynamic remote) {
+  factory TransactionLocalModel.fromRemote(Map<String, dynamic> remote) {
     return TransactionLocalModel(
-      idServer: remote.id,
-      type: remote.type is String
-          ? TransactionType.values.byName(remote.type)
-          : remote.type,
-      amount: (remote.amount as num).toDouble(),
-      currency: remote.currency ?? 'VND',
-      note: remote.note ?? '',
-      imageUrl: remote.imageUrl,
-      transactionAt: DateTime.parse(remote.transactionAt),
-      createdAt: remote.cDateTime.parse(remote.createdAt),
-      updatedAt: remote.uDateTime.parse(remote.updatedAt),
-      userId: remote.userId,
-      categoryId: remote.categoryId ?? '',
-      reminderId: remote.reminderId,
+      idServer: remote['id'],
+      type: _parseTransactionType(remote['type']),
+      amount: (remote['amount'] as num?)?.toDouble() ?? 0.0,
+      currency: remote['currency'] ?? 'VND',
+      note: remote['note'] ?? '',
+      imageUrl: remote['image_description'],
+      transactionAt: DateTime.parse(remote['transaction_at']),
+      createdAt: DateTime.parse(remote['created_at']),
+      updatedAt: DateTime.parse(remote['updated_at']),
+      userId: remote['user_id'],
+      categoryId: remote['category_id'] ?? '',
+      reminderId: remote['reminder_id'],
       isSynced: true,
     );
+  }
+
+  static TransactionType _parseTransactionType(dynamic type) {
+    if (type is TransactionType) return type;
+    if (type is String) {
+      return TransactionType.values.firstWhere(
+        (e) => e.name == type,
+        orElse: () => TransactionType.EXPENSE,
+      );
+    }
+    return TransactionType.EXPENSE;
   }
 
   Map<String, dynamic> toJson() {
@@ -99,7 +108,7 @@ class TransactionLocalModel {
     if (noteTemp != note) patch['note'] = noteTemp;
     if (cateTemp.idServer != category.value?.idServer) {
       patch['category_id'] = cateTemp.idServer;
-      patch['type'] = cateTemp.type;
+      patch['type'] = cateTemp.type?.name;
     }
     if (transactionAtTemp != transactionAt) {
       patch['transaction_at'] = transactionAtTemp.toIso8601String();

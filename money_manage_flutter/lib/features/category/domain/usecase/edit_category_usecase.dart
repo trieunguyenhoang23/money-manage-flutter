@@ -12,21 +12,19 @@ class EditCategoryUseCase {
   EditCategoryUseCase(this.repository);
 
   Future<Either<Failure, CategoryLocalModel>> execute(
-    String name,
-    String desc,
-    TransactionType type,
+    Map<String,dynamic> updatedJson,
     CategoryLocalModel oldItem,
   ) async {
     // Validation Check
-    if (name.trim().length < 3) {
+    if (updatedJson['name'].trim().length < 3) {
       return Left(ValidationFailure(ValidationCode.nameTooShort));
     }
 
-    if (desc.trim().isEmpty) {
+    if (updatedJson['description'].trim().isEmpty) {
       return Left(ValidationFailure(ValidationCode.descriptionEmpty));
     }
 
     // 2. If valid, proceed to repository
-    return await repository.editCategory(name, desc, type,oldItem);
+    return await repository.editCategory(updatedJson,oldItem);
   }
 }

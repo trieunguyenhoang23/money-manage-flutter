@@ -31,6 +31,10 @@ class CategoryAPI {
 }
 
 class TransactionAPI {
+  /// GET
+  static String get get_load_by_page =>
+      '${APIConstants.bareUrl}/get/transactions/load_by_page';
+
   /// POST
   static String get post_transactions =>
       '${APIConstants.bareUrl}/post/transactions';

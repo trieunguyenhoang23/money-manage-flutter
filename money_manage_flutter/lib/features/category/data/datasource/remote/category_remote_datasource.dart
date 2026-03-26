@@ -9,11 +9,16 @@ class CategoryRemoteDatasource {
 
   CategoryRemoteDatasource(this._dioService);
 
-  Future<ApiResult> loadCateByPage(int page, int limit_count) async {
+  Future<ApiResult> loadCateByPage(
+    int page,
+    int limit_count, {
+    String? type,
+  }) async {
     final response = await _dioService.getWithCache(
       '${CategoryAPI.get_load_by_page}?'
       'page=$page&'
-      'limit_count=$limit_count',
+      'limit_count=$limit_count&'
+      '${type != null ? 'type=$type' : ''}',
     );
 
     return response;

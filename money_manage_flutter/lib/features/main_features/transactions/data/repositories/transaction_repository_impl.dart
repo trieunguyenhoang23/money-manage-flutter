@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/core_external.dart';
+import '../../../../../core/data/datasource/sync_state_datasource.dart';
 import '../../../../../infrastructure/file/models/file_picked.dart';
 import '../../../../category/data/model/local/category_local_model.dart';
 import '../../domain/repositories/transaction_repository.dart';
@@ -13,11 +14,13 @@ class TransactionRepositoryImpl implements TransactionRepository {
   final TransactionsRemoteDatasource _remoteDatasource;
   final TransactionsLocalDatasource _localDatasource;
   final SyncManager _syncManager;
+  final SyncStateDatasource _syncStateDatasource;
 
   TransactionRepositoryImpl(
     this._remoteDatasource,
     this._localDatasource,
     this._syncManager,
+    this._syncStateDatasource,
   );
 
   int limitCount = SizeAppUtils().isTablet ? 20 : 10;
@@ -44,7 +47,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
       amount: amount,
       note: note,
       type: category.type ?? TransactionType.EXPENSE,
-      categoryId: category.idServer,
+      categoryId: category.idServer!,
       transactionAt: transactionAt,
       createdAt: now,
       updatedAt: now,
@@ -84,21 +87,47 @@ class TransactionRepositoryImpl implements TransactionRepository {
   @override
   Future<List<TransactionLocalModel>> loadTransByPage(int page) async {
     var localData = await _localDatasource.loadByPage(page, limitCount);
-    _syncManager.runIfMeetStandard((currentActiveUserId, networkStatus) async {
-      // final remoteData = await _remoteDatasource.loadCateByPage(
-      //   page,
-      //   limitCount,
-      // );
-      // if (remoteData.isSuccess) {
-      //   final localModels = await parseListJsonIsolate(
-      //     CategoryLocalModel.fromJson,
-      //     remoteData.data,
-      //   );
 
-      // Save to local Isar
-      // await _localDatasource.saveAll(localModels);
-      // localData = await _localDatasource.loadByType(page, limitCount, type);
-      // }
+    await _syncManager.runIfMeetStandard((
+      currentActiveUserId,
+      networkStatus,
+    ) async {
+      if (_syncStateDatasource.hasReachedEnd(SyncSchema.transaction)) return;
+
+      bool isPartialPage = localData.length < limitCount;
+
+      /// If local data in this page doesn't meet limitCount
+      if (isPartialPage) {
+        /// Get last page to continue fetching dat from server
+        int lastFetched = _syncStateDatasource.getLastPage(
+          SyncSchema.transaction,
+        );
+        int nextPage = lastFetched + 1;
+
+        await _remoteDatasource.loadTransByPage(page, limitCount).then((
+          result,
+        ) async {
+          if (result.isFailure) return;
+
+          /// Set last page if data is empty
+          if (result.data.isEmpty) {
+            await _syncStateDatasource.setReachedEnd(SyncSchema.transaction, true,);
+            return;
+          }
+
+          /// Save lastest fetching page
+          await _syncStateDatasource.setLastPage(SyncSchema.transaction, nextPage,);
+          final localModels = await parseListJsonIsolate(
+            TransactionLocalModel.fromRemote,
+            result.data,
+          );
+
+          // Save to local Isar
+          await _localDatasource.saveAll(localModels);
+          // Re-fetch from local to get the unified list
+          localData = await _localDatasource.loadByPage(page, limitCount);
+        });
+      }
     });
 
     return localData;
@@ -142,7 +171,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
     required CategoryLocalModel newCate,
     FilePicked? imageFile,
   }) async {
-    oldItem.merge(
+    bool hasChanged = oldItem.merge(
       amountTemp: updateJsonRequestBody['amount'] ?? oldItem.amount,
       noteTemp: updateJsonRequestBody['note'] ?? oldItem.note,
       transactionAtTemp: updateJsonRequestBody['transaction_at'] != null
@@ -152,31 +181,38 @@ class TransactionRepositoryImpl implements TransactionRepository {
       newImageBytes: imageFile?.bytes,
     );
 
-    await _syncManager.runIfMeetStandard((
-      currentActiveUserId,
-      networkStatus,
-    ) async {
-      String imageName =
-          '${currentActiveUserId}_${DateTime.now().millisecondsSinceEpoch}.${imageFile?.extension}';
-      // Update Transaction to Server
-      final result = await _remoteDatasource.updateTransaction(
-        id: oldItem.idServer ?? '',
-        updateJsonRequestBody,
-        image_description_buffer: imageFile?.bytes,
-        image_name: imageName,
-      );
+    /// Just update if any data change
+    if (hasChanged) {
+      await _syncManager.runIfMeetStandard((
+        currentActiveUserId,
+        networkStatus,
+      ) async {
+        String imageName =
+            '${currentActiveUserId}_${DateTime.now().millisecondsSinceEpoch}.${imageFile?.extension}';
+        // Update Transaction to Server
+        final result = await _remoteDatasource.updateTransaction(
+          id: oldItem.idServer ?? '',
+          updateJsonRequestBody,
+          image_description_buffer: imageFile?.bytes,
+          image_name: imageName,
+        );
 
-      if (result.isSuccess) {
-        oldItem
-          ..imageUrl = result.data['image_description']
-          ..imageBytes = null
-          ..userId = currentActiveUserId
-          ..isSynced = true;
-      }
-    });
-
-    await _localDatasource.putTransaction(oldItem, newCate);
+        if (result.isSuccess) {
+          oldItem
+            ..imageUrl = result.data['image_description']
+            ..imageBytes = null
+            ..userId = currentActiveUserId
+            ..isSynced = true;
+        }
+      });
+      await _localDatasource.putTransaction(oldItem, newCate);
+    }
 
     return Right(oldItem);
+  }
+
+  @override
+  Future<void> clearAllData() async {
+    await _localDatasource.clearAll();
   }
 }

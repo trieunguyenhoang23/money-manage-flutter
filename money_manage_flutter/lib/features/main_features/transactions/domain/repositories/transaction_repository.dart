@@ -30,4 +30,6 @@ abstract class TransactionRepository {
   Future<Either<Failure, bool>> removeTransaction({
     required TransactionLocalModel transaction,
   });
+
+  Future<void> clearAllData();
 }

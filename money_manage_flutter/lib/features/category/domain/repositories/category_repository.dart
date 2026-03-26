@@ -11,10 +11,9 @@ abstract class CategoryRepository {
   );
 
   Future<Either<Failure, CategoryLocalModel>> editCategory(
-    String name,
-    String desc,
-    TransactionType type,
-    CategoryLocalModel oldItem,
+      Map<String,dynamic> updatedJson,
+
+      CategoryLocalModel oldItem,
   );
 
   Future<List<CategoryLocalModel>> loadCategoryByPage(int page);

@@ -90,7 +90,12 @@ int _categoryLocalModelEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
-  bytesCount += 3 + object.idServer.length * 3;
+  {
+    final value = object.idServer;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   {
     final value = object.name;
     if (value != null) {
@@ -134,17 +139,20 @@ CategoryLocalModel _categoryLocalModelDeserialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = CategoryLocalModel();
-  object.createdAt = reader.readDateTimeOrNull(offsets[0]);
-  object.description = reader.readStringOrNull(offsets[1]);
+  final object = CategoryLocalModel(
+    createdAt: reader.readDateTimeOrNull(offsets[0]),
+    description: reader.readStringOrNull(offsets[1]),
+    idServer: reader.readStringOrNull(offsets[2]),
+    isSynced: reader.readBoolOrNull(offsets[3]) ?? false,
+    name: reader.readStringOrNull(offsets[4]),
+    type:
+        _CategoryLocalModeltypeValueEnumMap[reader.readStringOrNull(
+          offsets[5],
+        )],
+    updatedAt: reader.readDateTimeOrNull(offsets[6]),
+    userId: reader.readStringOrNull(offsets[7]),
+  );
   object.id = id;
-  object.idServer = reader.readString(offsets[2]);
-  object.isSynced = reader.readBool(offsets[3]);
-  object.name = reader.readStringOrNull(offsets[4]);
-  object.type =
-      _CategoryLocalModeltypeValueEnumMap[reader.readStringOrNull(offsets[5])];
-  object.updatedAt = reader.readDateTimeOrNull(offsets[6]);
-  object.userId = reader.readStringOrNull(offsets[7]);
   return object;
 }
 
@@ -160,9 +168,9 @@ P _categoryLocalModelDeserializeProp<P>(
     case 1:
       return (reader.readStringOrNull(offset)) as P;
     case 2:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 3:
-      return (reader.readBool(offset)) as P;
+      return (reader.readBoolOrNull(offset) ?? false) as P;
     case 4:
       return (reader.readStringOrNull(offset)) as P;
     case 5:
@@ -207,40 +215,40 @@ void _categoryLocalModelAttach(
 }
 
 extension CategoryLocalModelByIndex on IsarCollection<CategoryLocalModel> {
-  Future<CategoryLocalModel?> getByIdServer(String idServer) {
+  Future<CategoryLocalModel?> getByIdServer(String? idServer) {
     return getByIndex(r'idServer', [idServer]);
   }
 
-  CategoryLocalModel? getByIdServerSync(String idServer) {
+  CategoryLocalModel? getByIdServerSync(String? idServer) {
     return getByIndexSync(r'idServer', [idServer]);
   }
 
-  Future<bool> deleteByIdServer(String idServer) {
+  Future<bool> deleteByIdServer(String? idServer) {
     return deleteByIndex(r'idServer', [idServer]);
   }
 
-  bool deleteByIdServerSync(String idServer) {
+  bool deleteByIdServerSync(String? idServer) {
     return deleteByIndexSync(r'idServer', [idServer]);
   }
 
   Future<List<CategoryLocalModel?>> getAllByIdServer(
-    List<String> idServerValues,
+    List<String?> idServerValues,
   ) {
     final values = idServerValues.map((e) => [e]).toList();
     return getAllByIndex(r'idServer', values);
   }
 
-  List<CategoryLocalModel?> getAllByIdServerSync(List<String> idServerValues) {
+  List<CategoryLocalModel?> getAllByIdServerSync(List<String?> idServerValues) {
     final values = idServerValues.map((e) => [e]).toList();
     return getAllByIndexSync(r'idServer', values);
   }
 
-  Future<int> deleteAllByIdServer(List<String> idServerValues) {
+  Future<int> deleteAllByIdServer(List<String?> idServerValues) {
     final values = idServerValues.map((e) => [e]).toList();
     return deleteAllByIndex(r'idServer', values);
   }
 
-  int deleteAllByIdServerSync(List<String> idServerValues) {
+  int deleteAllByIdServerSync(List<String?> idServerValues) {
     final values = idServerValues.map((e) => [e]).toList();
     return deleteAllByIndexSync(r'idServer', values);
   }
@@ -344,7 +352,30 @@ extension CategoryLocalModelQueryWhere
   }
 
   QueryBuilder<CategoryLocalModel, CategoryLocalModel, QAfterWhereClause>
-  idServerEqualTo(String idServer) {
+  idServerIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        IndexWhereClause.equalTo(indexName: r'idServer', value: [null]),
+      );
+    });
+  }
+
+  QueryBuilder<CategoryLocalModel, CategoryLocalModel, QAfterWhereClause>
+  idServerIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        IndexWhereClause.between(
+          indexName: r'idServer',
+          lower: [null],
+          includeLower: false,
+          upper: [],
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<CategoryLocalModel, CategoryLocalModel, QAfterWhereClause>
+  idServerEqualTo(String? idServer) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         IndexWhereClause.equalTo(indexName: r'idServer', value: [idServer]),
@@ -353,7 +384,7 @@ extension CategoryLocalModelQueryWhere
   }
 
   QueryBuilder<CategoryLocalModel, CategoryLocalModel, QAfterWhereClause>
-  idServerNotEqualTo(String idServer) {
+  idServerNotEqualTo(String? idServer) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -686,7 +717,25 @@ extension CategoryLocalModelQueryFilter
   }
 
   QueryBuilder<CategoryLocalModel, CategoryLocalModel, QAfterFilterCondition>
-  idServerEqualTo(String value, {bool caseSensitive = true}) {
+  idServerIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'idServer'),
+      );
+    });
+  }
+
+  QueryBuilder<CategoryLocalModel, CategoryLocalModel, QAfterFilterCondition>
+  idServerIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'idServer'),
+      );
+    });
+  }
+
+  QueryBuilder<CategoryLocalModel, CategoryLocalModel, QAfterFilterCondition>
+  idServerEqualTo(String? value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.equalTo(
@@ -700,7 +749,7 @@ extension CategoryLocalModelQueryFilter
 
   QueryBuilder<CategoryLocalModel, CategoryLocalModel, QAfterFilterCondition>
   idServerGreaterThan(
-    String value, {
+    String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -718,7 +767,7 @@ extension CategoryLocalModelQueryFilter
 
   QueryBuilder<CategoryLocalModel, CategoryLocalModel, QAfterFilterCondition>
   idServerLessThan(
-    String value, {
+    String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
@@ -736,8 +785,8 @@ extension CategoryLocalModelQueryFilter
 
   QueryBuilder<CategoryLocalModel, CategoryLocalModel, QAfterFilterCondition>
   idServerBetween(
-    String lower,
-    String upper, {
+    String? lower,
+    String? upper, {
     bool includeLower = true,
     bool includeUpper = true,
     bool caseSensitive = true,
@@ -1717,7 +1766,7 @@ extension CategoryLocalModelQueryProperty
     });
   }
 
-  QueryBuilder<CategoryLocalModel, String, QQueryOperations>
+  QueryBuilder<CategoryLocalModel, String?, QQueryOperations>
   idServerProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'idServer');

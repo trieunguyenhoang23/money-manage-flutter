@@ -77,6 +77,7 @@ import '../../infrastructure/network/network_info.dart' as _i436;
 import '../../infrastructure/social_auth/apple_auth_service.dart' as _i502;
 import '../../infrastructure/social_auth/google_auth_service.dart' as _i219;
 import '../../infrastructure/social_auth/social_auth_factory.dart' as _i22;
+import '../data/datasource/sync_state_datasource.dart' as _i287;
 import '../network/auth_interceptor.dart' as _i908;
 import '../network/sync_manager.dart' as _i848;
 import 'module_di.dart' as _i633;
@@ -105,6 +106,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i1013.TransactionsLocalDatasource>(
       () => _i1013.TransactionsLocalDatasource(gh<_i214.Isar>()),
+    );
+    gh.lazySingleton<_i287.SyncStateDatasource>(
+      () => _i287.SyncStateDatasource(gh<_i460.SharedPreferences>()),
     );
     gh.singleton<_i820.IFileService>(
       () => _i835.FileServiceImpl(
@@ -183,25 +187,15 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i407.TransactionsRemoteDatasource>(),
         gh<_i1013.TransactionsLocalDatasource>(),
         gh<_i858.SyncManager>(),
+        gh<_i287.SyncStateDatasource>(),
       ),
     );
     gh.lazySingleton<_i869.CategoryRepository>(
       () => _i528.CategoryRepositoryImpl(
         gh<_i702.CategoryRemoteDatasource>(),
         gh<_i197.CategoryLocalDatasource>(),
-        gh<_i168.UserRepository>(),
-      ),
-    );
-    gh.lazySingleton<_i845.CreateCategoryUseCase>(
-      () => _i845.CreateCategoryUseCase(gh<_i869.CategoryRepository>()),
-    );
-    gh.lazySingleton<_i617.EditCategoryUseCase>(
-      () => _i617.EditCategoryUseCase(gh<_i869.CategoryRepository>()),
-    );
-    gh.lazySingleton<_i100.LogoutUseCase>(
-      () => _i100.LogoutUseCase(
-        gh<_i168.UserRepository>(),
-        gh<_i869.CategoryRepository>(),
+        gh<_i858.SyncManager>(),
+        gh<_i287.SyncStateDatasource>(),
       ),
     );
     gh.lazySingleton<_i1069.LoadingCategoryUseCase>(
@@ -222,12 +216,26 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i947.UpdateTransactionUseCase>(
       () => _i947.UpdateTransactionUseCase(gh<_i874.TransactionRepository>()),
     );
+    gh.lazySingleton<_i100.LogoutUseCase>(
+      () => _i100.LogoutUseCase(
+        gh<_i168.UserRepository>(),
+        gh<_i869.CategoryRepository>(),
+        gh<_i874.TransactionRepository>(),
+        gh<_i287.SyncStateDatasource>(),
+      ),
+    );
     gh.lazySingleton<_i429.AuthUseCase>(
       () => _i429.AuthUseCase(
         gh<_i168.UserRepository>(),
         gh<_i129.SyncRepository>(),
         gh<_i869.CategoryRepository>(),
       ),
+    );
+    gh.lazySingleton<_i845.CreateCategoryUseCase>(
+      () => _i845.CreateCategoryUseCase(gh<_i869.CategoryRepository>()),
+    );
+    gh.lazySingleton<_i617.EditCategoryUseCase>(
+      () => _i617.EditCategoryUseCase(gh<_i869.CategoryRepository>()),
     );
     return this;
   }

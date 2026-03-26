@@ -45,7 +45,7 @@ class TransactionsLocalDatasource {
       final id = category.idServer;
       if (seen.contains(id)) continue;
 
-      seen.add(id);
+      seen.add(id!);
       result.add(category);
 
       if (result.length >= range) {
@@ -63,7 +63,7 @@ class TransactionsLocalDatasource {
       final id = cate.idServer;
       if (seen.contains(id)) continue;
 
-      seen.add(id);
+      seen.add(id!);
       result.add(cate);
 
       if (result.length >= range) break;
@@ -87,9 +87,31 @@ class TransactionsLocalDatasource {
     });
   }
 
+  Future<void> saveAll(List<TransactionLocalModel> transactions) async {
+    await _isar.writeTxn(() async {
+      // 1. Bulk insert all transactions first
+      // This returns the internal Isar IDs if they were null/auto-increment
+      await _isar.transactionLocalModels.putAll(transactions);
+
+      // 2. Prepare all links
+      // We iterate through and ensure the category link is set and saved
+      for (var tx in transactions) {
+        // Note: This assumes tx.category.value was already assigned
+        // before calling saveAll. If not, you'd assign it here.
+        await tx.category.save();
+      }
+    });
+  }
+
   Future<void> removeTransaction(TransactionLocalModel transaction) async {
     _isar.writeTxn(() async {
       await _isar.transactionLocalModels.delete(transaction.id);
+    });
+  }
+
+  Future<void> clearAll() async {
+    await _isar.writeTxn(() async {
+      await _isar.transactionLocalModels.clear();
     });
   }
 }
