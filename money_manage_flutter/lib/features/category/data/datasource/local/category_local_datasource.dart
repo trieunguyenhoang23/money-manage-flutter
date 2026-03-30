@@ -36,6 +36,27 @@ class CategoryLocalDatasource {
         .findAll();
   }
 
+  Future<List<CategoryLocalModel>> loadDataNotYetSync(int limitCount) async {
+    return await _isar.categoryLocalModels
+        .filter()
+        .isSyncedEqualTo(false)
+        .sortByCreatedAtDesc()
+        .offset(0 * limitCount)
+        .limit(limitCount)
+        .findAll();
+  }
+
+  Future<int> getLengthDataNotYetSync() async {
+    return await _isar.categoryLocalModels
+        .filter()
+        .isSyncedEqualTo(false)
+        .count();
+  }
+
+  Future<int> getLengthData() async {
+    return await _isar.categoryLocalModels.count();
+  }
+
   Future<void> save(CategoryLocalModel cate) async {
     await _isar.writeTxn(() async {
       await _isar.categoryLocalModels.put(cate);
@@ -54,10 +75,15 @@ class CategoryLocalDatasource {
     });
   }
 
-  Future<void> markAllAsSynced(List<CategoryLocalModel> list) async {
+  Future<void> markAllAsSynced(
+    List<CategoryLocalModel> list,
+    String userId,
+  ) async {
     await _isar.writeTxn(() async {
       for (var item in list) {
-        item.isSynced = true;
+        item
+          ..isSynced = true
+          ..userId = userId;
       }
       await _isar.categoryLocalModels.putAll(list);
     });

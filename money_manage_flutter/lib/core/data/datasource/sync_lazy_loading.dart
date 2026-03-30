@@ -4,10 +4,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum SyncSchema { category, transaction, reminder }
 
 @LazySingleton()
-class SyncStateDatasource {
+class SyncLazyLoading {
   final SharedPreferences _prefs;
 
-  SyncStateDatasource(this._prefs);
+  SyncLazyLoading(this._prefs);
 
   static const String _keyLastPage = 'sync_last_page_';
   static const String _keyHasReachedEnd = 'sync_has_reached_end_';

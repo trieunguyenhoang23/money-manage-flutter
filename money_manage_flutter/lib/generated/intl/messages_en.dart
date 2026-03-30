@@ -20,6 +20,8 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
+  static String m0(keyword) => "Synchronization error ${keyword}";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
     "analytics": MessageLookupByLibrary.simpleMessage("Analysis"),
@@ -54,6 +56,11 @@ class MessageLookup extends MessageLookupByLibrary {
     "profile_remind": MessageLookupByLibrary.simpleMessage("Remind"),
     "profile_theme": MessageLookupByLibrary.simpleMessage("Theme"),
     "retry": MessageLookupByLibrary.simpleMessage("Retry"),
+    "sync_complete": MessageLookupByLibrary.simpleMessage(
+      "Complete synchronization",
+    ),
+    "sync_error": m0,
+    "sync_loading": MessageLookupByLibrary.simpleMessage("Synchronizing"),
     "transaction": MessageLookupByLibrary.simpleMessage("Transaction"),
     "transaction_at": MessageLookupByLibrary.simpleMessage("Transaction At:"),
     "transaction_create_new": MessageLookupByLibrary.simpleMessage(

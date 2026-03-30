@@ -1,5 +1,5 @@
 import 'package:injectable/injectable.dart';
-import '../../../../../core/data/datasource/sync_state_datasource.dart';
+import '../../../../../core/data/datasource/sync_lazy_loading.dart';
 import '../../../../category/domain/repositories/category_repository.dart';
 import '../../../transactions/domain/repositories/transaction_repository.dart';
 import '../repositories/user_repository.dart';
@@ -9,13 +9,13 @@ class LogoutUseCase {
   final UserRepository _userRepository;
   final CategoryRepository _categoryRepository;
   final TransactionRepository _transactionRepository;
-  final SyncStateDatasource _syncStateDatasource;
+  final SyncLazyLoading _SyncLazyLoading;
 
   LogoutUseCase(
     this._userRepository,
     this._categoryRepository,
     this._transactionRepository,
-    this._syncStateDatasource,
+    this._SyncLazyLoading,
   );
 
   Future<void> execute() async {
@@ -24,8 +24,8 @@ class LogoutUseCase {
     await _userRepository.clearSession();
 
     /// Reset loading data state
-    await _syncStateDatasource.resetSync(SyncSchema.reminder);
-    await _syncStateDatasource.resetSync(SyncSchema.category);
-    await _syncStateDatasource.resetSync(SyncSchema.transaction);
+    await _SyncLazyLoading.resetSync(SyncSchema.reminder);
+    await _SyncLazyLoading.resetSync(SyncSchema.category);
+    await _SyncLazyLoading.resetSync(SyncSchema.transaction);
   }
 }

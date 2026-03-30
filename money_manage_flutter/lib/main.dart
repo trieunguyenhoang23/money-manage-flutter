@@ -1,3 +1,6 @@
+import 'package:flutter/foundation.dart';
+import 'package:workmanager/workmanager.dart';
+import 'core/background/callback_dispatcher.dart';
 import 'core/di/injection.dart';
 import 'export/core.dart';
 import 'generated/l10n.dart';
@@ -13,7 +16,9 @@ void main() async {
 
   await configureDependencies();
   await initializeDateFormatting();
-  
+
+  await Workmanager().initialize(callbackDispatcher, isInDebugMode: kDebugMode);
+
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,

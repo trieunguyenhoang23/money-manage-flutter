@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
-import '../../../../core/data/datasource/sync_state_datasource.dart';
+import '../../../../core/data/datasource/sync_lazy_loading.dart';
 import '../../domain/repositories/category_repository.dart';
 import '../datasource/local/category_local_datasource.dart';
 import '../datasource/remote/category_remote_datasource.dart';
@@ -12,13 +12,13 @@ class CategoryRepositoryImpl implements CategoryRepository {
   final CategoryRemoteDatasource _remoteDatasource;
   final CategoryLocalDatasource _localDatasource;
   final SyncManager _syncManager;
-  final SyncStateDatasource _syncStateDatasource;
+  final SyncLazyLoading _SyncLazyLoading;
 
   CategoryRepositoryImpl(
     this._remoteDatasource,
     this._localDatasource,
     this._syncManager,
-    this._syncStateDatasource,
+    this._SyncLazyLoading,
   );
 
   int limitCount = SizeAppUtils().isTablet ? 20 : 10;
@@ -72,14 +72,14 @@ class CategoryRepositoryImpl implements CategoryRepository {
       currentActiveUserId,
       networkStatus,
     ) async {
-      if (_syncStateDatasource.hasReachedEnd(SyncSchema.category)) return;
+      if (_SyncLazyLoading.hasReachedEnd(SyncSchema.category)) return;
 
       bool isPartialPage = localData.length < limitCount;
 
       /// If local data in this page doesn't meet limitCount
       if (isPartialPage) {
         /// Get last page to continue fetching dat from server
-        int lastFetched = _syncStateDatasource.getLastPage(SyncSchema.category);
+        int lastFetched = _SyncLazyLoading.getLastPage(SyncSchema.category);
         int nextPage = lastFetched + 1;
 
         await _remoteDatasource.loadCateByPage(page, limitCount).then((
@@ -89,12 +89,12 @@ class CategoryRepositoryImpl implements CategoryRepository {
 
           /// Set last page if data is empty
           if (result.data.isEmpty) {
-            await _syncStateDatasource.setReachedEnd(SyncSchema.category, true);
+            await _SyncLazyLoading.setReachedEnd(SyncSchema.category, true);
             return;
           }
 
           /// Save lastest fetching page
-          await _syncStateDatasource.setLastPage(SyncSchema.category, nextPage);
+          await _SyncLazyLoading.setLastPage(SyncSchema.category, nextPage);
           final localModels = await parseListJsonIsolate(
             CategoryLocalModel.fromRemote,
             result.data,

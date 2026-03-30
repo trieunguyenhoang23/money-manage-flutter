@@ -57,6 +57,14 @@ abstract class ModuleDI {
   @preResolve
   Future<Isar> get isar async {
     final dir = await getApplicationDocumentsDirectory();
+
+    // Check is default db opened
+    // If opened (from other Isolate), Isar.getInstance() will return that isolate
+    final existingIsar = Isar.getInstance();
+    if (existingIsar != null && existingIsar.isOpen) {
+      return existingIsar;
+    }
+
     final schemas = [
       CategoryLocalModelSchema,
       UserLocalModelSchema,

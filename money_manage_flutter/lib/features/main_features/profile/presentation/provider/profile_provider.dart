@@ -1,8 +1,5 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:money_manage_flutter/core/enum/transaction_type.dart';
-import 'package:money_manage_flutter/core/utils/toast_utils.dart';
-import 'package:money_manage_flutter/features/main_features/profile/presentation/provider/currency_provider.dart';
-import '../../../../../core/di/injection.dart';
+import 'package:money_manage_flutter/export/core.dart';
 import '../../../../../infrastructure/social_auth/social_auth_factory.dart';
 import '../../../../category/presentation/provider/category_provider.dart';
 import '../../../transactions/presentation/provider/transaction_provider.dart';
@@ -10,6 +7,7 @@ import '../../data/datasource/local/user_local_datasource.dart';
 import '../../data/model/local/user_local_model.dart';
 import '../../domain/usecase/auth_usecase.dart';
 import '../../domain/usecase/logout_usecase.dart';
+import 'currency_provider.dart';
 
 class ProfileState {
   final UserLocalModel? userLocalModel;
@@ -48,6 +46,11 @@ class ProfileNotifier extends AsyncNotifier<ProfileState> {
             state.value?.userLocalModel?.currency ?? 'VND',
             isSyncData: false,
           );
+
+      /// Register sync data in background
+      Future.delayed(const Duration(seconds: 3), () {
+        BackgroundTaskHelper.scheduleSync();
+      });
     });
   }
 

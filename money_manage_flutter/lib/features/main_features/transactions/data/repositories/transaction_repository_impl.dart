@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/core_external.dart';
-import '../../../../../core/data/datasource/sync_state_datasource.dart';
+import '../../../../../core/data/datasource/sync_lazy_loading.dart';
 import '../../../../../infrastructure/file/models/file_picked.dart';
 import '../../../../category/data/datasource/local/category_local_datasource.dart';
 import '../../../../category/data/model/local/category_local_model.dart';
@@ -15,14 +15,14 @@ class TransactionRepositoryImpl implements TransactionRepository {
   final TransactionsRemoteDatasource _remoteDatasource;
   final TransactionsLocalDatasource _localDatasource;
   final SyncManager _syncManager;
-  final SyncStateDatasource _syncStateDatasource;
+  final SyncLazyLoading _SyncLazyLoading;
   final CategoryLocalDatasource _categoryLocalDatasource;
 
   TransactionRepositoryImpl(
     this._remoteDatasource,
     this._localDatasource,
     this._syncManager,
-    this._syncStateDatasource,
+    this._SyncLazyLoading,
     this._categoryLocalDatasource,
   );
 
@@ -94,14 +94,14 @@ class TransactionRepositoryImpl implements TransactionRepository {
       currentActiveUserId,
       networkStatus,
     ) async {
-      if (_syncStateDatasource.hasReachedEnd(SyncSchema.transaction)) return;
+      if (_SyncLazyLoading.hasReachedEnd(SyncSchema.transaction)) return;
 
       bool isPartialPage = localData.length < limitCount;
 
       /// If local data in this page doesn't meet limitCount
       if (isPartialPage) {
         /// Get last page to continue fetching dat from server
-        int lastFetched = _syncStateDatasource.getLastPage(
+        int lastFetched = _SyncLazyLoading.getLastPage(
           SyncSchema.transaction,
         );
         int nextPage = lastFetched + 1;
@@ -113,7 +113,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
           /// Set last page if data is empty
           if (result.data.isEmpty) {
-            await _syncStateDatasource.setReachedEnd(
+            await _SyncLazyLoading.setReachedEnd(
               SyncSchema.transaction,
               true,
             );
@@ -121,7 +121,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
           }
 
           /// Save lastest fetching page
-          await _syncStateDatasource.setLastPage(
+          await _SyncLazyLoading.setLastPage(
             SyncSchema.transaction,
             nextPage,
           );

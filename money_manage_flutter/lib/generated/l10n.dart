@@ -144,6 +144,36 @@ class S {
     return Intl.message('Confirm', name: 'confirm', desc: '', args: []);
   }
 
+  /// `Synchronization error {keyword}`
+  String sync_error(Object keyword) {
+    return Intl.message(
+      'Synchronization error $keyword',
+      name: 'sync_error',
+      desc: '',
+      args: [keyword],
+    );
+  }
+
+  /// `Synchronizing`
+  String get sync_loading {
+    return Intl.message(
+      'Synchronizing',
+      name: 'sync_loading',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Complete synchronization`
+  String get sync_complete {
+    return Intl.message(
+      'Complete synchronization',
+      name: 'sync_complete',
+      desc: '',
+      args: [],
+    );
+  }
+
   // skipped getter for the '//TRANSACTIONS' key
 
   /// `Transaction`

@@ -47,7 +47,7 @@ class CategoryLocalModel {
           ? DateTime.tryParse(remote['updated_at'])?.toLocal()
           : null,
       userId: remote['user_id'],
-      isSynced: true, // Data from server is synced by default
+      isSynced: false, // Data from server is synced by default
     );
   }
 

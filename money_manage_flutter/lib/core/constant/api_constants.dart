@@ -18,8 +18,11 @@ class UserBaseAPI {
 
 class SyncAPI {
   /// POST
-  static String get post_sync_user_data =>
-      '${APIConstants.bareUrl}/post/sync/user-data';
+  static String get post_sync_batch_category =>
+      '${APIConstants.bareUrl}/post/sync/batch-category';
+
+  static String get post_sync_batch_transaction =>
+      '${APIConstants.bareUrl}/post/sync/batch-transaction';
 }
 
 class CategoryAPI {

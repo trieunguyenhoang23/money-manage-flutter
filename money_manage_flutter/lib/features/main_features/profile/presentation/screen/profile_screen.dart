@@ -1,6 +1,12 @@
+import 'package:money_manage_flutter/core/di/injection.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
+import '../../../../sync/data/model/sync_batch_progress.dart';
+import '../../../../sync/domain/repositories/sync_repository.dart';
+import '../../../../sync/domain/usecase/sync_category_usecase.dart';
+import '../../../../sync/domain/usecase/sync_transaction_usecase.dart';
+import '../../../../sync/presentation/widget/sync_progress_builder_widget.dart';
 import '../provider/profile_provider.dart';
 import '../widget/profile_currency_widget.dart';
 import '../widget/profile_theme_widget.dart';
@@ -13,9 +19,26 @@ class ProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
-  late List<Widget> profileOptions = const [
+  List<Widget> profileOptions = const [
     ProfileCurrencyWidget(),
     ProfileThemeWidget(),
+  ];
+
+  List<Widget> syncWidget = [
+    SyncProgressBuilderWidget(
+      syncStreamFactory: () => getIt<SyncCateUseCase>().execute(),
+      onCompleted: () {},
+      onRetry: () {},
+      syncType: SyncType.category,
+      getSyncStatus: getIt<SyncRepository>().getCategorySyncStatus,
+    ),
+    SyncProgressBuilderWidget(
+      syncStreamFactory: () => getIt<SyncTransactionUseCase>().execute(),
+      onCompleted: () {},
+      onRetry: () {},
+      syncType: SyncType.transaction,
+      getSyncStatus: getIt<SyncRepository>().getTransactionSyncStatus,
+    ),
   ];
 
   @override
@@ -31,13 +54,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               return SliverToBoxAdapter(
                 child: profileState.when(
                   data: (state) => state.userLocalModel != null
-                      ? BtnMainWidget(
-                          onTap: profileNotifier.onLogout,
-                          color: ColorConstant.error400,
-                          child: TextGGStyle(
-                            context.lang.profile_logout,
-                            0.05.sw,
-                          ),
+                      ? Column(
+                          children: [
+                            BtnMainWidget(
+                              onTap: profileNotifier.onLogout,
+                              color: ColorConstant.error400,
+                              child: TextGGStyle(
+                                context.lang.profile_logout,
+                                0.05.sw,
+                              ),
+                            ),
+
+                            /// Sync widget
+                            for (var widget in syncWidget) ...[
+                              const SpacingStyle(),
+                              widget,
+                            ],
+                          ],
                         )
                       : BtnMainWidget(
                           onTap: profileNotifier.onSignIn,
@@ -65,6 +98,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               crossAxisSpacing: 10,
             ),
           ),
+          const SliverToBoxAdapter(child: SpacingStyle()),
         ],
       ),
     );

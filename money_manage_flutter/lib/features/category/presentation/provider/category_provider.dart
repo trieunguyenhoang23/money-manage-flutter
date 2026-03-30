@@ -6,7 +6,7 @@ import '../../data/model/local/category_local_model.dart';
 import '../../domain/usecase/loading_category_usecase.dart';
 
 final loadingCategoryProvider =
-    StateNotifierProvider.autoDispose<
+    StateNotifierProvider<
       PullToRefreshNotifier<CategoryLocalModel>,
       PullToRefreshState<CategoryLocalModel>
     >((ref) {

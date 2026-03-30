@@ -22,6 +22,27 @@ class TransactionsLocalDatasource {
         .findAll();
   }
 
+  Future<List<TransactionLocalModel>> loadDataNotYetSync(int limitCount) async {
+    return await _isar.transactionLocalModels
+        .filter()
+        .isSyncedEqualTo(false)
+        .sortByCreatedAtDesc()
+        .offset(0 * limitCount)
+        .limit(limitCount)
+        .findAll();
+  }
+
+  Future<int> getLengthDataNotYetSync() async {
+    return await _isar.transactionLocalModels
+        .filter()
+        .isSyncedEqualTo(false)
+        .count();
+  }
+
+  Future<int> getLengthData() async {
+    return await _isar.transactionLocalModels.count();
+  }
+
   Future<List<CategoryLocalModel>> getRecentActiveCategories(
     int range,
     TransactionType type,
@@ -112,6 +133,20 @@ class TransactionsLocalDatasource {
   Future<void> clearAll() async {
     await _isar.writeTxn(() async {
       await _isar.transactionLocalModels.clear();
+    });
+  }
+
+  Future<void> markAllAsSynced(
+    List<TransactionLocalModel> list,
+    String userId,
+  ) async {
+    await _isar.writeTxn(() async {
+      for (var item in list) {
+        item
+          ..isSynced = true
+          ..userId = userId;
+      }
+      await _isar.transactionLocalModels.putAll(list);
     });
   }
 }
