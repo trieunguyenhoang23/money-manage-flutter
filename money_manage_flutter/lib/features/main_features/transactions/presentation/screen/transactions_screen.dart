@@ -1,6 +1,7 @@
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:money_manage_flutter/core/constant/color_constant.dart';
 import 'package:money_manage_flutter/export/router.dart';
+import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import '../../../../../core/router/navigator_router.dart';
 import '../../../../../shared/widget/btn/btn_floating_widget.dart';
@@ -63,6 +64,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                           context,
                         ),
                   ),
+                  const SliverToBoxAdapter(child: SpacingStyle()),
                   const SliverFillRemaining(child: TransactionGridViewWidget()),
                 ],
               );

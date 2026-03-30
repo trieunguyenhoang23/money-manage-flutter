@@ -5,6 +5,24 @@ enum TransactionType {
   INCOME,
   EXPENSE;
 
+  static TransactionType fromDynamic(dynamic value) {
+    if (value is TransactionType) return value;
+
+    if (value is String) {
+      return TransactionType.values.firstWhere(
+        (e) => e.name.toUpperCase() == value.toUpperCase(),
+        orElse: () =>
+            TransactionType.EXPENSE, // Giá trị mặc định nếu không khớp
+      );
+    }
+
+    return TransactionType.EXPENSE;
+  }
+
+  bool get isIncome => this == TransactionType.INCOME;
+
+  bool get isExpense => this == TransactionType.EXPENSE;
+
   String displayTitle(BuildContext context) {
     switch (this) {
       case TransactionType.INCOME:
@@ -14,5 +32,5 @@ enum TransactionType {
     }
   }
 
-  Color get color => this == TransactionType.INCOME ? Colors.green : Colors.red;
+  Color get color => isIncome ? Colors.green : Colors.red;
 }

@@ -183,7 +183,7 @@ class _CategoryItem extends StatelessWidget {
             decoration: BoxDecoration(
               color: isSelected
                   ? ColorConstant.primary
-                  : ColorConstant.neutral200,
+                  : context.colorScheme.surface,
               borderRadius: BorderRadius.circular(8),
             ),
             alignment: Alignment.center,

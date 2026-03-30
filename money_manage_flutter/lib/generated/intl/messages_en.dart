@@ -47,6 +47,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "gallery": MessageLookupByLibrary.simpleMessage("Gallery"),
     "image": MessageLookupByLibrary.simpleMessage("Image"),
     "income": MessageLookupByLibrary.simpleMessage("Income"),
+    "language": MessageLookupByLibrary.simpleMessage("Language"),
     "name": MessageLookupByLibrary.simpleMessage("Name"),
     "note": MessageLookupByLibrary.simpleMessage("Note"),
     "profile": MessageLookupByLibrary.simpleMessage("Profile"),

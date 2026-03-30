@@ -30,3 +30,10 @@ export 'package:money_manage_flutter/shared/widget/dialog/dialog_utils.dart';
 
 /// State
 export 'package:money_manage_flutter/shared/state/pull_to_refresh_state.dart';
+
+/// l10n
+export 'package:money_manage_flutter/shared/l10n/l10n.dart';
+export 'package:money_manage_flutter/shared/l10n/lang_provider.dart';
+
+/// Theme
+export 'package:money_manage_flutter/shared/theme/theme_provider.dart';

@@ -3,7 +3,6 @@ import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/router.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import 'package:money_manage_flutter/export/shared.dart';
-import '../../../../../core/di/injection.dart';
 import '../../../profile/presentation/provider/currency_provider.dart';
 import '../../data/model/local/transaction_local_model.dart';
 import '../../domain/usecase/remove_transaction_usecase.dart';
@@ -55,9 +54,9 @@ class TransactionItemWidget extends ConsumerWidget {
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                      color: ColorConstant.neutral200,
+                      color: context.colorScheme.surface,
                       boxShadow: [
-                        shadowStyle(Colors.black12, const Offset(0, 2), 5),
+                        shadowStyle(Colors.black54, const Offset(0, 5), 5),
                       ],
                     ),
                     child: Padding(

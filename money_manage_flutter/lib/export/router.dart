@@ -19,6 +19,7 @@ export 'package:money_manage_flutter/features/main_features/analytics/presentati
 /// Profile
 export 'package:money_manage_flutter/features/main_features/profile/presentation/screen/profile_screen.dart';
 export 'package:money_manage_flutter/features/main_features/profile/presentation/profile_routes.dart';
+export 'package:money_manage_flutter/features/main_features/profile/presentation/screen/language_screen.dart';
 
 /// Category
 export 'package:money_manage_flutter/features/category/presentation/screen/category_screen.dart';

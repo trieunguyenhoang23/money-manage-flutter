@@ -60,13 +60,13 @@ class _TabBarWidgetState extends State<TabBarWidget>
                 radius: widthBtn / 2,
                 color: isSelected
                     ? ColorConstant.primary
-                    : ColorConstant.neutral50,
+                    : context.colorScheme.onSurface,
                 child: TextGGStyle(
                   listType[index],
                   widthBtn.clamp(10, 15),
                   color: isSelected ? Colors.white : ColorConstant.neutral200,
                   style: GoogleFonts.urbanist(),
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w600,
                 ),
                 onTap: () {
                   tabController.animateTo(index);

@@ -30,7 +30,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSize {
     double horizontalPadding = 0.04.sw;
 
     return AppBar(
-      //Tránh đổi màu khi scroll
+      // Avoid changing color when scrolling
       surfaceTintColor: Colors.transparent,
       automaticallyImplyLeading: false,
       backgroundColor: Colors.transparent,
@@ -44,7 +44,8 @@ class AppBarWidget extends StatelessWidget implements PreferredSize {
                 icPath: IcPathConstant.icMenu,
                 onTap: () => Scaffold.of(context).openDrawer(),
               )
-            : BtnAppbarWidget(
+            : isLeading
+            ? BtnAppbarWidget(
                 icPath: IcPathConstant.icLeading,
                 onTap: () {
                   if (onTapLeading != null) {
@@ -53,7 +54,8 @@ class AppBarWidget extends StatelessWidget implements PreferredSize {
                     Navigator.pop(context);
                   }
                 },
-              ),
+              )
+            : const SizedBox(),
       ),
       title: TextGGStyle(
         title,

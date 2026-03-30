@@ -18,6 +18,7 @@
   "sync_error": "Synchronization error {keyword}",
   "sync_loading": "Synchronizing",
   "sync_complete": "Complete synchronization",
+  "language": "Language",
   "//TRANSACTIONS": "===============================TRANSACTIONS==============================================",
   "transaction": "Transaction",
   "transactions_income": "Income",

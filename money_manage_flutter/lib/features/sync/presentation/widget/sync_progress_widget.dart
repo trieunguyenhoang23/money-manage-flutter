@@ -93,7 +93,6 @@ class _SyncProgressWidgetState extends State<SyncProgressWidget> {
     if (_lastProgress != null) {
       return SyncLoadingWidget(
         progress: _lastProgress!,
-        activeColor: _getColorForType(),
         title: _getTitleForType(),
       );
     }
@@ -101,16 +100,7 @@ class _SyncProgressWidgetState extends State<SyncProgressWidget> {
     return const LoadingWidget();
   }
 
-  Color _getColorForType() {
-    switch (widget.syncType) {
-      case SyncType.category:
-        return Colors.orange;
-      case SyncType.transaction:
-        return Colors.green;
-      default:
-        return Colors.blue;
-    }
-  }
+
 
   String _getTitleForType() {
     return "${context.lang.sync_loading} ${widget.syncType.name.toUpperCase()}...";

@@ -17,7 +17,7 @@ final loadingCategoryProvider =
       );
     });
 
-final loadingCategoryByTypeProvider = StateNotifierProvider.autoDispose
+final loadingCategoryByTypeProvider = StateNotifierProvider
     .family<
       PullToRefreshNotifier<CategoryLocalModel>,
       PullToRefreshState<CategoryLocalModel>,

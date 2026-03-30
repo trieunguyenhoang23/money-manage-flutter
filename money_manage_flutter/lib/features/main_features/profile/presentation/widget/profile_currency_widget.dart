@@ -29,9 +29,12 @@ class ProfileCurrencyWidget extends ConsumerWidget {
             );
           },
           child: Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               border: Border(
-                bottom: BorderSide(color: Colors.black12, width: 0.5),
+                bottom: BorderSide(
+                  color: context.colorScheme.onSurface,
+                  width: 0.5,
+                ),
               ),
             ),
             child: Row(

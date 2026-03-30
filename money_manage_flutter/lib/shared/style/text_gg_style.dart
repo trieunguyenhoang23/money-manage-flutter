@@ -1,5 +1,6 @@
 import 'package:auto_size_text_plus/auto_size_text_plus.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:money_manage_flutter/core/extension/context_extension.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 
 class TextGGStyle extends StatelessWidget {
@@ -40,6 +41,7 @@ class TextGGStyle extends StatelessWidget {
       isShadow: isShadow,
       fontWeight: fontWeight,
       customStyle: style,
+      context: context,
     );
 
     return isAutoSizeText
@@ -69,17 +71,18 @@ TextStyle styleCommon({
   required bool isShadow,
   FontWeight? fontWeight,
   TextStyle? customStyle,
+  required BuildContext context,
 }) {
   final TextStyle base = customStyle != null
       ? customStyle.copyWith(
           fontSize: fontSize,
           fontWeight: fontWeight,
-          color: color,
+          color: color ?? context.colorScheme.onBackground,
         )
       : GoogleFonts.montserrat(
           fontSize: fontSize,
           fontWeight: fontWeight,
-          color: color,
+          color: color ?? context.colorScheme.onBackground,
         );
 
   return base.copyWith(

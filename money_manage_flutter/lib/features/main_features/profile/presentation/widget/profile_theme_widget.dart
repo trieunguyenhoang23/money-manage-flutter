@@ -1,29 +1,32 @@
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
-import '../../../../../shared/style/text_gg_style.dart';
+import 'package:money_manage_flutter/export/shared.dart';
 
 class ProfileThemeWidget extends ConsumerWidget {
   const ProfileThemeWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    bool switchValue = true;
+    final themeState = ref.watch(themeProvider);
+    final themeNotifier = ref.read(themeProvider.notifier);
+
+    bool isLightMode = themeState.brightness == Brightness.light;
 
     return LayoutBuilder(
       builder: (context, cc) {
         return Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             border: Border(
-              bottom: BorderSide(color: Colors.black12, width: 0.5),
+              bottom: BorderSide(
+                color: context.colorScheme.onSurface,
+                width: 0.5,
+              ),
             ),
           ),
           child: Row(
             children: [
-              const Icon(
-                // theme.brightness == Brightness.light
-                //     ? Icons.dark_mode
-                //     : Icons.light_mode,
-                Icons.light_mode,
+              Icon(
+                isLightMode ? Icons.dark_mode : Icons.light_mode,
                 color: ColorConstant.warning700,
               ),
               SizedBox(width: 0.05 * cc.maxWidth),
@@ -34,10 +37,11 @@ class ProfileThemeWidget extends ConsumerWidget {
                   return Switch(
                     activeThumbColor: Colors.white,
                     activeTrackColor: ColorConstant.primary,
-                    value: switchValue,
-                    onChanged: (value) {
+                    value: isLightMode,
+                    onChanged: (value) async {
+                      await themeNotifier.switchTheme();
                       ss(() {
-                        switchValue = value;
+                        isLightMode = value;
                       });
                     },
                   );

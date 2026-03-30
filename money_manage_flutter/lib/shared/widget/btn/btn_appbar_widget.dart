@@ -7,39 +7,58 @@ class BtnAppbarWidget extends StatelessWidget {
   final String icPath;
   final Widget? widget;
   final bool isActionButton;
+  final double? customSize; // Thêm biến này để linh hoạt hơn nếu muốn
   final Function() onTap;
 
   const BtnAppbarWidget({
     super.key,
-     this.icPath = '',
+    this.icPath = '',
     this.widget,
     required this.onTap,
     this.isActionButton = false,
+    this.customSize,
   });
 
   @override
   Widget build(BuildContext context) {
-    double icSize = (20 / 812).sh.clamp(20, 50);
+    // Nếu không truyền customSize thì dùng mặc định
+    double icSize = customSize ?? (20 / 812).sh.clamp(20, 50);
+
     bool isLottieFile = icPath.toLowerCase().endsWith('.json');
     bool isSvgFile = icPath.toLowerCase().endsWith('.svg');
 
     return InkWell(
       onTap: onTap,
-      child: SizedBox(
+      child: Container(
+        alignment: Alignment.center,
         width: icSize,
         height: icSize,
         child: isLottieFile
-            ? RepaintBoundary(child: Lottie.asset(icPath))
+            ? RepaintBoundary(
+                child: Lottie.asset(
+                  icPath,
+                  width: icSize,
+                  height: icSize,
+                  fit: BoxFit.contain,
+                ),
+              )
             : widget ??
                   (isSvgFile
                       ? SvgPicture.asset(
                           icPath,
+                          width: icSize,
+                          height: icSize,
                           colorFilter: const ColorFilter.mode(
                             ColorConstant.primary,
                             BlendMode.srcIn,
                           ),
                         )
-                      : Image.asset(icPath, color: ColorConstant.primary)),
+                      : Image.asset(
+                          icPath,
+                          width: icSize,
+                          height: icSize,
+                          color: ColorConstant.primary,
+                        )),
       ),
     );
   }

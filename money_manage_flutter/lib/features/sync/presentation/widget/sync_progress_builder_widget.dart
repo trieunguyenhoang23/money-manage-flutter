@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:money_manage_flutter/core/constant/color_constant.dart';
-import 'package:money_manage_flutter/core/extension/context_extension.dart';
+import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import '../../../../shared/widget/component/loading_widget.dart';
 import '../../data/model/sync_batch_progress.dart';
@@ -33,8 +32,7 @@ class _SyncProgressBuilderWidgetState extends State<SyncProgressBuilderWidget> {
 
   void _handleRetry() {
     setState(() {
-      _retryKey
-          .value++; // Tăng key để force FutureBuilder gọi lại syncStreamFactory()
+      _retryKey.value++;
     });
     widget.onRetry();
   }
@@ -69,7 +67,6 @@ class _SyncProgressBuilderWidgetState extends State<SyncProgressBuilderWidget> {
               total: data.total,
               overallProgress: 1,
             ),
-            activeColor: ColorConstant.success400,
             title: '${context.lang.sync_complete} ${widget.syncType.name}',
           );
         }

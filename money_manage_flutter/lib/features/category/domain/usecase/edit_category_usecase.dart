@@ -11,18 +11,19 @@ class EditCategoryUseCase {
   EditCategoryUseCase(this.repository);
 
   Future<Either<Failure, CategoryLocalModel>> execute(
-    Map<String,dynamic> updatedJson,
+    Map<String, dynamic> updatedJson,
     CategoryLocalModel oldItem,
   ) async {
     // Validation Check
-    if (updatedJson['name'].trim().length < 3) {
+    if (updatedJson['name'] != null && updatedJson['name'].trim().length < 3) {
       return Left(ValidationFailure(ValidationCode.nameTooShort));
     }
 
-    if (updatedJson['description'].trim().isEmpty) {
+    if (updatedJson['description'] != null &&
+        updatedJson['description'].trim().isEmpty) {
       return Left(ValidationFailure(ValidationCode.descriptionEmpty));
     }
 
-    return await repository.editCategory(updatedJson,oldItem);
+    return await repository.editCategory(updatedJson, oldItem);
   }
 }

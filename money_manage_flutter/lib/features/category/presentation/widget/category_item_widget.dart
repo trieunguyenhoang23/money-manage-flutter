@@ -14,10 +14,8 @@ class CategoryItemWidget extends StatelessWidget {
       builder: (context, cc) {
         return Container(
           decoration: BoxDecoration(
-            color: ColorConstant.neutral200,
-            borderRadius: BorderRadius.all(
-              Radius.circular(cc.maxHeight * 0.1),
-            ),
+            color: context.colorScheme.surface,
+            borderRadius: BorderRadius.all(Radius.circular(cc.maxHeight * 0.1)),
             boxShadow: [shadowStyle(Colors.black12, const Offset(0, 2), 5)],
           ),
           child: Padding(

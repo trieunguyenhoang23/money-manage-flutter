@@ -30,9 +30,11 @@ class _MainShellScreenState extends State<MainShellScreen> {
     return PopScope(
       canPop: false,
       child: Scaffold(
+        backgroundColor: context.colorScheme.background,
         appBar: AppBarWidget(
           title: 'Money Manage',
-          isSetting: true,
+          isSetting: false,
+          isLeading: false,
           isCentralTitle: true,
           actionBtn: [
             BtnAppbarWidget(
@@ -73,7 +75,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
             boxShadow: [
               shadowStyle(ColorConstant.neutral300, const Offset(0, 5), 10),
             ],
-            color: Colors.white,
+            color: context.colorScheme.surface,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

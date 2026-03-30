@@ -1,18 +1,15 @@
-import 'package:money_manage_flutter/core/constant/color_constant.dart';
-import 'package:money_manage_flutter/core/extension/context_extension.dart';
+import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import '../../data/model/sync_batch_progress.dart';
 
 class SyncLoadingWidget extends StatelessWidget {
   final SyncBatchProgress progress;
-  final Color activeColor;
   final String title;
 
   const SyncLoadingWidget({
     super.key,
     required this.progress,
-    required this.activeColor,
     required this.title,
   });
 
@@ -25,8 +22,7 @@ class SyncLoadingWidget extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isDone ? Colors.green.shade50 : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: ColorConstant.neutral50),
+        borderRadius: BorderRadius.circular(0.025.sw),
         boxShadow: [
           shadowStyle(
             Colors.black12.withValues(alpha: 0.05),
@@ -34,6 +30,7 @@ class SyncLoadingWidget extends StatelessWidget {
             5,
           ),
         ],
+        border: Border.all(color: context.colorScheme.onBackground, width: 2),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -42,7 +39,7 @@ class SyncLoadingWidget extends StatelessWidget {
             children: [
               Icon(
                 isDone ? Icons.check_circle : Icons.sync,
-                color: activeColor,
+                color: ColorConstant.warning700,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -70,11 +67,11 @@ class SyncLoadingWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
               value: progress.overallProgress,
-              backgroundColor: isDone
-                  ? ColorConstant.success500
-                  : Colors.grey[200],
+              backgroundColor: ColorConstant.neutral200,
               minHeight: 8,
-              valueColor: AlwaysStoppedAnimation<Color>(activeColor),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                isDone ? ColorConstant.success500 : ColorConstant.warning700,
+              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -86,7 +83,9 @@ class SyncLoadingWidget extends StatelessWidget {
                 child: TextGGStyle(
                   '${(progress.overallProgress * 100).toInt()}%',
                   0.035.sw,
-                  color: isDone ? ColorConstant.success400 : activeColor,
+                  color: isDone
+                      ? ColorConstant.success400
+                      : ColorConstant.warning700,
                   fontWeight: FontWeight.bold,
                 ),
               ),

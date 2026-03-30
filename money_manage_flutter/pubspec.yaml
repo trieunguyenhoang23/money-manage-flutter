@@ -30,6 +30,7 @@ dependencies:
   extended_nested_scroll_view: ^6.2.1
   extended_image: ^9.1.0
   flutter_slidable: ^4.0.3
+  smooth_page_indicator: ^1.2.1
 
   # Monitoring & Analytics
   firebase_core: 4.5.0

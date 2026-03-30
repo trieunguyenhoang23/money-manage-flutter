@@ -1,5 +1,6 @@
 import 'package:google_fonts/google_fonts.dart';
 import 'package:money_manage_flutter/core/constant/color_constant.dart';
+import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 
 class TextInputEditWidget extends StatelessWidget {
@@ -38,7 +39,7 @@ class TextInputEditWidget extends StatelessWidget {
         return ClipRRect(
           borderRadius: BorderRadius.all(Radius.circular(h * 0.1)),
           child: Container(
-            color: ColorConstant.neutral200,
+            color: context.colorScheme.surface,
             height: h,
             child: Center(
               child: TextFormField(

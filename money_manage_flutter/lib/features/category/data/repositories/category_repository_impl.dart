@@ -155,7 +155,9 @@ class CategoryRepositoryImpl implements CategoryRepository {
       bool hasChanged = oldItem.merge(
         newName: updatedJson['name'],
         newDescription: updatedJson['description'],
-        newType: updatedJson['type'],
+        newType: updatedJson['type'] != null
+            ? TransactionType.fromDynamic(updatedJson['type'])
+            : null,
       );
 
       /// Just update if any properties change

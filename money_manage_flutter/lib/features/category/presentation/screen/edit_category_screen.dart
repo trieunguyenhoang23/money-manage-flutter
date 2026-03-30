@@ -1,6 +1,8 @@
 import 'package:go_router/go_router.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
+import 'package:money_manage_flutter/features/main_features/transactions/presentation/provider/quick_select_cate_provider.dart';
+import 'package:money_manage_flutter/features/main_features/transactions/presentation/provider/quick_select_cate_provider.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/enum/transaction_type.dart';
 import '../../data/model/local/category_local_model.dart';
@@ -150,9 +152,10 @@ class _EditCategoryScreenState extends ConsumerState<EditCategoryScreen> {
       },
       (updatedCate) {
         /// Update UI
-        ref
-            .read(loadingCategoryProvider.notifier)
-            .updateItem((item) => item.id == updatedCate.id, updatedCate);
+        ref.read(loadingCategoryProvider.notifier).refresh();
+        ref.invalidate(quickSelectCategoryProvider(TransactionType.INCOME));
+        ref.invalidate(quickSelectCategoryProvider(TransactionType.EXPENSE));
+
         context.pop();
       },
     );
