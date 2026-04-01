@@ -1,5 +1,6 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:money_manage_flutter/export/core.dart';
+import 'package:money_manage_flutter/features/main_features/analytics/presentation/provider/overview_balance_provider.dart';
 import '../../../../../infrastructure/social_auth/social_auth_factory.dart';
 import '../../../../category/presentation/provider/category_provider.dart';
 import '../../../transactions/presentation/provider/transaction_provider.dart';
@@ -47,6 +48,8 @@ class ProfileNotifier extends AsyncNotifier<ProfileState> {
             isSyncData: false,
           );
 
+      ref.refresh(overviewBalanceProvider);
+
       /// Register sync data in background
       Future.delayed(const Duration(seconds: 3), () {
         BackgroundTaskHelper.scheduleSync();
@@ -57,11 +60,11 @@ class ProfileNotifier extends AsyncNotifier<ProfileState> {
   Future<void> onLogout() async {
     await getIt<LogoutUseCase>().execute();
 
-    ref.invalidate(loadingCategoryProvider);
-    ref.invalidate(loadingTransactionProvider);
-    ref.invalidate(loadingCategoryByTypeProvider(TransactionType.INCOME));
-    ref.invalidate(loadingCategoryByTypeProvider(TransactionType.EXPENSE));
-
+    ref.refresh(loadingCategoryProvider);
+    ref.refresh(loadingTransactionProvider);
+    ref.refresh(loadingCategoryByTypeProvider(TransactionType.INCOME));
+    ref.refresh(loadingCategoryByTypeProvider(TransactionType.EXPENSE));
+    ref.refresh(overviewBalanceProvider);
     state = AsyncData(ProfileState(userLocalModel: null));
   }
 }

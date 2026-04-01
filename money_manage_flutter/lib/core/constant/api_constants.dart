@@ -1,5 +1,5 @@
 class APIConstants {
-  static const String bareUrl = 'http://192.168.1.8:2305';
+  static const String bareUrl = 'http://192.168.1.9:2305';
 }
 
 class UserAuthAPI {
@@ -54,4 +54,10 @@ class TransactionAPI {
   /// DELETE
   static String get delete_transactions =>
       '${APIConstants.bareUrl}/delete/transactions';
+}
+
+class AnalyticsAPI{
+  /// GET
+  static String get get_financial_data =>
+      '${APIConstants.bareUrl}/get/analytics/financial-data';
 }

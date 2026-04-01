@@ -82,6 +82,7 @@ class _SyncProgressSlideWidgetState extends State<SyncProgressSlideWidget> {
           Align(
             alignment: Alignment.topCenter,
             child: PageView.builder(
+              clipBehavior: Clip.none,
               controller: pageController,
               itemCount: syncWidget.length,
               itemBuilder: (context, index) {

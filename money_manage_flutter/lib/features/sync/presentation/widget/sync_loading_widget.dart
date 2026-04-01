@@ -25,12 +25,11 @@ class SyncLoadingWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(0.025.sw),
         boxShadow: [
           shadowStyle(
-            Colors.black12.withValues(alpha: 0.05),
-            const Offset(0, 4),
+            context.colorScheme.onSurface.withValues(alpha: 0.5),
+            const Offset(0, 2),
             5,
           ),
         ],
-        border: Border.all(color: context.colorScheme.onBackground, width: 2),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

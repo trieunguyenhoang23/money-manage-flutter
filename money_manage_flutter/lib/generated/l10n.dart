@@ -119,6 +119,11 @@ class S {
     return Intl.message('Expense', name: 'expense', desc: '', args: []);
   }
 
+  /// `Balance`
+  String get balance {
+    return Intl.message('Balance', name: 'balance', desc: '', args: []);
+  }
+
   /// `Image`
   String get image {
     return Intl.message('Image', name: 'image', desc: '', args: []);

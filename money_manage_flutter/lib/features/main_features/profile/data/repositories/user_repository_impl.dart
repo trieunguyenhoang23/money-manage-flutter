@@ -1,8 +1,6 @@
 import 'package:injectable/injectable.dart';
 import 'package:dartz/dartz.dart';
 import 'package:money_manage_flutter/core/network/sync_manager.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../../core/constant/string_constant.dart';
 import '../../../../../core/error/failure.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../datasource/local/user_local_datasource.dart';
@@ -16,14 +14,12 @@ class UserRepositoryImpl implements UserRepository {
   final UserRemoteDatasource _remoteDatasource;
   final SocialAuthFactory _socialAuthFactory;
   final SyncManager _syncManager;
-  final SharedPreferences _preferences;
 
   UserRepositoryImpl(
     this._localDatasource,
     this._remoteDatasource,
     this._socialAuthFactory,
     this._syncManager,
-    this._preferences,
   );
 
   @override
@@ -56,7 +52,7 @@ class UserRepositoryImpl implements UserRepository {
       await _localDatasource.saveUser(userLocalModel);
       return Right(userLocalModel);
     } catch (e) {
-      return const Left(CacheFailure('Failed to save user session'));
+      return Left(CacheFailure('Failed to save user session $e'));
     }
   }
 
@@ -72,23 +68,24 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<bool> updateCurrency(String newCurrency) async {
-    await _preferences.setString(currencyKey, newCurrency);
+  Future<void> updateCurrency(String newCurrency) async {
+    await _localDatasource.updateCurrency(newCurrency);
 
     await _syncManager.runIfMeetStandard((currentUserId, networkStatus) async {
       final localUser = await _localDatasource.getCurrentUser();
       if (localUser != null) {
-        await _remoteDatasource
-            .updateUserProperties({'currency': newCurrency})
-            .then((result) async {
-              if (result.isFailure) return;
-
-              localUser.currency = newCurrency;
-              await _localDatasource.saveUser(localUser);
-            });
+        await _remoteDatasource.updateUserProperties({'currency': newCurrency});
       }
     });
+  }
 
-    return _preferences.getString(currencyKey) != null;
+  @override
+  Future<double> getCurrentBalance() async {
+    return await _localDatasource.getCurrentBalance();
+  }
+
+  @override
+  Future<String> getCurrency() async {
+    return await _localDatasource.getCurrentCurrency();
   }
 }

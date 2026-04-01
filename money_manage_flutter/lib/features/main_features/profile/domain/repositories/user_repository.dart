@@ -5,7 +5,14 @@ import 'package:dartz/dartz.dart';
 
 abstract class UserRepository {
   Future<Either<Failure, UserLocalModel>> signIn(AuthMethod method);
-  Future<void> clearSession();
+
   Future<String> getCurrentUserId();
-  Future<bool> updateCurrency(String newCurrency);
+
+  Future<double> getCurrentBalance();
+
+  Future<String> getCurrency();
+
+  Future<void> clearSession();
+
+  Future<void> updateCurrency(String newCurrency);
 }

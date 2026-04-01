@@ -15,6 +15,7 @@ class UserLocalModel {
   DateTime? createdAt;
   String? currency;
   bool isSynced = false;
+  double? currentBalance;
 
   UserLocalModel();
 
@@ -28,6 +29,8 @@ class UserLocalModel {
           ? DateTime.parse(userData['created_at'] as String)
           : null
       ..currency = userData['currency'] ?? 'VND'
+      ..currentBalance =
+          double.tryParse(userData['currentBalance'].toString()) ?? 0
       ..isSynced = true;
   }
 
@@ -39,6 +42,7 @@ class UserLocalModel {
       'avatar_url': avatarUrl,
       'created_at': createdAt?.toIso8601String(),
       'currency': currency ?? 'VND',
+      'currentBalance': currentBalance ?? 0,
     };
   }
 }

@@ -38,3 +38,6 @@ export 'package:money_manage_flutter/core/di/injection.dart';
 
 /// Background
 export 'package:money_manage_flutter/core/background/background_task_helper.dart';
+
+/// Data
+export 'package:money_manage_flutter/core/data/datasource/sync_lazy_loading.dart';

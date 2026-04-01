@@ -24,9 +24,12 @@ abstract class ModuleDI {
 
   @Named(dioNoCache)
   @lazySingleton
-  Dio dioNoCacheInstance() {
+  Dio dioNoCacheInstance(AuthInterceptor authInterceptor) {
     final dio = Dio(BaseOptions(baseUrl: APIConstants.bareUrl));
-    dio.interceptors.addAll([LogInterceptor(responseBody: true)]);
+    dio.interceptors.addAll([
+      authInterceptor,
+      LogInterceptor(responseBody: true),
+    ]);
     return dio;
   }
 

@@ -32,19 +32,24 @@ const UserLocalModelSchema = CollectionSchema(
       name: r'currency',
       type: IsarType.string,
     ),
-    r'displayName': PropertySchema(
+    r'currentBalance': PropertySchema(
       id: 3,
+      name: r'currentBalance',
+      type: IsarType.double,
+    ),
+    r'displayName': PropertySchema(
+      id: 4,
       name: r'displayName',
       type: IsarType.string,
     ),
     r'idServer': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'idServer',
       type: IsarType.string,
     ),
-    r'isSynced': PropertySchema(id: 5, name: r'isSynced', type: IsarType.bool),
+    r'isSynced': PropertySchema(id: 6, name: r'isSynced', type: IsarType.bool),
     r'primaryEmail': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'primaryEmail',
       type: IsarType.string,
     ),
@@ -127,10 +132,11 @@ void _userLocalModelSerialize(
   writer.writeString(offsets[0], object.avatarUrl);
   writer.writeDateTime(offsets[1], object.createdAt);
   writer.writeString(offsets[2], object.currency);
-  writer.writeString(offsets[3], object.displayName);
-  writer.writeString(offsets[4], object.idServer);
-  writer.writeBool(offsets[5], object.isSynced);
-  writer.writeString(offsets[6], object.primaryEmail);
+  writer.writeDouble(offsets[3], object.currentBalance);
+  writer.writeString(offsets[4], object.displayName);
+  writer.writeString(offsets[5], object.idServer);
+  writer.writeBool(offsets[6], object.isSynced);
+  writer.writeString(offsets[7], object.primaryEmail);
 }
 
 UserLocalModel _userLocalModelDeserialize(
@@ -143,11 +149,12 @@ UserLocalModel _userLocalModelDeserialize(
   object.avatarUrl = reader.readStringOrNull(offsets[0]);
   object.createdAt = reader.readDateTimeOrNull(offsets[1]);
   object.currency = reader.readStringOrNull(offsets[2]);
-  object.displayName = reader.readStringOrNull(offsets[3]);
+  object.currentBalance = reader.readDoubleOrNull(offsets[3]);
+  object.displayName = reader.readStringOrNull(offsets[4]);
   object.id = id;
-  object.idServer = reader.readStringOrNull(offsets[4]);
-  object.isSynced = reader.readBool(offsets[5]);
-  object.primaryEmail = reader.readStringOrNull(offsets[6]);
+  object.idServer = reader.readStringOrNull(offsets[5]);
+  object.isSynced = reader.readBool(offsets[6]);
+  object.primaryEmail = reader.readStringOrNull(offsets[7]);
   return object;
 }
 
@@ -165,12 +172,14 @@ P _userLocalModelDeserializeProp<P>(
     case 2:
       return (reader.readStringOrNull(offset)) as P;
     case 3:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readDoubleOrNull(offset)) as P;
     case 4:
       return (reader.readStringOrNull(offset)) as P;
     case 5:
-      return (reader.readBool(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 6:
+      return (reader.readBool(offset)) as P;
+    case 7:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -803,6 +812,99 @@ extension UserLocalModelQueryFilter
   }
 
   QueryBuilder<UserLocalModel, UserLocalModel, QAfterFilterCondition>
+  currentBalanceIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'currentBalance'),
+      );
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterFilterCondition>
+  currentBalanceIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'currentBalance'),
+      );
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterFilterCondition>
+  currentBalanceEqualTo(double? value, {double epsilon = Query.epsilon}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'currentBalance',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterFilterCondition>
+  currentBalanceGreaterThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'currentBalance',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterFilterCondition>
+  currentBalanceLessThan(
+    double? value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'currentBalance',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterFilterCondition>
+  currentBalanceBetween(
+    double? lower,
+    double? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'currentBalance',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterFilterCondition>
   displayNameIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
@@ -1392,6 +1494,20 @@ extension UserLocalModelQuerySortBy
   }
 
   QueryBuilder<UserLocalModel, UserLocalModel, QAfterSortBy>
+  sortByCurrentBalance() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'currentBalance', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterSortBy>
+  sortByCurrentBalanceDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'currentBalance', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterSortBy>
   sortByDisplayName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'displayName', Sort.asc);
@@ -1488,6 +1604,20 @@ extension UserLocalModelQuerySortThenBy
   }
 
   QueryBuilder<UserLocalModel, UserLocalModel, QAfterSortBy>
+  thenByCurrentBalance() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'currentBalance', Sort.asc);
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterSortBy>
+  thenByCurrentBalanceDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'currentBalance', Sort.desc);
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QAfterSortBy>
   thenByDisplayName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'displayName', Sort.asc);
@@ -1580,6 +1710,13 @@ extension UserLocalModelQueryWhereDistinct
   }
 
   QueryBuilder<UserLocalModel, UserLocalModel, QDistinct>
+  distinctByCurrentBalance() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'currentBalance');
+    });
+  }
+
+  QueryBuilder<UserLocalModel, UserLocalModel, QDistinct>
   distinctByDisplayName({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'displayName', caseSensitive: caseSensitive);
@@ -1632,6 +1769,13 @@ extension UserLocalModelQueryProperty
   QueryBuilder<UserLocalModel, String?, QQueryOperations> currencyProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'currency');
+    });
+  }
+
+  QueryBuilder<UserLocalModel, double?, QQueryOperations>
+  currentBalanceProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'currentBalance');
     });
   }
 

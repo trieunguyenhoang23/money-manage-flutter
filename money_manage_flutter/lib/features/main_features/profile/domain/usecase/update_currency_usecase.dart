@@ -7,7 +7,7 @@ class UpdateCurrencyUseCase {
 
   UpdateCurrencyUseCase(this._userRepository);
 
-  Future<bool> execute(String newCurrency) async {
+  Future<void> execute(String newCurrency) async {
     return await _userRepository.updateCurrency(newCurrency);
   }
 }

@@ -21,7 +21,6 @@ class BtnAppbarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Nếu không truyền customSize thì dùng mặc định
     double icSize = customSize ?? (20 / 812).sh.clamp(20, 50);
 
     bool isLottieFile = icPath.toLowerCase().endsWith('.json');

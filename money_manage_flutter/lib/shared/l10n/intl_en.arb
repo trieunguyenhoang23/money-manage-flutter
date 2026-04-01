@@ -10,6 +10,7 @@
   "transaction_at": "Transaction At:",
   "income": "Income",
   "expense": "Expense",
+  "balance": "Balance",
   "image": "Image",
   "gallery": "Gallery",
   "file": "File",

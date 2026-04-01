@@ -37,6 +37,7 @@ class GridViewBuilder extends StatelessWidget {
         childAspectRatio: childAspectRatio,
       ),
       itemBuilder: itemBuilder,
+      shrinkWrap: true,
       itemCount: itemCount,
     );
   }

@@ -26,7 +26,7 @@ class ProfileThemeWidget extends ConsumerWidget {
           child: Row(
             children: [
               Icon(
-                isLightMode ? Icons.dark_mode : Icons.light_mode,
+                isLightMode ? Icons.light_mode : Icons.dark_mode,
                 color: ColorConstant.warning700,
               ),
               SizedBox(width: 0.05 * cc.maxWidth),
