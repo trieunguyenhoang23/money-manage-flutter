@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
+import 'package:money_manage_flutter/features/main_features/analytics/presentation/provider/overview_balance_provider.dart';
 import '../provider/transaction_create_provider.dart';
 import '../provider/transaction_provider.dart';
 import '../widget/transaction_form/category_picked_widget.dart';
@@ -97,6 +98,9 @@ class _CreateTransactionScreenState
             ref
                 .read(loadingTransactionProvider.notifier)
                 .addToFirst(transactionLocal);
+
+            /// Refresh Overview Balance to update new data
+            ref.refresh(overviewBalanceProvider);
 
             /// Pop until reaching main screen & switch to transaction tab
             NavigatorRouter.popAndSwitchTabMainBranch(context, 0);

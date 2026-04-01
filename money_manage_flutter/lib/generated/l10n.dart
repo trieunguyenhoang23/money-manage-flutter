@@ -184,6 +184,16 @@ class S {
     return Intl.message('Language', name: 'language', desc: '', args: []);
   }
 
+  /// `No data available`
+  String get no_data {
+    return Intl.message(
+      'No data available',
+      name: 'no_data',
+      desc: '',
+      args: [],
+    );
+  }
+
   // skipped getter for the '//TRANSACTIONS' key
 
   /// `Transaction`
@@ -377,6 +387,18 @@ class S {
     return Intl.message(
       'Edit Category',
       name: 'category_edit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  // skipped getter for the '//ANALYTIC' key
+
+  /// `Analytic Category`
+  String get analytic_category {
+    return Intl.message(
+      'Analytic Category',
+      name: 'analytic_category',
       desc: '',
       args: [],
     );

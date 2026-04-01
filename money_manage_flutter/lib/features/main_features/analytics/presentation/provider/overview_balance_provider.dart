@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:money_manage_flutter/core/di/injection.dart';
-import 'package:money_manage_flutter/core/utils/toast_utils.dart';
+import 'package:money_manage_flutter/export/core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/usecase/get_overview_balance_usecase.dart';
 
@@ -53,10 +52,8 @@ class OverviewBalanceNotifier extends AsyncNotifier<OverviewBalanceState> {
         );
       },
       (data) {
-        double balance = data.value1 + data.value2 - data.value3;
-
         return OverviewBalanceState(
-          balance: balance,
+          balance: data.value1,
           income: data.value2,
           expense: data.value3,
           isShowData: isShowDataPrefs,

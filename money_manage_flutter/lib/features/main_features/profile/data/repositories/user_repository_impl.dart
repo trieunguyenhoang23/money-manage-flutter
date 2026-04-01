@@ -80,11 +80,6 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<double> getCurrentBalance() async {
-    return await _localDatasource.getCurrentBalance();
-  }
-
-  @override
   Future<String> getCurrency() async {
     return await _localDatasource.getCurrentCurrency();
   }

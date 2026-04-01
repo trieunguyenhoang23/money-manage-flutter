@@ -20,6 +20,7 @@
   "sync_loading": "Synchronizing",
   "sync_complete": "Complete synchronization",
   "language": "Language",
+  "no_data": "No data available",
   "//TRANSACTIONS": "===============================TRANSACTIONS==============================================",
   "transaction": "Transaction",
   "transactions_income": "Income",
@@ -46,5 +47,7 @@
   "category_error_name_short": "Name must be at least 3 characters",
   "category_error_desc_empty": "Description cannot be empty",
   "category_error_server": "Something went wrong on our end",
-  "category_edit": "Edit Category"
+  "category_edit": "Edit Category",
+  "//ANALYTIC": "======================================ANALYTIC=================================================",
+  "analytic_category": "Analytic Category"
 }

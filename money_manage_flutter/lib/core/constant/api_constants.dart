@@ -56,8 +56,11 @@ class TransactionAPI {
       '${APIConstants.bareUrl}/delete/transactions';
 }
 
-class AnalyticsAPI{
+class AnalyticsAPI {
   /// GET
   static String get get_financial_data =>
       '${APIConstants.bareUrl}/get/analytics/financial-data';
+
+  static String get get_spending_categories =>
+      '${APIConstants.bareUrl}/get/analytics/spending-categories';
 }

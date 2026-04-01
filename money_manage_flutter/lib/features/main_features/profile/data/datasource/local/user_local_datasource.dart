@@ -41,34 +41,8 @@ class UserLocalDatasource {
     _preferences.setString(currencyKey, newCurrency);
   }
 
-  Future<void> updateCurrentBalance(double newBalance) async {
-    final user = await _isar.userLocalModels.where().findFirst();
-    if (user != null) {
-      user.currentBalance = newBalance;
-      await _isar.writeTxn(() async {
-        await _isar.userLocalModels.put(user);
-      });
-      return;
-    }
-
-    /// If user hasn't login in yet
-    _preferences.setDouble(currentBalance, newBalance);
-  }
-
-
   Future<UserLocalModel?> getCurrentUser() async {
     return await _isar.userLocalModels.where().findFirst();
-  }
-
-  Future<double> getCurrentBalance() async {
-    final user = await _isar.userLocalModels.where().findFirst();
-
-    if (user != null) {
-      return user.currentBalance ?? 0;
-    }
-
-    /// If user hasn't login in yet
-    return _preferences.getDouble(currentBalance) ?? 0;
   }
 
   Future<String> getCurrentCurrency() async {

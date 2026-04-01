@@ -8,8 +8,6 @@ abstract class UserRepository {
 
   Future<String> getCurrentUserId();
 
-  Future<double> getCurrentBalance();
-
   Future<String> getCurrency();
 
   Future<void> clearSession();

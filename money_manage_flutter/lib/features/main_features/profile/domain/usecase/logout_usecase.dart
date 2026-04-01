@@ -36,6 +36,5 @@ class LogoutUseCase {
     await _SyncLazyLoading.resetSync(SyncSchema.transaction);
 
     await _secureStorage.deleteAll();
-    await _preferences.remove(currentBalance);
   }
 }

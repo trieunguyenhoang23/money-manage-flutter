@@ -12,4 +12,10 @@ class AnalyticsRemoteDatasource {
   Future<ApiResult> getFinancialData() async {
     return await _dioService.getNoCache(AnalyticsAPI.get_financial_data);
   }
+
+  Future<ApiResult> getCategoryAnalytics(String type) async {
+    return await _dioService.getNoCache(
+      '${AnalyticsAPI.get_spending_categories}?type=$type',
+    );
+  }
 }

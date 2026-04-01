@@ -5,6 +5,7 @@ import '../../../profile/data/datasource/local/user_local_datasource.dart';
 import '../../domain/repositories/analytics_repository.dart';
 import '../datasource/local/analytics_local_datasource.dart';
 import '../datasource/remote/analytics_remote_datasource.dart';
+import '../model/category_analytics_model.dart';
 
 @LazySingleton(as: AnalyticsRepository)
 class AnalyticsRepositoryImpl implements AnalyticsRepository {
@@ -25,23 +26,56 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
   @override
   Future<Either<Failure, Tuple3<double, double, double>>>
   getFinancialData() async {
-    double currentBalance = await _userLocalDatasource.getCurrentBalance();
     double income = await _analyticsLocalDatasource.getIncome();
     double expense = await _analyticsLocalDatasource.getExpense();
 
     await _syncManager.runIfMeetStandard((currentUserId, isConnected) async {
       /// Only fetching data from server when transaction lazy loading hasn't finished
-      if (!_syncLazyLoading.hasReachedEnd(SyncSchema.transaction)) {
+      if (!_syncLazyLoading.hasReachedEnd(SyncSchema.category) &&
+          !_syncLazyLoading.hasReachedEnd(SyncSchema.transaction)) {
         await _analyticsRemoteDatasource.getFinancialData().then((result) {
           if (result.isFailure) return Left(result.error?.message);
 
-          currentBalance = result.data['currentBalance'];
           income = result.data['income'];
           expense = result.data['expense'];
         });
       }
     });
 
+    double currentBalance = income - expense;
     return Right(Tuple3(currentBalance, income, expense));
+  }
+
+  @override
+  Future<Either<Failure, List<CategoryAnalytics>>> getSpendingCateAnalytics(
+    String type,
+  ) async {
+    List<CategoryAnalytics> categoriesAnalytics =
+        await _analyticsLocalDatasource.getCategoryAnalytics(
+          TransactionType.fromDynamic(type),
+        );
+
+    String? error;
+    await _syncManager.runIfMeetStandard((currentUserId, isConnected) async {
+      if (!_syncLazyLoading.hasReachedEnd(SyncSchema.category) &&
+          !_syncLazyLoading.hasReachedEnd(SyncSchema.transaction)) {
+        final result = await _analyticsRemoteDatasource.getCategoryAnalytics(
+          type,
+        );
+
+        if (result.isFailure) {
+          error = result.error?.message;
+          return;
+        }
+
+        categoriesAnalytics = await parseListJsonIsolate(
+          CategoryAnalytics.fromJson,
+          result.data,
+        );
+      }
+    });
+
+    if (error != null) return Left(ServerFailure(error!));
+    return Right(categoriesAnalytics);
   }
 }

@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
+import '../../../analytics/presentation/provider/overview_balance_provider.dart';
 import '../../data/model/local/transaction_local_model.dart';
 import '../provider/transaction_provider.dart';
 import '../provider/transaction_update_provider.dart';
@@ -105,6 +106,10 @@ class _EditTransactionScreenState extends ConsumerState<EditTransactionScreen> {
                       (item) => item.idServer == updateTransaction.idServer,
                       updateTransaction,
                     );
+
+
+                /// Refresh Overview Balance to update new data
+                ref.refresh(overviewBalanceProvider);
 
                 /// Pop until reaching main screen & switch to transaction tab
                 NavigatorRouter.popAndSwitchTabMainBranch(context, 0);
