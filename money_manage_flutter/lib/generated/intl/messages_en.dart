@@ -27,6 +27,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "analytic_category": MessageLookupByLibrary.simpleMessage(
       "Analytic Category",
     ),
+    "analytic_overview": MessageLookupByLibrary.simpleMessage(
+      "Analytic Overview",
+    ),
     "analytics": MessageLookupByLibrary.simpleMessage("Analysis"),
     "balance": MessageLookupByLibrary.simpleMessage("Balance"),
     "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),

@@ -1,7 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hooks_riverpod/legacy.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import '../../../../../export/ui_external.dart';
 import '../../data/model/category_analytics_model.dart';
@@ -31,16 +30,9 @@ class AnalyticsParam {
   int get hashCode => type.hashCode ^ startDate.hashCode ^ endDate.hashCode;
 }
 
-final analyticsDateRangeProvider = StateProvider<DateTimeRange>((ref) {
-  return DateTimeRange(
-    start: DateTime.now().subtract(const Duration(days: 30)),
-    end: DateTime.now(),
-  );
-});
-
 final cateAnalyticsProvider = FutureProvider.family
     .autoDispose<
-      Tuple2<List<PieChartSectionData>, List<CategoryAnalytics>>,
+      Tuple3<List<PieChartSectionData>, List<CategoryAnalytics>, double>,
       AnalyticsParam
     >((ref, param) async {
       final useCase = getIt<GetCategoriesAnalyticsUseCase>();
@@ -56,7 +48,7 @@ final cateAnalyticsProvider = FutureProvider.family
           (sum, item) => sum + item.totalAmount,
         );
 
-        if (totalSum == 0) return const Tuple2([], []);
+        if (totalSum == 0) return const Tuple3([], [], 0);
 
         List<PieChartSectionData> pieChartData = data.map((item) {
           final percentage = (item.totalAmount / totalSum) * 100;
@@ -73,6 +65,6 @@ final cateAnalyticsProvider = FutureProvider.family
           );
         }).toList();
 
-        return Tuple2(pieChartData, data);
+        return Tuple3(pieChartData, data, totalSum);
       });
     });

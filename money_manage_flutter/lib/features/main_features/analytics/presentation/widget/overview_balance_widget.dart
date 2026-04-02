@@ -10,10 +10,10 @@ class OverviewBalanceWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    List<Tuple2<String, Provider<double>>> amountInfo = [
-      Tuple2(context.lang.balance, balanceProvider),
-      Tuple2(context.lang.income, incomeProvider),
-      Tuple2(context.lang.expense, expenseProvider),
+    List<Tuple3<String, Provider<double>, Color>> amountInfo = [
+      Tuple3(context.lang.balance, balanceProvider, ColorConstant.warning400),
+      Tuple3(context.lang.income, incomeProvider, ColorConstant.success400),
+      Tuple3(context.lang.expense, expenseProvider, ColorConstant.error400),
     ];
 
     double wFrame = 1.sw - 0.05.sw * 2;
@@ -55,10 +55,12 @@ class OverviewBalanceWidget extends ConsumerWidget {
                 itemCount: amountInfo.length,
 
                 itemBuilder: (context, index) {
-                  Tuple2<String, Provider<double>> item = amountInfo[index];
+                  Tuple3<String, Provider<double>, Color> item =
+                      amountInfo[index];
                   return OverViewItemWidget(
                     title: item.value1,
                     amountProvider: item.value2,
+                    color: item.value3,
                   );
                 },
                 childAspectRatio: 70 / 40,
@@ -74,11 +76,13 @@ class OverviewBalanceWidget extends ConsumerWidget {
 class OverViewItemWidget extends StatelessWidget {
   final String title;
   final Provider<double> amountProvider;
+  final Color color;
 
   const OverViewItemWidget({
     super.key,
     required this.title,
     required this.amountProvider,
+    required this.color,
   });
 
   @override
@@ -127,6 +131,7 @@ class OverViewItemWidget extends StatelessWidget {
                     cc.maxHeight * 0.25,
                     maxLines: 1,
                     fontWeight: FontWeight.bold,
+                    color: color,
                   );
                 },
               ),

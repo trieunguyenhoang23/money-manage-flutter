@@ -49,5 +49,6 @@
   "category_error_server": "Something went wrong on our end",
   "category_edit": "Edit Category",
   "//ANALYTIC": "======================================ANALYTIC=================================================",
+  "analytic_overview": "Analytic Overview",
   "analytic_category": "Analytic Category"
 }

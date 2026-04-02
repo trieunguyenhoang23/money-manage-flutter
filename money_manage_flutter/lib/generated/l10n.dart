@@ -394,6 +394,16 @@ class S {
 
   // skipped getter for the '//ANALYTIC' key
 
+  /// `Analytic Overview`
+  String get analytic_overview {
+    return Intl.message(
+      'Analytic Overview',
+      name: 'analytic_overview',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Analytic Category`
   String get analytic_category {
     return Intl.message(

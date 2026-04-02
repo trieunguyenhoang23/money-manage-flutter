@@ -27,4 +27,14 @@ class AnalyticsRemoteDatasource {
       },
     );
   }
+
+  Future<ApiResult> getOverviewAnalytics(
+    String startDate,
+    String endDate,
+  ) async {
+    return await _dioService.getNoCache(
+      AnalyticsAPI.get_overview,
+      queryParameters: {'startDate': startDate, 'endDate': endDate},
+    );
+  }
 }

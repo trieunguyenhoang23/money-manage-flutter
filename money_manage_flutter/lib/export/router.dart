@@ -16,6 +16,7 @@ export 'package:money_manage_flutter/features/main_features/transactions/present
 export 'package:money_manage_flutter/features/main_features/analytics/presentation/screen/analytics_screen.dart';
 export 'package:money_manage_flutter/features/main_features/analytics/presentation/analytics_routes.dart';
 export 'package:money_manage_flutter/features/main_features/analytics/presentation/screen/category_analytics_screen.dart';
+export 'package:money_manage_flutter/features/main_features/analytics/presentation/screen/overview_analytics_screen.dart';
 
 /// Profile
 export 'package:money_manage_flutter/features/main_features/profile/presentation/screen/profile_screen.dart';

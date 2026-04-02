@@ -6,6 +6,7 @@ import '../../domain/repositories/analytics_repository.dart';
 import '../datasource/local/analytics_local_datasource.dart';
 import '../datasource/remote/analytics_remote_datasource.dart';
 import '../model/category_analytics_model.dart';
+import '../model/overview_analytics_model.dart';
 
 @LazySingleton(as: AnalyticsRepository)
 class AnalyticsRepositoryImpl implements AnalyticsRepository {
@@ -83,5 +84,37 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
 
     if (error != null) return Left(ServerFailure(error!));
     return Right(categoriesAnalytics);
+  }
+
+  @override
+  Future<Either<Failure, OverviewAnalytics>> getOverviewAnalytics(
+    DateTime dateStart,
+    DateTime dateEnd,
+  ) async {
+    OverviewAnalytics overviewAnalytics = await _analyticsLocalDatasource
+        .getOverview(dateStart, dateEnd);
+    String? error;
+
+    await _syncManager.runIfMeetStandard((currentUserId, isConnected) async {
+      if (!_syncLazyLoading.hasReachedEnd(SyncSchema.transaction)) {
+        final result = await _analyticsRemoteDatasource.getOverviewAnalytics(
+          dateStart.formatServerStart,
+          dateEnd.formatServerEnd,
+        );
+
+        if (result.isFailure) {
+          error = result.error?.message;
+          return;
+        }
+
+        overviewAnalytics = await parseItemJsonIsolate(
+          OverviewAnalytics.fromJson,
+          result.data,
+        );
+      }
+    });
+
+    if (error != null) return Left(ServerFailure(error!));
+    return Right(overviewAnalytics);
   }
 }

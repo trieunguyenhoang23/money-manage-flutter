@@ -63,4 +63,7 @@ class AnalyticsAPI {
 
   static String get get_spending_categories =>
       '${APIConstants.bareUrl}/get/analytics/spending-categories';
+
+  static String get get_overview =>
+      '${APIConstants.bareUrl}/get/analytics/overview';
 }

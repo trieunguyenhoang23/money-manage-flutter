@@ -46,6 +46,8 @@ import '../../features/main_features/analytics/domain/usecase/get_categories_ana
     as _i1031;
 import '../../features/main_features/analytics/domain/usecase/get_overview_balance_usecase.dart'
     as _i1011;
+import '../../features/main_features/analytics/domain/usecase/get_overview_usecase.dart'
+    as _i767;
 import '../../features/main_features/profile/data/datasource/local/user_local_datasource.dart'
     as _i809;
 import '../../features/main_features/profile/data/datasource/remote/user_remote_datasource.dart'
@@ -238,6 +240,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1031.GetCategoriesAnalyticsUseCase>(
       () =>
           _i1031.GetCategoriesAnalyticsUseCase(gh<_i579.AnalyticsRepository>()),
+    );
+    gh.lazySingleton<_i767.GetOverviewUseCase>(
+      () => _i767.GetOverviewUseCase(gh<_i579.AnalyticsRepository>()),
     );
     gh.lazySingleton<_i129.SyncRepository>(
       () => _i91.SyncRepositoryImpl(

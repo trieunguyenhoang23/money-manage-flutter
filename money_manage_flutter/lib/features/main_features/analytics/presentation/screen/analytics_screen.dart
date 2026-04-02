@@ -17,6 +17,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   Widget build(BuildContext context) {
     List<Widget> analyticsWidgets = [
       AnalyticsWidget(
+        title: context.lang.analytic_overview,
+        iconData: Icons.stacked_line_chart,
+        namePath: AnalyticRoutes.overviewAnalyticName,
+      ),
+      AnalyticsWidget(
         title: context.lang.analytic_category,
         iconData: Icons.pie_chart,
         namePath: AnalyticRoutes.cateAnalyticName,
