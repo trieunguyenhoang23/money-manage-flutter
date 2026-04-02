@@ -29,7 +29,20 @@ class AnalyticsLocalDatasource {
 
   Future<List<CategoryAnalytics>> getCategoryAnalytics(
     TransactionType type,
+    DateTime dateStart,
+    DateTime dateEnd,
   ) async {
+    // Date range
+    final lower = DateTime(dateStart.year, dateStart.month, dateStart.day);
+    final upper = DateTime(
+      dateEnd.year,
+      dateEnd.month,
+      dateEnd.day,
+      23,
+      59,
+      59,
+    );
+
     final categories = await _isar.categoryLocalModels
         .filter()
         .typeEqualTo(type)
@@ -38,6 +51,8 @@ class AnalyticsLocalDatasource {
     final transactions = await _isar.transactionLocalModels
         .filter()
         .typeEqualTo(type)
+        .and()
+        .transactionAtBetween(lower, upper)
         .findAll();
 
     return categories
@@ -53,7 +68,7 @@ class AnalyticsLocalDatasource {
           );
 
           return CategoryAnalytics(
-            id: category.id.toString(),
+            id: category.idServer.toString(),
             name: category.name ?? '',
             type: category.type != null
                 ? category.type!.name

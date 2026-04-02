@@ -12,9 +12,13 @@ class GetCategoriesAnalyticsUseCase {
 
   Future<Either<Failure, List<CategoryAnalytics>>> execute(
     TransactionType type,
+    DateTime dateStart,
+    DateTime dateEnd,
   ) async {
     return await _analyticsRepository.getSpendingCateAnalytics(
       type.name.toUpperCase(),
+      dateStart,
+      dateEnd,
     );
   }
 }

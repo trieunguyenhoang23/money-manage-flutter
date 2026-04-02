@@ -9,7 +9,7 @@ class DialogUtils {
     return showDialog(
       useRootNavigator: true,
       context: appNavigatorKey.currentContext!,
-      barrierDismissible: true,
+      barrierDismissible: false,
       builder: (_) => PopScope(
         canPop: false,
         onPopInvokedWithResult: (s, i) => Future.value(true),

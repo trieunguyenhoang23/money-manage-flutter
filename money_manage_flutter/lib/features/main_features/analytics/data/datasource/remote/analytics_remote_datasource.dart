@@ -13,9 +13,18 @@ class AnalyticsRemoteDatasource {
     return await _dioService.getNoCache(AnalyticsAPI.get_financial_data);
   }
 
-  Future<ApiResult> getCategoryAnalytics(String type) async {
+  Future<ApiResult> getCategoryAnalytics(
+    String type,
+    String startDate,
+    String endDate,
+  ) async {
     return await _dioService.getNoCache(
-      '${AnalyticsAPI.get_spending_categories}?type=$type',
+      AnalyticsAPI.get_spending_categories,
+      queryParameters: {
+        'type': type,
+        'startDate': startDate,
+        'endDate': endDate,
+      },
     );
   }
 }

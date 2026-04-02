@@ -40,10 +40,14 @@ class DioService {
     String endpoint, {
     Object? body,
     Map<String, dynamic>? headers,
-    Map<String, dynamic>? params,
+    Map<String, dynamic>? queryParameters,
   }) {
     return _request(
-      () => _cachedDio.get<T>(endpoint, data: body, queryParameters: params),
+      () => _cachedDio.get<T>(
+        endpoint,
+        data: body,
+        queryParameters: queryParameters,
+      ),
     );
   }
 
@@ -51,10 +55,14 @@ class DioService {
     String endpoint, {
     Object? body,
     Map<String, dynamic>? headers,
-    Map<String, dynamic>? params,
+    Map<String, dynamic>? queryParameters,
   }) {
     return _request(
-      () => _noCacheDio.get<T>(endpoint, data: body, queryParameters: params),
+      () => _noCacheDio.get<T>(
+        endpoint,
+        data: body,
+        queryParameters: queryParameters,
+      ),
     );
   }
 

@@ -31,7 +31,7 @@ class _CreateTransactionScreenState
       const InputNoteWidget(),
       const DatePickedWidget(),
       const ImageWidget(),
-      _buildSubmitButton(),
+      _buildSubmitButton(context),
     ];
 
     return ProviderScope(
@@ -58,9 +58,9 @@ class _CreateTransactionScreenState
     );
   }
 
-  Widget _buildSubmitButton() {
+  Widget _buildSubmitButton(BuildContext context) {
     return BtnMainWidget(
-      onTap: _onCreate,
+      onTap: () async => await _onCreate(context),
       color: ColorConstant.primary,
       child: TextGGStyle(
         context.lang.create,
@@ -71,7 +71,7 @@ class _CreateTransactionScreenState
     );
   }
 
-  Future<void> _onCreate() async {
+  Future<void> _onCreate(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
       DialogUtils.loading(context);
       final notifier = ref.read(transactionCreateProvider.notifier);

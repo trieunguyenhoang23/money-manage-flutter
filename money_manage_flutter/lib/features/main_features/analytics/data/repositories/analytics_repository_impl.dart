@@ -49,10 +49,14 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
   @override
   Future<Either<Failure, List<CategoryAnalytics>>> getSpendingCateAnalytics(
     String type,
+    DateTime dateStart,
+    DateTime dateEnd,
   ) async {
     List<CategoryAnalytics> categoriesAnalytics =
         await _analyticsLocalDatasource.getCategoryAnalytics(
           TransactionType.fromDynamic(type),
+          dateStart,
+          dateEnd,
         );
 
     String? error;
@@ -61,6 +65,8 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
           !_syncLazyLoading.hasReachedEnd(SyncSchema.transaction)) {
         final result = await _analyticsRemoteDatasource.getCategoryAnalytics(
           type,
+          dateStart.formatServerStart,
+          dateEnd.formatServerEnd,
         );
 
         if (result.isFailure) {

@@ -7,5 +7,7 @@ abstract class AnalyticsRepository {
 
   Future<Either<Failure, List<CategoryAnalytics>>> getSpendingCateAnalytics(
     String type,
+    DateTime dateStart,
+    DateTime dateEnd,
   );
 }

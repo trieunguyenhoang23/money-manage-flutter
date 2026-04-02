@@ -1,9 +1,10 @@
+import 'package:dartz/dartz.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../../../core/di/injection.dart';
-import '../../../../../core/enum/transaction_type.dart';
-import '../../../../../core/utils/color_utils.dart';
+import 'package:hooks_riverpod/legacy.dart';
+import 'package:money_manage_flutter/export/core.dart';
 import '../../../../../export/ui_external.dart';
+import '../../data/model/category_analytics_model.dart';
 import '../../domain/usecase/get_categories_analytics_usecase.dart';
 
 class AnalyticsParam {
@@ -30,37 +31,48 @@ class AnalyticsParam {
   int get hashCode => type.hashCode ^ startDate.hashCode ^ endDate.hashCode;
 }
 
+final analyticsDateRangeProvider = StateProvider<DateTimeRange>((ref) {
+  return DateTimeRange(
+    start: DateTime.now().subtract(const Duration(days: 30)),
+    end: DateTime.now(),
+  );
+});
+
 final cateAnalyticsProvider = FutureProvider.family
-    .autoDispose<List<PieChartSectionData>, TransactionType>((ref, type) async {
+    .autoDispose<
+      Tuple2<List<PieChartSectionData>, List<CategoryAnalytics>>,
+      AnalyticsParam
+    >((ref, param) async {
       final useCase = getIt<GetCategoriesAnalyticsUseCase>();
-
-      final result = await useCase.execute(type);
-
-      return await result.fold(
-        (error) {
-          throw error.message;
-        },
-        (data) {
-          final totalSum = data.fold<double>(
-            0,
-            (sum, item) => sum + item.totalAmount,
-          );
-
-          List<PieChartSectionData> pieChartData = data.map((item) {
-            final percentage = (item.totalAmount / totalSum) * 100;
-            return PieChartSectionData(
-              color: generateUniqueColorById(item.id),
-              value: item.totalAmount,
-              title: '${item.name} \n ${percentage.toStringAsFixed(1)}%',
-              radius: 50,
-              titleStyle: GoogleFonts.montserrat(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            );
-          }).toList();
-
-          return pieChartData;
-        },
+      final result = await useCase.execute(
+        param.type,
+        param.startDate,
+        param.endDate,
       );
+
+      return result.fold((error) => throw error.message, (data) {
+        final totalSum = data.fold<double>(
+          0,
+          (sum, item) => sum + item.totalAmount,
+        );
+
+        if (totalSum == 0) return const Tuple2([], []);
+
+        List<PieChartSectionData> pieChartData = data.map((item) {
+          final percentage = (item.totalAmount / totalSum) * 100;
+          return PieChartSectionData(
+            color: generateUniqueColorById(item.id),
+            value: item.totalAmount,
+            title: '${item.name} \n ${percentage.toStringAsFixed(1)}%',
+            radius: 50,
+            titleStyle: GoogleFonts.montserrat(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 10,
+            ),
+          );
+        }).toList();
+
+        return Tuple2(pieChartData, data);
+      });
     });
