@@ -13,20 +13,23 @@ class OverviewLineGraphWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final range = ref.watch(dateRangeProvider);
-    final asyncGraph = ref.watch(overviewGraphProvider);
+    final overviewGraphState = ref.watch(overviewGraphProvider);
     final currencyCode = ref.read(currencyProvider);
 
-    return asyncGraph.when(
+    return overviewGraphState.when(
       loading: () => const LoadingWidget(),
       error: (err, _) => Center(child: TextGGStyle("Error: $err", 14)),
       data: (data) {
-        if (data is Failure) {
-          return Center(child: TextGGStyle(data.message, 14));
+        if (data.error != null) {
+          return Center(child: TextGGStyle(data.error!, 0.05.sw));
         }
-        if (data is! LineGraphModel) return const SizedBox.shrink();
+
+        if (data.graphModel == null) return const SizedBox.shrink();
+
+        LineGraphModel lineGraphModel = data.graphModel!;
 
         // Calculate the full width of the X-axis
-        final double maxX = _calculateMaxX(range, data.groupType);
+        final double maxX = _calculateMaxX(range, lineGraphModel.groupType);
 
         return AspectRatio(
           aspectRatio: 1.7,
@@ -35,34 +38,34 @@ class OverviewLineGraphWidget extends ConsumerWidget {
               minX: 0,
               maxX: maxX,
               minY: 0,
-              maxY: data.maxY,
-              gridData: _buildGridData(data.maxY),
+              maxY: lineGraphModel.maxY,
+              gridData: _buildGridData(lineGraphModel.maxY),
               borderData: FlBorderData(show: false),
               titlesData: _buildTitles(
                 context,
                 range,
-                data.groupType,
-                data.maxY,
+                lineGraphModel.groupType,
+                lineGraphModel.maxY,
                 maxX,
                 currencyCode.value ?? 'VND',
               ),
               lineBarsData: [
                 _lineData(
-                  data.balanceSpots,
+                  lineGraphModel.balanceSpots,
                   ColorConstant.warning500,
                   3,
                   true,
                   context,
                 ),
                 _lineData(
-                  data.incomeSpots,
+                  lineGraphModel.incomeSpots,
                   ColorConstant.success500,
                   2,
                   false,
                   context,
                 ),
                 _lineData(
-                  data.expenseSpots,
+                  lineGraphModel.expenseSpots,
                   ColorConstant.error500,
                   2,
                   false,

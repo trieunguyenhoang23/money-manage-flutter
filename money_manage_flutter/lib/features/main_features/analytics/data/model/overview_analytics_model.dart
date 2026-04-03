@@ -1,5 +1,5 @@
 class OverviewAnalytics {
-  final String groupType; // 'day', 'month', or 'year'
+  final String groupType;
   final List<OverviewPoint> points;
 
   OverviewAnalytics({required this.groupType, required this.points});
@@ -24,12 +24,14 @@ class OverviewPoint {
   final double income;
   final double expense;
   final double balance;
+  final TrendingPattern trend;
 
   OverviewPoint({
     required this.label,
     required this.income,
     required this.expense,
     required this.balance,
+    required this.trend,
   });
 
   factory OverviewPoint.fromJson(Map<String, dynamic> json) {
@@ -38,6 +40,7 @@ class OverviewPoint {
       income: (json['income'] as num).toDouble(),
       expense: (json['expense'] as num).toDouble(),
       balance: (json['balance'] as num).toDouble(),
+      trend: TrendingPattern.fromDynamic(json['trend']),
     );
   }
 
@@ -46,5 +49,32 @@ class OverviewPoint {
     'income': income,
     'expense': expense,
     'balance': balance,
+    'trend': trend.name,
   };
+
+  static TrendingPattern calculateTrend(double current, double previous) {
+    if (current > previous) return TrendingPattern.up;
+    if (current < previous) return TrendingPattern.down;
+    return TrendingPattern.flatten;
+  }
+}
+
+enum TrendingPattern {
+  up,
+  down,
+  flatten,
+  none;
+
+  static TrendingPattern fromDynamic(dynamic value) {
+    if (value is TrendingPattern) return value;
+
+    if (value is String) {
+      return TrendingPattern.values.firstWhere(
+        (e) => e.name.toUpperCase() == value.toUpperCase(),
+        orElse: () => TrendingPattern.flatten,
+      );
+    }
+
+    return TrendingPattern.flatten;
+  }
 }

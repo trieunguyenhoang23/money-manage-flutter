@@ -149,22 +149,30 @@ class AnalyticsLocalDatasource {
     final List<OverviewPoint> points = [];
     final sortedKeys = groupedMap.keys.toList()..sort();
 
-    for (var key in sortedKeys) {
+    double runningIncomeTemp = runningIncome;
+    double runningExpenseTemp = runningExpense;
+
+    for (int i = 0; i < sortedKeys.length; i++) {
+      final key = sortedKeys[i];
       final period = groupedMap[key]!;
 
-      // Add current period activity to the totals from the PAST
-      runningIncome += period.income;
-      runningExpense += period.expense;
+      // Update cumulative
+      runningIncomeTemp += period.income;
+      runningExpenseTemp += period.expense;
 
-      // Calculate the balance based on the NEW totals
-      runningBalance = runningIncome - runningExpense;
+      final currentBalance = runningIncomeTemp - runningExpenseTemp;
+
+      TrendingPattern trend = i == 0
+          ? TrendingPattern.none
+          : OverviewPoint.calculateTrend(currentBalance, points[i - 1].balance);
 
       points.add(
         OverviewPoint(
           label: key,
-          income: runningIncome,
-          expense: runningExpense,
-          balance: runningBalance,
+          income: runningIncomeTemp,
+          expense: runningExpenseTemp,
+          balance: currentBalance,
+          trend: trend,
         ),
       );
     }

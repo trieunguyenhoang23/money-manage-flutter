@@ -50,5 +50,6 @@
   "category_edit": "Edit Category",
   "//ANALYTIC": "======================================ANALYTIC=================================================",
   "analytic_overview": "Analytic Overview",
-  "analytic_category": "Analytic Category"
+  "analytic_category": "Analytic Category",
+  "analytic_time_line": "Time line"
 }

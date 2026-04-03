@@ -413,6 +413,16 @@ class S {
       args: [],
     );
   }
+
+  /// `Time line`
+  String get analytic_time_line {
+    return Intl.message(
+      'Time line',
+      name: 'analytic_time_line',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<S> {

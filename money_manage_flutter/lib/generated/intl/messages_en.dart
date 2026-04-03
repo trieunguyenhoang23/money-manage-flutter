@@ -30,6 +30,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "analytic_overview": MessageLookupByLibrary.simpleMessage(
       "Analytic Overview",
     ),
+    "analytic_time_line": MessageLookupByLibrary.simpleMessage("Time line"),
     "analytics": MessageLookupByLibrary.simpleMessage("Analysis"),
     "balance": MessageLookupByLibrary.simpleMessage("Balance"),
     "cancel": MessageLookupByLibrary.simpleMessage("Cancel"),
