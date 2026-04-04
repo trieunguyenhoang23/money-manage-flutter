@@ -5,7 +5,12 @@ import '../../../../category/data/model/local/category_local_model.dart';
 import '../../data/model/local/transaction_local_model.dart';
 
 abstract class TransactionRepository {
-  Future<List<TransactionLocalModel>> loadTransByPage(int page);
+  Future<List<TransactionLocalModel>> loadTransByMonth(
+    int page,
+    int month,
+    int year, {
+    TransactionType? type,
+  });
 
   Future<List<CategoryLocalModel>> getCategoryThroughTrans(
     TransactionType type,

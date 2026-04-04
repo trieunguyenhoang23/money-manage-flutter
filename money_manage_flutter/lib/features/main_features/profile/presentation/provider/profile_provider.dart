@@ -37,8 +37,8 @@ class ProfileNotifier extends AsyncNotifier<ProfileState> {
       state = AsyncData(state.value!.copyWith(userLocalModel: userLocal));
 
       /// Refresh data từ server
-      await ref.read(loadingCategoryProvider.notifier).refresh();
-      await ref.read(loadingTransactionProvider.notifier).refresh();
+      ref.invalidate(loadingTransactionProvider);
+      ref.invalidate(loadingCategoryProvider);
 
       /// Update UI only => isSyncData: false
       await ref
@@ -59,13 +59,15 @@ class ProfileNotifier extends AsyncNotifier<ProfileState> {
 
   Future<void> onLogout() async {
     await getIt<LogoutUseCase>().execute();
-
-    ref.refresh(loadingCategoryProvider);
-    ref.refresh(loadingTransactionProvider);
-    ref.refresh(loadingCategoryByTypeProvider(TransactionType.INCOME));
-    ref.refresh(loadingCategoryByTypeProvider(TransactionType.EXPENSE));
-    ref.refresh(overviewBalanceProvider);
     state = AsyncData(ProfileState(userLocalModel: null));
+
+    Future.microtask(() {
+      ref.invalidate(loadingCategoryProvider);
+      ref.invalidate(loadingTransactionProvider);
+      ref.invalidate(loadingCategoryByTypeProvider(TransactionType.INCOME));
+      ref.invalidate(loadingCategoryByTypeProvider(TransactionType.EXPENSE));
+      ref.invalidate(overviewBalanceProvider);
+    });
   }
 }
 

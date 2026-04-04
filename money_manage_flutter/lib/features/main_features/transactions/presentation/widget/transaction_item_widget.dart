@@ -163,7 +163,7 @@ class TransactionItemWidget extends ConsumerWidget {
   }
 
   Future<void> _onDelete(BuildContext context, WidgetRef ref) async {
-    final transactionNotifier = ref.read(loadingTransactionProvider.notifier);
+    final container = ProviderScope.containerOf(context, listen: false);
 
     final title = context.lang.transaction_delete_item_title;
     final content = context.lang.transaction_delete_item_content;
@@ -182,7 +182,7 @@ class TransactionItemWidget extends ConsumerWidget {
             }
           },
           (isSuccess) {
-            transactionNotifier.removeItem(item);
+            container.invalidate(loadingTransactionProvider);
           },
         );
       },

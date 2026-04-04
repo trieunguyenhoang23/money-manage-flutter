@@ -13,7 +13,7 @@ class DialogBg1Widget extends StatelessWidget {
       width: w,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(0.8.sw * 0.075)),
-        color: ColorConstant.neutral200,
+        color: context.colorScheme.surface,
       ),
       child: child,
     );

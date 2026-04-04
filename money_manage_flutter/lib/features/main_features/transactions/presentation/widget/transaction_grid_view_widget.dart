@@ -2,6 +2,7 @@ import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import '../../data/model/local/transaction_local_model.dart';
+import '../provider/transaction_filter_provider.dart';
 import '../provider/transaction_provider.dart';
 import 'transaction_item_widget.dart';
 
@@ -16,38 +17,6 @@ class TransactionGridViewWidget extends ConsumerStatefulWidget {
 class _TransactionGridViewWidgetState
     extends ConsumerState<TransactionGridViewWidget> {
   ScrollController scrollController = ScrollController();
-  late final ProviderSubscription refListener;
-
-  final provider = loadingTransactionProvider;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final notifier = ref.read(provider.notifier);
-
-      // Load lần đầu
-      if (notifier.page == 0) {
-        notifier.loadMore();
-      }
-
-      // Listen animation list change
-      refListener = ref.listenManual(provider, (prev, next) {
-        final prevList = (prev as dynamic)?.visibleList as List? ?? [];
-        final nextList = (next as dynamic).visibleList as List;
-
-        if (prevList.isNotEmpty && nextList.length > prevList.length) {
-          updateAnimationLastItem(
-            prevList,
-            nextList,
-            scrollController: scrollController,
-          );
-        }
-      });
-    });
-  }
 
   @override
   void dispose() {
@@ -55,16 +24,44 @@ class _TransactionGridViewWidgetState
     super.dispose();
 
     scrollController.dispose();
-    refListener.close();
   }
 
   @override
   Widget build(BuildContext context) {
-    final notifier = ref.read(provider.notifier);
-    final state = ref.watch(provider);
+    // Tracking current filter (Year/Month/Type)
+    final syncKey = ref.watch(transactionFilterProvider);
+
+    // Point to the correct provider
+    final currentProvider = loadingTransactionProvider(syncKey);
+
+    final state = ref.watch(currentProvider);
+    final notifier = ref.read(currentProvider.notifier);
+
+    ref.listen(currentProvider, (prev, next) {
+      if (prev == null) return;
+      if (next.visibleList.length > prev.visibleList.length &&
+          notifier.page > 1) {
+        updateAnimationLastItem(
+          prev.visibleList,
+          next.visibleList,
+          scrollController: scrollController,
+        );
+      }
+    });
+
+    // Automatically load the first time if there is no data yet
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      if (state.visibleList.isEmpty &&
+          !state.isLoading &&
+          state.errorMessage == null &&
+          notifier.page == 0) {
+        notifier.loadMore();
+      }
+    });
 
     double wBtn = 0.4.sw;
-
     double hBtn = wBtn * 75 / 319;
 
     if (state.errorMessage != null && state.visibleList.isEmpty) {
@@ -77,7 +74,7 @@ class _TransactionGridViewWidgetState
             BtnMainWidget(
               w: wBtn,
               h: hBtn,
-              onTap: () => ref.read(provider.notifier).loadMore(),
+              onTap: () => notifier.loadMore(),
               color: ColorConstant.primary,
               radius: hBtn * 0.05,
               child: TextGGStyle(context.lang.retry, hBtn * 0.4),
@@ -98,7 +95,9 @@ class _TransactionGridViewWidgetState
                 if (scrollInfo.metrics.pixels >=
                     scrollInfo.metrics.maxScrollExtent) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    notifier.loadMore();
+                    if (!state.isLoading && state.visibleList.isNotEmpty) {
+                      Future.microtask(() => notifier.loadMore());
+                    }
                   });
                 }
                 return false;

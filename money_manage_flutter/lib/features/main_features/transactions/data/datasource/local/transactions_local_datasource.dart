@@ -10,13 +10,27 @@ class TransactionsLocalDatasource {
 
   TransactionsLocalDatasource(this._isar);
 
-  Future<List<TransactionLocalModel>> loadByPage(
-    int page,
-    int limitCount,
-  ) async {
-    return await _isar.transactionLocalModels
-        .where()
-        .sortByCreatedAtDesc()
+  Future<List<TransactionLocalModel>> loadTransByMonth({
+    required int page,
+    required int limitCount,
+    required int month,
+    required int year,
+    TransactionType? type,
+  }) async {
+    final startTime = DateTime(year, month, 1);
+    final endTime = DateTime(year, month + 1, 0, 23, 59, 59);
+
+    var query = _isar.transactionLocalModels.filter().transactionAtBetween(
+      startTime,
+      endTime,
+    );
+
+    if (type != null) {
+      query = query.and().typeEqualTo(type);
+    }
+
+    return await query
+        .sortByTransactionAtDesc()
         .offset(page * limitCount)
         .limit(limitCount)
         .findAll();
@@ -26,7 +40,7 @@ class TransactionsLocalDatasource {
     return await _isar.transactionLocalModels
         .filter()
         .isSyncedEqualTo(false)
-        .sortByCreatedAtDesc()
+        .sortByTransactionAtDesc()
         .offset(0 * limitCount)
         .limit(limitCount)
         .findAll();

@@ -2,52 +2,49 @@ import 'package:intl/intl.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/core.dart';
+import '../../data/datasource/sync/transaction_sync_key.dart';
+import '../provider/transaction_filter_provider.dart';
 
-class MonthSelectWidget extends StatefulWidget implements PreferredSizeWidget {
+class MonthSelectWidget extends ConsumerWidget implements PreferredSizeWidget {
   const MonthSelectWidget({super.key});
 
   @override
-  State<MonthSelectWidget> createState() => _MonthSelectWidgetState();
-
-  @override
   Size get preferredSize => Size.fromHeight(0.065.sh);
-}
-
-class _MonthSelectWidgetState extends State<MonthSelectWidget> {
-  // 3. Move selection state here so it persists and triggers UI updates
-  int selectedMonth = DateTime.now().month - 1;
-  int selectedYear = DateTime.now().year;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 1. Theo dõi filter hiện tại
+    final currentFilter = ref.watch(transactionFilterProvider);
+
     return Container(
-      height: widget.preferredSize.height,
+      height: preferredSize.height,
       padding: const EdgeInsets.only(bottom: 10),
-      // Background color if needed to match AppBar
-      color: Colors.transparent,
-      child: GridViewBuilder(
-        isScrollHorizontal: true,
-        crossAxisCount: 1,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
         itemCount: 12,
         itemBuilder: (context, index) {
-          // 4. Localized Month Names
+          final monthValue = index + 1;
           final monthName = DateFormat(
             'MMM',
             Localizations.localeOf(context).languageCode,
-          ).format(DateTime(selectedYear, index + 1));
+          ).format(DateTime(currentFilter.year, monthValue));
 
           return MonthItemWidget(
             month: monthName,
-            isSelected: selectedMonth == index,
+            isSelected: currentFilter.month == monthValue,
             onTap: () {
-              setState(() {
-                selectedMonth = index;
-              });
-              // TODO: Call your Riverpod/Provider notifier here
+              ref
+                  .read(transactionFilterProvider.notifier)
+                  .update(
+                    (state) => TransactionSyncKey(
+                      year: state.year,
+                      month: monthValue,
+                      type: state.type,
+                    ),
+                  );
             },
           );
         },
-        childAspectRatio: 4 / 6,
       ),
     );
   }
@@ -67,27 +64,27 @@ class MonthItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, cc) {
-        return GestureDetector(
-          onTap: onTap,
-          child: Container(
-            margin: EdgeInsets.symmetric(horizontal: cc.maxWidth * 0.01),
-            decoration: BoxDecoration(
-              color: isSelected ? ColorConstant.primary : Colors.transparent,
-              borderRadius: BorderRadius.circular(cc.maxHeight * 0.4),
-            ),
-            child: Center(
-              child: TextGGStyle(
-                month,
-                cc.maxHeight * 0.3,
-                color: isSelected ? Colors.white : Colors.grey,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
+    final double itemHeight = 0.05.sh;
+    final double itemWidth = 0.175.sw;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: itemWidth,
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        decoration: BoxDecoration(
+          color: isSelected ? ColorConstant.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(itemHeight * 0.3),
+        ),
+        child: Center(
+          child: TextGGStyle(
+            month,
+            itemHeight * 0.35, // Font size dựa trên itemHeight
+            color: isSelected ? Colors.white : Colors.grey,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

@@ -66,6 +66,8 @@ import '../../features/main_features/transactions/data/datasource/local/transact
     as _i1013;
 import '../../features/main_features/transactions/data/datasource/remote/transactions_remote_datasource.dart'
     as _i407;
+import '../../features/main_features/transactions/data/datasource/sync/transaction_sync_store.dart'
+    as _i261;
 import '../../features/main_features/transactions/data/repositories/transaction_repository_impl.dart'
     as _i716;
 import '../../features/main_features/transactions/domain/repositories/transaction_repository.dart'
@@ -131,6 +133,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i446.SyncLazyLoading>(
       () => _i446.SyncLazyLoading(gh<_i460.SharedPreferences>()),
+    );
+    gh.lazySingleton<_i261.TransactionSyncStore>(
+      () => _i261.TransactionSyncStore(gh<_i460.SharedPreferences>()),
     );
     gh.singleton<_i820.IFileService>(
       () => _i835.FileServiceImpl(
@@ -222,7 +227,7 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i407.TransactionsRemoteDatasource>(),
         gh<_i1013.TransactionsLocalDatasource>(),
         gh<_i858.SyncManager>(),
-        gh<_i858.SyncLazyLoading>(),
+        gh<_i261.TransactionSyncStore>(),
         gh<_i197.CategoryLocalDatasource>(),
       ),
     );
@@ -289,7 +294,7 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i874.TransactionRepository>(),
         gh<_i446.SyncLazyLoading>(),
         gh<_i558.FlutterSecureStorage>(),
-        gh<_i460.SharedPreferences>(),
+        gh<_i261.TransactionSyncStore>(),
       ),
     );
     return this;

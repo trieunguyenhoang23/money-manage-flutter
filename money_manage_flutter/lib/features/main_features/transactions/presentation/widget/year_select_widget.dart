@@ -1,44 +1,52 @@
 import 'package:money_manage_flutter/export/ui_external.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/core.dart';
+import '../../data/datasource/sync/transaction_sync_key.dart';
+import '../provider/transaction_filter_provider.dart';
 
-class YearSelectWidget extends ConsumerStatefulWidget {
+class YearSelectWidget extends ConsumerWidget {
   const YearSelectWidget({super.key});
 
   @override
-  ConsumerState<YearSelectWidget> createState() => _YearSelectWidgetState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentFilter = ref.watch(transactionFilterProvider);
 
-class _YearSelectWidgetState extends ConsumerState<YearSelectWidget> {
-  int selectedYear = DateTime.now().year;
+    final List<int> years = List.generate(
+      20,
+      (index) => DateTime.now().year - index,
+    );
 
-  final List<int> years = List.generate(
-    20,
-    (index) => (DateTime.now().year) - index,
-  );
-
-  @override
-  Widget build(BuildContext context) {
     return Center(
       child: DropdownButton<int>(
-        value: selectedYear,
+        value: currentFilter.year,
         underline: const SizedBox(),
         icon: const Icon(Icons.arrow_drop_down, color: ColorConstant.primary),
-        items: years.map((int year) {
-          return DropdownMenuItem<int>(
-            value: year,
-            child: TextGGStyle(
-              year.toString(),
-              0.04.sw.clamp(14, 18),
-              fontWeight: FontWeight.bold,
-            ),
-          );
-        }).toList(),
+        items: years
+            .map(
+              (year) => DropdownMenuItem<int>(
+                value: year,
+                child: TextGGStyle(
+                  year.toString(),
+                  16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            )
+            .toList(),
         onChanged: (value) {
-          if (value != null) setState(() => selectedYear = value);
+          if (value != null) {
+            ref
+                .read(transactionFilterProvider.notifier)
+                .update(
+                  (state) => TransactionSyncKey(
+                    year: value,
+                    month: state.month,
+                    type: state.type,
+                  ),
+                );
+          }
         },
       ),
     );
   }
 }
-

@@ -1,13 +1,14 @@
 import 'package:dartz/dartz.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/core_external.dart';
-import '../../../../../core/data/datasource/sync_lazy_loading.dart';
+import 'package:money_manage_flutter/features/main_features/transactions/data/datasource/sync/transaction_sync_store.dart';
 import '../../../../../infrastructure/file/models/file_picked.dart';
 import '../../../../category/data/datasource/local/category_local_datasource.dart';
 import '../../../../category/data/model/local/category_local_model.dart';
 import '../../domain/repositories/transaction_repository.dart';
 import '../datasource/local/transactions_local_datasource.dart';
 import '../datasource/remote/transactions_remote_datasource.dart';
+import '../datasource/sync/transaction_sync_key.dart';
 import '../model/local/transaction_local_model.dart';
 
 @LazySingleton(as: TransactionRepository)
@@ -15,14 +16,14 @@ class TransactionRepositoryImpl implements TransactionRepository {
   final TransactionsRemoteDatasource _remoteDatasource;
   final TransactionsLocalDatasource _localDatasource;
   final SyncManager _syncManager;
-  final SyncLazyLoading _SyncLazyLoading;
+  final TransactionSyncStore _syncStore;
   final CategoryLocalDatasource _categoryLocalDatasource;
 
   TransactionRepositoryImpl(
     this._remoteDatasource,
     this._localDatasource,
     this._syncManager,
-    this._SyncLazyLoading,
+    this._syncStore,
     this._categoryLocalDatasource,
   );
 
@@ -83,71 +84,107 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
     await _localDatasource.putTransaction(transaction, category);
 
+    // Reset sync key
+    final syncKey = TransactionSyncKey(
+      year: transactionAt.year,
+      month: transactionAt.month,
+      type: null, // Reset tab ALL
+    );
+    await _syncStore.reset(syncKey);
+
     return Right(transaction);
   }
 
+
   @override
-  Future<List<TransactionLocalModel>> loadTransByPage(int page) async {
-    var localData = await _localDatasource.loadByPage(page, limitCount);
+  Future<List<TransactionLocalModel>> loadTransByMonth(
+    int page,
+    int month,
+    int year, {
+    TransactionType? type,
+  }) async {
+    /// Declare key for month & year
+    final syncKey = TransactionSyncKey(year: year, month: month, type: type);
+
+    // Fetch data from server first
+    var localData = await _localDatasource.loadTransByMonth(
+      page: page,
+      month: month,
+      year: year,
+      type: type,
+      limitCount: limitCount,
+    );
 
     await _syncManager.runIfMeetStandard((
       currentActiveUserId,
       networkStatus,
     ) async {
-      if (_SyncLazyLoading.hasReachedEnd(SyncSchema.transaction)) return;
+      /// Check sync Status
+      if (_syncStore.isFullyReachedEnd(syncKey)) return;
 
-      bool isPartialPage = localData.length < limitCount;
+      /// Call API if the current page don't have enough data
+      final progress = _syncStore.getProgress(syncKey);
+      final bool isDataMissing = localData.length < limitCount;
+      final bool isRequestingNewPage = page >= progress.nextPage;
 
-      /// If local data in this page doesn't meet limitCount
-      if (isPartialPage) {
-        /// Get last page to continue fetching dat from server
-        int lastFetched = _SyncLazyLoading.getLastPage(
-          SyncSchema.transaction,
-        );
-        int nextPage = lastFetched + 1;
+      if (!isDataMissing && !isRequestingNewPage) return;
 
-        await _remoteDatasource.loadTransByPage(page, limitCount).then((
-          result,
-        ) async {
-          if (result.isFailure) return;
+      /// Important:
+      /// if missing data on the current page, reload that page
+      /// if it's a completely new page, load the next page
+      int pageToFetch = isDataMissing ? page : progress.nextPage;
 
-          /// Set last page if data is empty
-          if (result.data.isEmpty) {
-            await _SyncLazyLoading.setReachedEnd(
-              SyncSchema.transaction,
-              true,
-            );
-            return;
-          }
+      // Call API
+      final result = await _remoteDatasource.loadTransByMonth(
+        pageToFetch,
+        limitCount,
+        month,
+        year,
+        type: type?.name.toUpperCase(),
+      );
 
-          /// Save lastest fetching page
-          await _SyncLazyLoading.setLastPage(
-            SyncSchema.transaction,
-            nextPage,
-          );
+      if (result.isFailure) return;
 
-          final localModels = await parseListJsonIsolate(
-            TransactionLocalModel.fromRemote,
-            result.data,
-          );
-
-          // Save category to local
-          for (var item in result.data) {
-            final localCategory = CategoryLocalModel.fromRemote(
-              item['category'],
-            );
-            await _categoryLocalDatasource.save(localCategory);
-          }
-
-          // Save to local Isar
-          await _localDatasource.saveAll(localModels);
-          // Re-fetch from local to get the unified list
-          localData = await _localDatasource.loadByPage(page, limitCount);
-        });
+      if (result.data.isEmpty) {
+        /// Mark data as expired for this month/year/type
+        await _syncStore.markReachedEnd(syncKey);
+        return;
       }
+
+      // Save remote data to local
+      final localModels = await parseListJsonIsolate(
+        TransactionLocalModel.fromRemote,
+        result.data,
+      );
+
+      /// Save category if needed
+      final categories = result.data
+          .map((item) => item['category'])
+          .whereType<Map<String, dynamic>>()
+          .map<CategoryLocalModel>(
+            (json) => CategoryLocalModel.fromRemote(json),
+          )
+          .toSet() // Duplicate Filter (Unique)
+          .toList();
+
+      if (categories.isNotEmpty) {
+        await _categoryLocalDatasource.saveAll(categories);
+      }
+
+      await _localDatasource.saveAll(localModels);
+
+      // Update sync progress for this key was successful
+      await _syncStore.savePage(syncKey, pageToFetch + 1);
     });
 
-    return localData;
+    // Fetch data from local again
+    return await _localDatasource.loadTransByMonth(
+      page: page,
+      month: month,
+      year: year,
+      type: type,
+      limitCount: limitCount,
+    );
   }
 
   @override

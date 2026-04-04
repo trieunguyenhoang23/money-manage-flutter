@@ -1,6 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 import 'package:money_manage_flutter/core/constant/string_constant.dart';
+import 'package:money_manage_flutter/features/main_features/transactions/data/datasource/sync/transaction_sync_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../core/data/datasource/sync_lazy_loading.dart';
 import '../../../../category/domain/repositories/category_repository.dart';
@@ -14,7 +15,7 @@ class LogoutUseCase {
   final TransactionRepository _transactionRepository;
   final SyncLazyLoading _SyncLazyLoading;
   final FlutterSecureStorage _secureStorage;
-  final SharedPreferences _preferences;
+  final TransactionSyncStore _transactionSyncStore;
 
   LogoutUseCase(
     this._userRepository,
@@ -22,7 +23,7 @@ class LogoutUseCase {
     this._transactionRepository,
     this._SyncLazyLoading,
     this._secureStorage,
-    this._preferences,
+    this._transactionSyncStore,
   );
 
   Future<void> execute() async {
@@ -34,6 +35,8 @@ class LogoutUseCase {
     await _SyncLazyLoading.resetSync(SyncSchema.reminder);
     await _SyncLazyLoading.resetSync(SyncSchema.category);
     await _SyncLazyLoading.resetSync(SyncSchema.transaction);
+
+    await _transactionSyncStore.clearAllSyncProgress();
 
     await _secureStorage.deleteAll();
   }

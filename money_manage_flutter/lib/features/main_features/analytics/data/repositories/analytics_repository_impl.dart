@@ -37,8 +37,8 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
         await _analyticsRemoteDatasource.getFinancialData().then((result) {
           if (result.isFailure) return Left(result.error?.message);
 
-          income = result.data['income'];
-          expense = result.data['expense'];
+          income = double.tryParse(result.data['income'].toString()) ?? 0;
+          expense = double.tryParse(result.data['expense'].toString()) ?? 0;
         });
       }
     });

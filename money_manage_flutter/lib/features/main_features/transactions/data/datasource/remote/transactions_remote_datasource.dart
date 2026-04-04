@@ -10,11 +10,22 @@ class TransactionsRemoteDatasource {
 
   TransactionsRemoteDatasource(this._dioService);
 
-  Future<ApiResult> loadTransByPage(int page, int limit_count) async {
-    final response = await _dioService.getWithCache(
-      '${TransactionAPI.get_load_by_page}?'
-      'page=$page&'
-      'limit_count=$limit_count',
+  Future<ApiResult> loadTransByMonth(
+    int page,
+    int limit_count,
+    int month,
+    int year, {
+    String? type,
+  }) async {
+    final response = await _dioService.getNoCache(
+      TransactionAPI.get_load_by_month,
+      queryParameters: {
+        'page': page,
+        'limit_count': limit_count,
+        'month': month,
+        'year': year,
+        if (type != null) 'type': type,
+      },
     );
 
     return response;
