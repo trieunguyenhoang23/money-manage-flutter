@@ -37,16 +37,6 @@ class _MainShellScreenState extends State<MainShellScreen> {
           isLeading: false,
           isCentralTitle: true,
           actionBtn: [
-            BtnAppbarWidget(
-              widget: const Icon(Icons.sort, color: ColorConstant.primary),
-              onTap: () {
-                NavigatorRouter.pushNamed(
-                  context,
-                  TransactionsRoutes.createNewTransactionName,
-                  pathParameters: {},
-                );
-              },
-            ),
             SizedBox(width: 0.025.sw),
             BtnAppbarWidget(
               widget: const Icon(

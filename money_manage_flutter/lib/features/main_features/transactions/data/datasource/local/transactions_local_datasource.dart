@@ -29,11 +29,17 @@ class TransactionsLocalDatasource {
       query = query.and().typeEqualTo(type);
     }
 
-    return await query
+    final list = await query
         .sortByTransactionAtDesc()
         .offset(page * limitCount)
         .limit(limitCount)
         .findAll();
+
+    for (var transaction in list) {
+      await transaction.category.load();
+    }
+
+    return list;
   }
 
   Future<List<TransactionLocalModel>> loadDataNotYetSync(int limitCount) async {
@@ -111,7 +117,7 @@ class TransactionsLocalDatasource {
     TransactionLocalModel transaction,
     CategoryLocalModel category,
   ) async {
-    _isar.writeTxn(() async {
+    await _isar.writeTxn(() async {
       await _isar.transactionLocalModels.put(transaction);
 
       // Link the category
@@ -124,15 +130,22 @@ class TransactionsLocalDatasource {
 
   Future<void> saveAll(List<TransactionLocalModel> transactions) async {
     await _isar.writeTxn(() async {
-      // 1. Bulk insert all transactions first
-      // This returns the internal Isar IDs if they were null/auto-increment
+      for (var tx in transactions) {
+        if (tx.category.value == null && tx.categoryId.isNotEmpty) {
+          final cate = await _isar.categoryLocalModels
+              .filter()
+              .idServerEqualTo(tx.categoryId)
+              .findFirst();
+          if (cate != null) {
+            tx.category.value = cate;
+          }
+        }
+      }
+
       await _isar.transactionLocalModels.putAll(transactions);
 
-      // 2. Prepare all links
-      // We iterate through and ensure the category link is set and saved
+      /// Link the relationship category for each transaction item
       for (var tx in transactions) {
-        // Note: This assumes tx.category.value was already assigned
-        // before calling saveAll. If not, you'd assign it here.
         await tx.category.save();
       }
     });

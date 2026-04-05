@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
-import '../../../../core/data/datasource/sync_lazy_loading.dart';
+import '../datasource/sync/category_sync_store.dart';
 import '../../domain/repositories/category_repository.dart';
 import '../datasource/local/category_local_datasource.dart';
 import '../datasource/remote/category_remote_datasource.dart';
@@ -12,13 +12,13 @@ class CategoryRepositoryImpl implements CategoryRepository {
   final CategoryRemoteDatasource _remoteDatasource;
   final CategoryLocalDatasource _localDatasource;
   final SyncManager _syncManager;
-  final SyncLazyLoading _SyncLazyLoading;
+  final CategorySyncStore _categorySyncStore;
 
   CategoryRepositoryImpl(
     this._remoteDatasource,
     this._localDatasource,
     this._syncManager,
-    this._SyncLazyLoading,
+    this._categorySyncStore,
   );
 
   int limitCount = SizeAppUtils().isTablet ? 20 : 10;
@@ -72,14 +72,14 @@ class CategoryRepositoryImpl implements CategoryRepository {
       currentActiveUserId,
       networkStatus,
     ) async {
-      if (_SyncLazyLoading.hasReachedEnd(SyncSchema.category)) return;
+      if (_categorySyncStore.hasReachedEnd()) return;
 
       bool isPartialPage = localData.length < limitCount;
 
       /// If local data in this page doesn't meet limitCount
       if (isPartialPage) {
         /// Get last page to continue fetching dat from server
-        int lastFetched = _SyncLazyLoading.getLastPage(SyncSchema.category);
+        int lastFetched = _categorySyncStore.getLastPage();
         int nextPage = lastFetched + 1;
 
         await _remoteDatasource.loadCateByPage(page, limitCount).then((
@@ -89,12 +89,12 @@ class CategoryRepositoryImpl implements CategoryRepository {
 
           /// Set last page if data is empty
           if (result.data.isEmpty) {
-            await _SyncLazyLoading.setReachedEnd(SyncSchema.category, true);
+            await _categorySyncStore.setReachedEnd(true);
             return;
           }
 
           /// Save lastest fetching page
-          await _SyncLazyLoading.setLastPage(SyncSchema.category, nextPage);
+          await _categorySyncStore.setLastPage(nextPage);
           final localModels = await parseListJsonIsolate(
             CategoryLocalModel.fromRemote,
             result.data,

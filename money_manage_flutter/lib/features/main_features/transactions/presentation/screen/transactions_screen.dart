@@ -6,6 +6,7 @@ import 'package:money_manage_flutter/export/ui_external.dart';
 import '../../../../../core/router/navigator_router.dart';
 import '../../../../../shared/widget/btn/btn_floating_widget.dart';
 import '../widget/month_select_widget.dart';
+import '../widget/transaction_filter_widget.dart';
 import '../widget/transaction_grid_view_widget.dart';
 import '../widget/year_select_widget.dart';
 
@@ -17,17 +18,6 @@ class TransactionsScreen extends StatefulWidget {
 }
 
 class _TransactionsScreenState extends State<TransactionsScreen> {
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -45,9 +35,18 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   pinned: true,
                   floating: false,
                   titleSpacing: 0,
-                  title: const YearSelectWidget(),
+                  title: SizedBox(
+                    width: 1.sw,
+                    child: const Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        YearSelectWidget(),
+                        Positioned(right: 0, child: TransactionFilterWidget()),
+                      ],
+                    ),
+                  ),
                   bottom: const MonthSelectWidget(),
-                  centerTitle: true,
+                  centerTitle: false,
                   toolbarHeight: (158 / 375).sw.clamp(0, 207) * 35 / 158 + 10,
                   automaticallyImplyLeading: false,
                 ),

@@ -8,7 +8,7 @@ part 'category_local_model.g.dart';
 class CategoryLocalModel {
   Id id = Isar.autoIncrement;
 
-  @Index(unique: true, replace: true)
+  @Index(unique: true)
   String? idServer;
 
   String? name;

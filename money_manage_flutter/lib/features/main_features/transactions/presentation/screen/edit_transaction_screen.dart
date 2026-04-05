@@ -101,13 +101,6 @@ class _EditTransactionScreenState extends ConsumerState<EditTransactionScreen> {
               },
               (updateTransaction) {
                 ref.invalidate(loadingTransactionProvider);
-                // ref
-                //     .read(loadingTransactionProvider.notifier)
-                //     .updateItem(
-                //       (item) => item.idServer == updateTransaction.idServer,
-                //       updateTransaction,
-                //     );
-
 
                 /// Refresh Overview Balance to update new data
                 ref.refresh(overviewBalanceProvider);

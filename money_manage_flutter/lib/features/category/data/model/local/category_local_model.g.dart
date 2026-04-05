@@ -59,7 +59,7 @@ const CategoryLocalModelSchema = CollectionSchema(
       id: 2504112552765302450,
       name: r'idServer',
       unique: true,
-      replace: true,
+      replace: false,
       properties: [
         IndexPropertySchema(
           name: r'idServer',

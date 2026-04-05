@@ -189,10 +189,13 @@ class _CategoryItem extends StatelessWidget {
             alignment: Alignment.center,
             child: isAddItem
                 ? const Icon(Icons.add)
-                : TextGGStyle(
-                    category?.name ?? '',
-                    cc.maxWidth * 0.1,
-                    maxLines: 1,
+                : Padding(
+                    padding: EdgeInsets.all(cc.maxWidth * 0.1),
+                    child: TextGGStyle(
+                      category?.name ?? '',
+                      cc.maxWidth * 0.1,
+                      maxLines: 2,
+                    ),
                   ),
           ),
         );

@@ -41,4 +41,4 @@ export 'package:money_manage_flutter/core/di/injection.dart';
 export 'package:money_manage_flutter/core/background/background_task_helper.dart';
 
 /// Data
-export 'package:money_manage_flutter/core/data/datasource/sync_lazy_loading.dart';
+export 'package:money_manage_flutter/features/category/data/datasource/sync/category_sync_store.dart';

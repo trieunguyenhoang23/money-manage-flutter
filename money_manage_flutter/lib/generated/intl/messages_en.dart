@@ -24,6 +24,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "all": MessageLookupByLibrary.simpleMessage("All"),
     "analytic_category": MessageLookupByLibrary.simpleMessage(
       "Analytic Category",
     ),

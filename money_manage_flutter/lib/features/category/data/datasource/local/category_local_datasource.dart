@@ -57,15 +57,53 @@ class CategoryLocalDatasource {
     return await _isar.categoryLocalModels.count();
   }
 
-  Future<void> save(CategoryLocalModel cate) async {
+  Future<void> save(CategoryLocalModel input) async {
     await _isar.writeTxn(() async {
-      await _isar.categoryLocalModels.put(cate);
+      final existing = await _isar.categoryLocalModels
+          .filter()
+          .idServerEqualTo(input.idServer)
+          .findFirst();
+
+      if (existing != null) {
+        existing
+          ..name = input.name
+          ..description = input.description
+          ..type = input.type
+          ..createdAt = input.createdAt ?? existing.createdAt
+          ..updatedAt = input.updatedAt ?? DateTime.now()
+          ..userId = input.userId ?? existing.userId
+          ..isSynced = input.isSynced;
+
+        await _isar.categoryLocalModels.put(existing);
+      } else {
+        await _isar.categoryLocalModels.put(input);
+      }
     });
   }
 
   Future<void> saveAll(List<CategoryLocalModel> cates) async {
     await _isar.writeTxn(() async {
-      await _isar.categoryLocalModels.putAll(cates);
+      for (final item in cates) {
+        final existing = await _isar.categoryLocalModels
+            .filter()
+            .idServerEqualTo(item.idServer)
+            .findFirst();
+
+        if (existing != null) {
+          existing
+            ..name = item.name
+            ..description = item.description
+            ..type = item.type
+            ..createdAt = item.createdAt ?? existing.createdAt
+            ..updatedAt = item.updatedAt ?? DateTime.now()
+            ..userId = item.userId ?? existing.userId
+            ..isSynced = item.isSynced;
+
+          await _isar.categoryLocalModels.put(existing);
+        } else {
+          await _isar.categoryLocalModels.put(item);
+        }
+      }
     });
   }
 

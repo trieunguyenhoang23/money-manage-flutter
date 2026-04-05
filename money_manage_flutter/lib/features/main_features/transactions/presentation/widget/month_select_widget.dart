@@ -13,7 +13,6 @@ class MonthSelectWidget extends ConsumerWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 1. Theo dõi filter hiện tại
     final currentFilter = ref.watch(transactionFilterProvider);
 
     return Container(
@@ -74,12 +73,12 @@ class MonthItemWidget extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         decoration: BoxDecoration(
           color: isSelected ? ColorConstant.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(itemHeight * 0.3),
+          borderRadius: BorderRadius.circular(itemHeight * 0.4),
         ),
         child: Center(
           child: TextGGStyle(
             month,
-            itemHeight * 0.35, // Font size dựa trên itemHeight
+            itemHeight * 0.35,
             color: isSelected ? Colors.white : Colors.grey,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),

@@ -8,6 +8,7 @@
   "created_at": "Create at:",
   "updated_at": "Recent update:",
   "transaction_at": "Transaction At:",
+  "all": "All",
   "income": "Income",
   "expense": "Expense",
   "balance": "Balance",

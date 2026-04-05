@@ -109,6 +109,11 @@ class S {
     );
   }
 
+  /// `All`
+  String get all {
+    return Intl.message('All', name: 'all', desc: '', args: []);
+  }
+
   /// `Income`
   String get income {
     return Intl.message('Income', name: 'income', desc: '', args: []);

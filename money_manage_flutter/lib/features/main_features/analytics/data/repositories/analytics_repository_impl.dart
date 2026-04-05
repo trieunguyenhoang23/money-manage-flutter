@@ -12,16 +12,14 @@ import '../model/overview_analytics_model.dart';
 class AnalyticsRepositoryImpl implements AnalyticsRepository {
   final AnalyticsRemoteDatasource _analyticsRemoteDatasource;
   final AnalyticsLocalDatasource _analyticsLocalDatasource;
-  final UserLocalDatasource _userLocalDatasource;
   final SyncManager _syncManager;
-  final SyncLazyLoading _syncLazyLoading;
+  final CategorySyncStore _categorySyncStore;
 
   AnalyticsRepositoryImpl(
     this._analyticsLocalDatasource,
     this._analyticsRemoteDatasource,
     this._syncManager,
-    this._syncLazyLoading,
-    this._userLocalDatasource,
+    this._categorySyncStore,
   );
 
   @override
@@ -32,8 +30,10 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
 
     await _syncManager.runIfMeetStandard((currentUserId, isConnected) async {
       /// Only fetching data from server when transaction lazy loading hasn't finished
-      if (!_syncLazyLoading.hasReachedEnd(SyncSchema.category) &&
-          !_syncLazyLoading.hasReachedEnd(SyncSchema.transaction)) {
+      if (!_categorySyncStore.hasReachedEnd()
+      /// FIX: Check fetch all data transaction from Server
+      // && !_syncLazyLoading.hasReachedEnd(SyncSchema.transaction)
+      ) {
         await _analyticsRemoteDatasource.getFinancialData().then((result) {
           if (result.isFailure) return Left(result.error?.message);
 
@@ -62,8 +62,10 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
 
     String? error;
     await _syncManager.runIfMeetStandard((currentUserId, isConnected) async {
-      if (!_syncLazyLoading.hasReachedEnd(SyncSchema.category) &&
-          !_syncLazyLoading.hasReachedEnd(SyncSchema.transaction)) {
+      if (!_categorySyncStore.hasReachedEnd()
+      /// FIX: Check fetch all data transaction from Server
+      // && !_syncLazyLoading.hasReachedEnd(SyncSchema.transaction)
+      ) {
         final result = await _analyticsRemoteDatasource.getCategoryAnalytics(
           type,
           dateStart.formatServerStart,
@@ -96,7 +98,10 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
     String? error;
 
     await _syncManager.runIfMeetStandard((currentUserId, isConnected) async {
-      if (!_syncLazyLoading.hasReachedEnd(SyncSchema.transaction)) {
+      if (true
+      /// FIX: Check fetch all data transaction from Server
+      // !_syncLazyLoading.hasReachedEnd(SyncSchema.transaction)
+      ) {
         final result = await _analyticsRemoteDatasource.getOverviewAnalytics(
           dateStart.formatServerStart,
           dateEnd.formatServerEnd,

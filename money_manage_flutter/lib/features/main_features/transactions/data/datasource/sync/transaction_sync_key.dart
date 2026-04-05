@@ -17,4 +17,12 @@ class TransactionSyncKey extends Equatable {
 
   String toKey(String prefix) =>
       '${prefix}_${year}_${month}_${type?.name ?? 'all'}';
+
+  TransactionSyncKey copyWith({int? year, int? month, TransactionType? type}) {
+    return TransactionSyncKey(
+      year: year ?? this.year,
+      month: month ?? this.month,
+      type: type,
+    );
+  }
 }
