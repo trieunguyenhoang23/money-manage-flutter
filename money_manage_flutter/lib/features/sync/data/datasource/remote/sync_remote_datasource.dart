@@ -12,6 +12,42 @@ class SyncRemoteDatasource {
 
   SyncRemoteDatasource(this._dioService);
 
+  ///GET
+  Future<ApiResult> getTransactionSyncDelta({
+    String? lastTimeSync,
+    required int page,
+    required int limit,
+  }) async {
+    final response = await _dioService.getNoCache(
+      SyncAPI.get_transaction_sync_delta,
+      queryParameters: {
+        'page': page,
+        'limit_count': limit,
+        'last_time_sync': lastTimeSync,
+      },
+    );
+
+    return response;
+  }
+
+  Future<ApiResult> getCategorySyncDelta({
+    String? lastTimeSync,
+    required int page,
+    required int limit,
+  }) async {
+    final response = await _dioService.getNoCache(
+      SyncAPI.get_category_sync_delta,
+      queryParameters: {
+        'page': page,
+        'limit_count': limit,
+        'last_time_sync': lastTimeSync,
+      },
+    );
+
+    return response;
+  }
+
+  ///POST
   Future<ApiResult> syncCategoryData(Map<String, dynamic> arrayJsonBody) async {
     final response = await _dioService.post(
       SyncAPI.post_sync_batch_category,

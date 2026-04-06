@@ -1,5 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
+import 'package:money_manage_flutter/features/sync/domain/sync_manager.dart';
+import '../../../../../core/di/injection.dart';
 import '../../../../category/domain/repositories/category_repository.dart';
 import '../../../../sync/data/datasource/local/sync_local_storage.dart';
 import '../../../transactions/data/datasource/sync/transaction_sync_store.dart';
@@ -36,5 +38,7 @@ class LogoutUseCase {
     await _transactionSyncStore.clearAllSyncProgress();
 
     await _secureStorage.deleteAll();
+
+    await getIt.resetLazySingleton<SyncManager>();
   }
 }

@@ -17,6 +17,13 @@ class UserBaseAPI {
 }
 
 class SyncAPI {
+  /// GET
+  static String get get_transaction_sync_delta =>
+      '${APIConstants.bareUrl}/get/transactions/sync_delta';
+
+  static String get get_category_sync_delta =>
+      '${APIConstants.bareUrl}/get/categories/sync_delta';
+
   /// POST
   static String get post_sync_batch_category =>
       '${APIConstants.bareUrl}/post/sync/batch-category';
@@ -42,9 +49,6 @@ class TransactionAPI {
   /// GET
   static String get get_load_by_month =>
       '${APIConstants.bareUrl}/get/transactions/load_by_month';
-
-  static String get get_load_by_page =>
-      '${APIConstants.bareUrl}/get/transactions/load_by_page';
 
   /// POST
   static String get post_transactions =>

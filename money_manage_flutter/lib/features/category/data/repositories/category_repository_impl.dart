@@ -65,42 +65,25 @@ class CategoryRepositoryImpl implements CategoryRepository {
   Future<List<CategoryLocalModel>> loadCategoryByPage(int page) async {
     var localData = await _localDatasource.loadByPage(page, limitCount);
 
-    await _onlineActionGuard.run((currentActiveUserId, networkStatus) async {
-      if (_syncLocalStorage.hasReachedEnd(SyncSchema.category)) return;
+    final isSynced = _syncLocalStorage.isFirstSyncCompleted(
+      SyncSchema.category,
+    );
 
-      bool isPartialPage = localData.length < limitCount;
+    if (!isSynced && localData.length < limitCount) {
+      await _onlineActionGuard.run((currentActiveUserId, networkStatus) async {
+        final result = await _remoteDatasource.loadCateByPage(page, limitCount);
 
-      /// If local data in this page doesn't meet limitCount
-      if (isPartialPage) {
-        /// Get last page to continue fetching dat from server
-        int lastFetched = _syncLocalStorage.getLastPage(SyncSchema.category);
-        int nextPage = lastFetched + 1;
-
-        await _remoteDatasource.loadCateByPage(page, limitCount).then((
-          result,
-        ) async {
-          if (result.isFailure) return;
-
-          /// Set last page if data is empty
-          if (result.data.isEmpty) {
-            await _syncLocalStorage.setReachedEnd(SyncSchema.category, true);
-            return;
-          }
-
-          /// Save lastest fetching page
-          await _syncLocalStorage.setLastPage(SyncSchema.category, nextPage);
-          final localModels = await parseListJsonIsolate(
+        if (result.isSuccess && result.data.isNotEmpty) {
+          final remoteModels = await parseListJsonIsolate(
             CategoryLocalModel.fromRemote,
             result.data,
           );
 
-          // Save to local Isar
-          await _localDatasource.saveAll(localModels);
-          // Re-fetch from local to get the unified list
+          await _localDatasource.saveAll(remoteModels);
           localData = await _localDatasource.loadByPage(page, limitCount);
-        });
-      }
-    });
+        }
+      });
+    }
 
     return localData;
   }

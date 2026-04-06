@@ -140,11 +140,22 @@ class TransactionItemWidget extends ConsumerWidget {
                                     maxLines: 2,
                                   ),
                                 ),
-                                Icon(
-                                  item.isSynced
-                                      ? Icons.cloud
-                                      : Icons.downloading_sharp,
-                                  color: ColorConstant.warning700,
+                                Row(
+                                  children: [
+                                    if (item.imageUrl != null ||
+                                        item.imageBytes != null)
+                                      const Icon(
+                                        Icons.image,
+                                        color: ColorConstant.warning700,
+                                      ),
+                                    SizedBox(width: cc.maxWidth * 0.025,),
+                                    Icon(
+                                      item.isSynced
+                                          ? Icons.cloud
+                                          : Icons.downloading_sharp,
+                                      color: ColorConstant.warning700,
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),

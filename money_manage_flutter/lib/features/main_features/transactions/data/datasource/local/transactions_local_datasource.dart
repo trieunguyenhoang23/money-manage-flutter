@@ -165,6 +165,15 @@ class TransactionsLocalDatasource {
     });
   }
 
+  Future<void> deleteByServerIds(List<String> serverIds) async {
+    await _isar.writeTxn(() async {
+      await _isar.transactionLocalModels
+          .filter()
+          .anyOf(serverIds, (q, String id) => q.idServerEqualTo(id))
+          .deleteAll();
+    });
+  }
+
   Future<void> clearAll() async {
     await _isar.writeTxn(() async {
       await _isar.transactionLocalModels.clear();

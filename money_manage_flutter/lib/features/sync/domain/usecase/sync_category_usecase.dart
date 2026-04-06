@@ -1,35 +1,36 @@
+import '../../../../core/utils/size_app_utils.dart';
 import '../../../../export/core_external.dart';
 import '../../data/datasource/local/sync_local_storage.dart';
 import '../../data/model/sync_batch_progress.dart';
-import '../repositories/sync_repository.dart';
+import '../repositories/category_sync_repository.dart';
 
 @injectable
 class SyncCateUseCase {
-  final SyncRepository _syncRepository;
+  final CategorySyncRepository _categorySyncRepository;
   final SyncLocalStorage _syncLocalStorage;
 
-  SyncCateUseCase(this._syncRepository, this._syncLocalStorage);
+  SyncCateUseCase(this._categorySyncRepository, this._syncLocalStorage);
 
-  static const limitCount = 20;
+  int limitCount = SizeAppUtils().isTablet ? 20 : 10;
 
   Stream<SyncBatchProgress> execute() async* {
     final schema = SyncSchema.category;
     // =========================================================
     // Stage 1: PUSH LOCAL CATEGORIES TO SERVER (0.0 -> 0.5)
     // =========================================================
-    final currentStatus = await _syncRepository.getCategorySyncStatus();
+    final currentStatus = await _categorySyncRepository.getCategorySyncStatus();
     final int pushTotal = currentStatus.notSynced;
     int pushRemaining = pushTotal;
 
     if (pushTotal > 0) {
       while (pushRemaining > 0) {
-        final result = await _syncRepository.syncCategory(limitCount);
+        final result = await _categorySyncRepository.syncCategory(limitCount);
 
         if (result.isLeft()) {
           throw result.fold((l) => l, (r) => null)!;
         }
 
-        final newStatus = await _syncRepository.getCategorySyncStatus();
+        final newStatus = await _categorySyncRepository.getCategorySyncStatus();
         pushRemaining = newStatus.notSynced;
 
         // 0% -> 50%
@@ -54,28 +55,27 @@ class SyncCateUseCase {
     // =========================================================
     // Stage 2: PULL SERVER CATEGORIES TO LOCAL (0.5 -> 1.0)
     // =========================================================
-    if (_syncLocalStorage.hasReachedEnd(schema)) {
-      yield SyncBatchProgress(
-        type: SyncType.category,
-        current: 100,
-        total: 100,
-        overallProgress: 1.0,
-      );
-      return;
-    }
-
+    String? lastSync = _syncLocalStorage.getLastSyncTime(schema);
     bool hasMore = true;
+    int currentPage = 0;
+
     while (hasMore) {
-      final pullResult = await _syncRepository.loadCateByPageFromServer();
+      final pullResult = await _categorySyncRepository.loadCateDelta(
+        lastTimeSync: lastSync,
+        page: currentPage,
+      );
 
       if (pullResult.isLeft()) {
         throw pullResult.fold((l) => l, (r) => null)!;
       }
 
-      hasMore = pullResult.getOrElse(() => false);
+      final syncResponse = pullResult.fold(
+        (failure) => throw failure,
+        (response) => response,
+      );
 
-      // 0.5 => 1.0
-      int currentPage = _syncLocalStorage.getLastPage(schema);
+      hasMore = syncResponse.hasMore;
+
       double pullProgress =
           0.5 +
           (0.5 * (hasMore ? (currentPage / (currentPage + 1)) * 0.9 : 1.0));
@@ -86,6 +86,23 @@ class SyncCateUseCase {
         total: -1,
         overallProgress: pullProgress,
       );
+
+      currentPage++;
+
+      if (!hasMore) {
+        await _syncLocalStorage.setLastSyncTime(
+          schema,
+          syncResponse.serverTime,
+        );
+        await _syncLocalStorage.setFirstSyncCompleted(schema, true);
+      }
     }
+
+    yield SyncBatchProgress(
+      type: SyncType.category,
+      current: 100,
+      total: 100,
+      overallProgress: 1.0,
+    );
   }
 }

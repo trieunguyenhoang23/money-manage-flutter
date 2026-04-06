@@ -9,30 +9,30 @@ class SyncLocalStorage {
 
   SyncLocalStorage(this._prefs);
 
-  static const String _keyLastPage = 'sync_last_page_';
-  static const String _keyHasReachedEnd = 'sync_has_reached_end_';
+  static const String _keyLastSyncTime = 'sync_last_time_';
 
-  // --- Page Management ---
-  int getLastPage(SyncSchema schema) {
-    return _prefs.getInt('$_keyLastPage${schema.name}') ?? 0;
+  static const String _keyIsFirstSyncCompleted = 'is_first_sync_completed_';
+
+  bool isFirstSyncCompleted(SyncSchema schema) {
+    return _prefs.getBool('$_keyIsFirstSyncCompleted${schema.name}') ?? false;
   }
 
-  Future<void> setLastPage(SyncSchema schema, int page) async {
-    await _prefs.setInt('$_keyLastPage${schema.name}', page);
+  Future<void> setFirstSyncCompleted(SyncSchema schema, bool value) async {
+    await _prefs.setBool('$_keyIsFirstSyncCompleted${schema.name}', value);
   }
 
-  // --- Boundary Management  ---
-  bool hasReachedEnd(SyncSchema schema) {
-    return _prefs.getBool('$_keyHasReachedEnd${schema.name}') ?? false;
+  // --- Timestamp Management ---
+  String? getLastSyncTime(SyncSchema schema) {
+    return _prefs.getString('$_keyLastSyncTime${schema.name}');
   }
 
-  Future<void> setReachedEnd(SyncSchema schema, bool value) async {
-    await _prefs.setBool('$_keyHasReachedEnd${schema.name}', value);
+  Future<void> setLastSyncTime(SyncSchema schema, String isoTimestamp) async {
+    await _prefs.setString('$_keyLastSyncTime${schema.name}', isoTimestamp);
   }
 
-  // --- Reset ---
+  // --- Reset  ---
   Future<void> resetSync(SyncSchema schema) async {
-    await _prefs.remove('$_keyLastPage${schema.name}');
-    await _prefs.remove('$_keyHasReachedEnd${schema.name}');
+    await _prefs.remove('$_keyLastSyncTime${schema.name}');
+    await _prefs.remove('$_keyIsFirstSyncCompleted${schema.name}');
   }
 }

@@ -86,9 +86,15 @@ import '../../features/sync/data/datasource/local/sync_local_storage.dart'
     as _i852;
 import '../../features/sync/data/datasource/remote/sync_remote_datasource.dart'
     as _i472;
-import '../../features/sync/data/repositories/sync_repository_impl.dart'
-    as _i91;
-import '../../features/sync/domain/repositories/sync_repository.dart' as _i129;
+import '../../features/sync/data/repositories/category_sync_repository_impl.dart'
+    as _i405;
+import '../../features/sync/data/repositories/transaction_sync_repository_impl.dart'
+    as _i309;
+import '../../features/sync/domain/repositories/category_sync_repository.dart'
+    as _i975;
+import '../../features/sync/domain/repositories/transaction_sync_repository.dart'
+    as _i831;
+import '../../features/sync/domain/sync_manager.dart' as _i791;
 import '../../features/sync/domain/usecase/sync_category_usecase.dart' as _i773;
 import '../../features/sync/domain/usecase/sync_transaction_usecase.dart'
     as _i79;
@@ -208,6 +214,13 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i852.SyncLocalStorage>(),
       ),
     );
+    gh.lazySingleton<_i975.CategorySyncRepository>(
+      () => _i405.CategorySyncRepositoryImpl(
+        gh<_i197.CategoryLocalDatasource>(),
+        gh<_i472.SyncRemoteDatasource>(),
+        gh<_i858.OnlineActionGuard>(),
+      ),
+    );
     gh.lazySingleton<_i168.UserRepository>(
       () => _i790.UserRepositoryImpl(
         gh<_i809.UserLocalDatasource>(),
@@ -224,35 +237,20 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i852.SyncLocalStorage>(),
       ),
     );
+    gh.lazySingleton<_i831.TransactionSyncRepository>(
+      () => _i309.TransactionSyncRepositoryImpl(
+        gh<_i197.CategoryLocalDatasource>(),
+        gh<_i1013.TransactionsLocalDatasource>(),
+        gh<_i472.SyncRemoteDatasource>(),
+        gh<_i858.OnlineActionGuard>(),
+        gh<_i261.TransactionSyncStore>(),
+      ),
+    );
     gh.lazySingleton<_i845.CreateCategoryUseCase>(
       () => _i845.CreateCategoryUseCase(gh<_i869.CategoryRepository>()),
     );
     gh.lazySingleton<_i617.EditCategoryUseCase>(
       () => _i617.EditCategoryUseCase(gh<_i869.CategoryRepository>()),
-    );
-    gh.lazySingleton<_i129.SyncRepository>(
-      () => _i91.SyncRepositoryImpl(
-        gh<_i702.CategoryRemoteDatasource>(),
-        gh<_i197.CategoryLocalDatasource>(),
-        gh<_i1013.TransactionsLocalDatasource>(),
-        gh<_i472.SyncRemoteDatasource>(),
-        gh<_i858.OnlineActionGuard>(),
-        gh<_i852.SyncLocalStorage>(),
-        gh<_i407.TransactionsRemoteDatasource>(),
-        gh<_i261.TransactionSyncStore>(),
-      ),
-    );
-    gh.lazySingleton<_i79.SyncTransactionUseCase>(
-      () => _i79.SyncTransactionUseCase(
-        gh<_i129.SyncRepository>(),
-        gh<_i852.SyncLocalStorage>(),
-      ),
-    );
-    gh.factory<_i773.SyncCateUseCase>(
-      () => _i773.SyncCateUseCase(
-        gh<_i129.SyncRepository>(),
-        gh<_i852.SyncLocalStorage>(),
-      ),
     );
     gh.lazySingleton<_i874.TransactionRepository>(
       () => _i716.TransactionRepositoryImpl(
@@ -263,12 +261,18 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i197.CategoryLocalDatasource>(),
       ),
     );
-    gh.lazySingleton<_i1011.GetOverviewBalanceUseCase>(
-      () => _i1011.GetOverviewBalanceUseCase(gh<_i579.AnalyticsRepository>()),
+    gh.factory<_i773.SyncCateUseCase>(
+      () => _i773.SyncCateUseCase(
+        gh<_i975.CategorySyncRepository>(),
+        gh<_i852.SyncLocalStorage>(),
+      ),
     );
     gh.lazySingleton<_i1031.GetCategoriesAnalyticsUseCase>(
       () =>
           _i1031.GetCategoriesAnalyticsUseCase(gh<_i579.AnalyticsRepository>()),
+    );
+    gh.lazySingleton<_i1011.GetOverviewBalanceUseCase>(
+      () => _i1011.GetOverviewBalanceUseCase(gh<_i579.AnalyticsRepository>()),
     );
     gh.lazySingleton<_i767.GetOverviewUseCase>(
       () => _i767.GetOverviewUseCase(gh<_i579.AnalyticsRepository>()),
@@ -296,6 +300,20 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i947.UpdateTransactionUseCase>(
       () => _i947.UpdateTransactionUseCase(gh<_i874.TransactionRepository>()),
+    );
+    gh.lazySingleton<_i79.SyncTransactionUseCase>(
+      () => _i79.SyncTransactionUseCase(
+        gh<_i831.TransactionSyncRepository>(),
+        gh<_i852.SyncLocalStorage>(),
+      ),
+    );
+    gh.lazySingleton<_i791.SyncManager>(
+      () => _i791.SyncManager(
+        gh<_i773.SyncCateUseCase>(),
+        gh<_i79.SyncTransactionUseCase>(),
+        gh<_i64.OnlineActionGuard>(),
+      ),
+      dispose: (i) => i.dispose(),
     );
     gh.lazySingleton<_i100.LogoutUseCase>(
       () => _i100.LogoutUseCase(

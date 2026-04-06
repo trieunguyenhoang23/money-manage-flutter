@@ -226,7 +226,9 @@ class TransactionRepositoryImpl implements TransactionRepository {
     );
 
     /// Just update if any data change
-    if (hasChanged) {
+    bool isDeleteImg = updateJsonRequestBody['delete_image'] ?? false;
+
+    if (hasChanged || isDeleteImg) {
       await _onlineActionGuard.run((currentActiveUserId, networkStatus) async {
         String imageName =
             '${currentActiveUserId}_${DateTime.now().millisecondsSinceEpoch}.${imageFile?.extension}';
@@ -241,9 +243,13 @@ class TransactionRepositoryImpl implements TransactionRepository {
             )
             .then((result) async {
               if (result.isFailure) return;
+
+              String? imgUrlTemp = isDeleteImg
+                  ? null
+                  : result.data['image_description'] ?? oldItem.imageUrl;
+
               oldItem
-                ..imageUrl =
-                    result.data['image_description'] ?? oldItem.imageUrl
+                ..imageUrl = imgUrlTemp
                 ..imageBytes = null
                 ..userId = currentActiveUserId
                 ..isSynced = true;

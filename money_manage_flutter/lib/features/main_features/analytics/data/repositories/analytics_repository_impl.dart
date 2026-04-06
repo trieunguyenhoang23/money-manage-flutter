@@ -30,8 +30,14 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
 
     await _onlineActionGuard.run((currentUserId, isConnected) async {
       /// Only fetching data from server when transaction lazy loading hasn't finished
-      if (!_syncLocalStorage.hasReachedEnd(SyncSchema.category) &&
-          !_syncLocalStorage.hasReachedEnd(SyncSchema.transaction)) {
+      bool isCatSynced = _syncLocalStorage.isFirstSyncCompleted(
+        SyncSchema.category,
+      );
+      bool isTransSynced = _syncLocalStorage.isFirstSyncCompleted(
+        SyncSchema.transaction,
+      );
+
+      if (!isCatSynced || !isTransSynced) {
         await _analyticsRemoteDatasource.getFinancialData().then((result) {
           if (result.isFailure) return Left(result.error?.message);
 
@@ -60,8 +66,14 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
 
     String? error;
     await _onlineActionGuard.run((currentUserId, isConnected) async {
-      if (!_syncLocalStorage.hasReachedEnd(SyncSchema.category) &&
-          !_syncLocalStorage.hasReachedEnd(SyncSchema.transaction)) {
+      bool isCatSynced = _syncLocalStorage.isFirstSyncCompleted(
+        SyncSchema.category,
+      );
+      bool isTransSynced = _syncLocalStorage.isFirstSyncCompleted(
+        SyncSchema.transaction,
+      );
+
+      if (!isCatSynced || !isTransSynced) {
         final result = await _analyticsRemoteDatasource.getCategoryAnalytics(
           type,
           dateStart.formatServerStart,
@@ -94,7 +106,11 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
     String? error;
 
     await _onlineActionGuard.run((currentUserId, isConnected) async {
-      if (!_syncLocalStorage.hasReachedEnd(SyncSchema.transaction)) {
+      bool isTransSynced = _syncLocalStorage.isFirstSyncCompleted(
+        SyncSchema.transaction,
+      );
+
+      if (!isTransSynced) {
         final result = await _analyticsRemoteDatasource.getOverviewAnalytics(
           dateStart.formatServerStart,
           dateEnd.formatServerEnd,
