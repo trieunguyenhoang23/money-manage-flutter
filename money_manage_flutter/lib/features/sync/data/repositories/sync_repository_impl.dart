@@ -2,26 +2,73 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import 'package:flutter/services.dart';
-import 'package:money_manage_flutter/core/network/sync_manager.dart';
-import '../../../../core/error/failure.dart';
+import 'package:money_manage_flutter/export/core.dart';
+import 'package:money_manage_flutter/features/category/data/datasource/remote/category_remote_datasource.dart';
 import '../../../category/data/datasource/local/category_local_datasource.dart';
+import '../../../category/data/model/local/category_local_model.dart';
 import '../../../main_features/transactions/data/datasource/local/transactions_local_datasource.dart';
+import '../../../main_features/transactions/data/datasource/remote/transactions_remote_datasource.dart';
+import '../../../main_features/transactions/data/datasource/sync/transaction_sync_store.dart';
+import '../../../main_features/transactions/data/model/local/transaction_local_model.dart';
 import '../../domain/repositories/sync_repository.dart';
+import '../datasource/local/sync_local_storage.dart';
 import '../datasource/remote/sync_remote_datasource.dart';
 
 @LazySingleton(as: SyncRepository)
 class SyncRepositoryImpl implements SyncRepository {
+  final CategoryRemoteDatasource _categoryRemoteDatasource;
   final CategoryLocalDatasource _categoryLocalDatasource;
   final TransactionsLocalDatasource _transactionsLocalDatasource;
+  final TransactionsRemoteDatasource _transactionsRemoteDatasource;
   final SyncRemoteDatasource _remoteSyncDatasource;
-  final SyncManager _syncManager;
+  final OnlineActionGuard _onlineActionGuard;
+  final SyncLocalStorage _syncLocalStorage;
+  final TransactionSyncStore _transactionSyncStore;
 
   SyncRepositoryImpl(
+    this._categoryRemoteDatasource,
     this._categoryLocalDatasource,
     this._transactionsLocalDatasource,
     this._remoteSyncDatasource,
-    this._syncManager,
+    this._onlineActionGuard,
+    this._syncLocalStorage,
+    this._transactionsRemoteDatasource,
+    this._transactionSyncStore,
   );
+
+  int limitCount = SizeAppUtils().isTablet ? 20 : 10;
+
+  @override
+  Future<Either<Failure, bool>> loadCateByPageFromServer() async {
+    final schema = SyncSchema.category;
+    int currentPage = _syncLocalStorage.getLastPage(schema);
+    final result = await _categoryRemoteDatasource.loadCateByPage(
+      currentPage,
+      limitCount,
+    );
+    if (result.isFailure) {
+      return Left(
+        ServerFailure(result.error?.message ?? "Load categories failed"),
+      );
+    }
+
+    if (result.data.isEmpty) {
+      await _syncLocalStorage.setReachedEnd(schema, true);
+      return const Right(
+        false,
+      ); // Trả về false để dừng vòng lặp while trong UseCase
+    }
+
+    final remoteData = await parseListJsonIsolate(
+      CategoryLocalModel.fromRemote,
+      result.data,
+    );
+
+    await _categoryLocalDatasource.saveAll(remoteData);
+
+    await _syncLocalStorage.setLastPage(schema, currentPage + 1);
+    return const Right(true);
+  }
 
   @override
   Future<({int total, int notSynced})> getCategorySyncStatus() async {
@@ -34,7 +81,7 @@ class SyncRepositoryImpl implements SyncRepository {
   Future<Either<Failure, int>> syncCategory(int limitCount) async {
     Either<Failure, int> result = const Left(NetworkFailure("Not Internet"));
 
-    await _syncManager.runIfMeetStandard((currentUserId, isConnected) async {
+    await _onlineActionGuard.run((currentUserId, isConnected) async {
       try {
         final categories = await _categoryLocalDatasource.loadDataNotYetSync(
           limitCount,
@@ -70,6 +117,50 @@ class SyncRepositoryImpl implements SyncRepository {
     return result;
   }
 
+  /// -------------------------- TRANSACTION --------------------------
+  @override
+  Future<Either<Failure, bool>> loadTransByPageFromServer() async {
+    final schema = SyncSchema.transaction;
+
+    /// Get last page to continue fetching dat from server
+    int currentPage = _syncLocalStorage.getLastPage(schema);
+
+    final result = await _transactionsRemoteDatasource.loadTransByPage(
+      currentPage,
+      limitCount,
+    );
+    if (result.isFailure) return Left(ServerFailure(result.error!.message!));
+
+    if (result.data.isEmpty) {
+      await _syncLocalStorage.setReachedEnd(schema, true);
+      return const Right(false);
+    }
+
+    final remoteData = await parseListJsonIsolate(
+      TransactionLocalModel.fromRemote,
+      result.data,
+    );
+
+    // Save category to local
+    final categories = result.data
+        .map((item) => item['category'])
+        .whereType<Map<String, dynamic>>()
+        .map<CategoryLocalModel>((json) => CategoryLocalModel.fromRemote(json))
+        .toSet() // Duplicate Filter (Unique)
+        .toList();
+
+    if (categories.isNotEmpty) {
+      await _categoryLocalDatasource.saveAll(categories);
+    }
+
+    await _transactionsLocalDatasource.saveAll(remoteData);
+    await _syncLocalStorage.setLastPage(schema, currentPage + 1);
+
+    /// Reset loading transaction by by month, year
+    await _transactionSyncStore.clearAllSyncProgress();
+    return const Right(true);
+  }
+
   @override
   Future<({int notSynced, int total})> getTransactionSyncStatus() async {
     final total = await _transactionsLocalDatasource.getLengthData();
@@ -82,7 +173,7 @@ class SyncRepositoryImpl implements SyncRepository {
   Future<Either<Failure, int>> syncTransaction(int limitCount) async {
     Either<Failure, int> result = const Left(NetworkFailure("Not Internet"));
 
-    await _syncManager.runIfMeetStandard((currentUserId, isConnected) async {
+    await _onlineActionGuard.run((currentUserId, isConnected) async {
       try {
         final transactions = await _transactionsLocalDatasource
             .loadDataNotYetSync(limitCount);

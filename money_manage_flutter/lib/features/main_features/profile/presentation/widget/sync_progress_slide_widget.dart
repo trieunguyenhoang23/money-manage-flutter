@@ -1,6 +1,4 @@
 import 'dart:async';
-
-import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';

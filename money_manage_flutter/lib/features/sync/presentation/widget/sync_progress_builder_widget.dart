@@ -3,6 +3,7 @@ import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import '../../../../shared/widget/component/loading_widget.dart';
 import '../../data/model/sync_batch_progress.dart';
+import 'sync_error_widget.dart';
 import 'sync_loading_widget.dart';
 import 'sync_progress_widget.dart';
 
@@ -48,26 +49,12 @@ class _SyncProgressBuilderWidgetState extends State<SyncProgressBuilderWidget> {
         }
 
         if (snapshot.hasData) {
-          final data = snapshot.data!;
-
-          if (data.notSynced > 0) {
-            return SyncProgressWidget(
-              key: ValueKey('progress_widget_$_retryKey'),
-              syncStream: widget.syncStreamFactory(),
-              syncType: widget.syncType,
-              onCompleted: widget.onCompleted,
-              onRetry: _handleRetry,
-            );
-          }
-
-          return SyncLoadingWidget(
-            progress: SyncBatchProgress(
-              type: widget.syncType,
-              current: data.total,
-              total: data.total,
-              overallProgress: 1,
-            ),
-            title: '${context.lang.sync_complete} ${widget.syncType.name}',
+          return SyncProgressWidget(
+            key: ValueKey('progress_widget_${_retryKey.value}'),
+            syncStream: widget.syncStreamFactory(),
+            syncType: widget.syncType,
+            onCompleted: widget.onCompleted,
+            onRetry: _handleRetry,
           );
         }
 

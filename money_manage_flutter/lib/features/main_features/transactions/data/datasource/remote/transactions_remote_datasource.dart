@@ -31,6 +31,15 @@ class TransactionsRemoteDatasource {
     return response;
   }
 
+  Future<ApiResult> loadTransByPage(int page, int limit_count) async {
+    final response = await _dioService.getNoCache(
+      TransactionAPI.get_load_by_page,
+      queryParameters: {'page': page, 'limit_count': limit_count},
+    );
+
+    return response;
+  }
+
   Future<ApiResult> uploadTransaction(
     Map<String, dynamic> jsonBodyRequest, {
     Uint8List? image_description_buffer,

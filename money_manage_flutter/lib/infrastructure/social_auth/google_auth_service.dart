@@ -15,7 +15,8 @@ class GoogleAuthService implements SocialAuthService {
       await _googleSignIn.initialize(
         ///Thay client Id trong GoogleService-Info.plist
         clientId: Platform.isIOS ? 'YOUR_IOS_CLIENT_ID_IF_NEEDED' : null,
-        serverClientId: '249271941631-uq021p3k62jla4ci5ujn9i6ophe178no.apps.googleusercontent.com'
+        serverClientId:
+            '249271941631-uq021p3k62jla4ci5ujn9i6ophe178no.apps.googleusercontent.com',
       );
       _initialized = true;
     }
@@ -26,22 +27,27 @@ class GoogleAuthService implements SocialAuthService {
     await _ensureInitialized();
 
     // Sử dụng authenticate thay vì signIn
-    final account = await _googleSignIn.authenticate(scopeHint: ['email']);
+    try {
+      final account = await _googleSignIn.authenticate(scopeHint: ['email']);
 
-    if (kDebugMode) {
-      debugPrint('id ${account.id}');
-      debugPrint('email ${account.email}');
-      debugPrint('name ${account.displayName}');
-      debugPrint('account.photoUrl ${account.photoUrl}');
+      if (kDebugMode) {
+        debugPrint('id ${account.id}');
+        debugPrint('email ${account.email}');
+        debugPrint('name ${account.displayName}');
+        debugPrint('account.photoUrl ${account.photoUrl}');
+      }
+
+      return SocialUser(
+        id: account.id,
+        email: account.email,
+        name: account.displayName ?? '',
+        avatarUrl: account.photoUrl ?? '',
+        type: ProviderAccountType.GOOGLE,
+      );
+    } catch (e) {
+      debugPrint('Error signIn Social Auth $e');
+      return null;
     }
-
-    return SocialUser(
-      id: account.id,
-      email: account.email,
-      name: account.displayName ?? '',
-      avatarUrl: account.photoUrl ?? '',
-      type: ProviderAccountType.GOOGLE,
-    );
   }
 
   @override
@@ -49,4 +55,3 @@ class GoogleAuthService implements SocialAuthService {
     await _googleSignIn.signOut();
   }
 }
-

@@ -44,7 +44,6 @@ class SyncRemoteDatasource {
       SyncAPI.post_sync_batch_transaction,
       formData,
     );
-
     return response;
   }
 }

@@ -131,6 +131,15 @@ class TransactionsLocalDatasource {
   Future<void> saveAll(List<TransactionLocalModel> transactions) async {
     await _isar.writeTxn(() async {
       for (var tx in transactions) {
+        final existing = await _isar.transactionLocalModels
+            .filter()
+            .idServerEqualTo(tx.idServer)
+            .findFirst();
+
+        if (existing != null) {
+          tx.id = existing.id;
+        }
+
         if (tx.category.value == null && tx.categoryId.isNotEmpty) {
           final cate = await _isar.categoryLocalModels
               .filter()
@@ -144,7 +153,6 @@ class TransactionsLocalDatasource {
 
       await _isar.transactionLocalModels.putAll(transactions);
 
-      /// Link the relationship category for each transaction item
       for (var tx in transactions) {
         await tx.category.save();
       }

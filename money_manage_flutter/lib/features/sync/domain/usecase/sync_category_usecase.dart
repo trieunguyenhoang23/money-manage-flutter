@@ -1,69 +1,91 @@
 import '../../../../export/core_external.dart';
+import '../../data/datasource/local/sync_local_storage.dart';
 import '../../data/model/sync_batch_progress.dart';
 import '../repositories/sync_repository.dart';
 
 @injectable
 class SyncCateUseCase {
   final SyncRepository _syncRepository;
+  final SyncLocalStorage _syncLocalStorage;
 
-  SyncCateUseCase(this._syncRepository);
+  SyncCateUseCase(this._syncRepository, this._syncLocalStorage);
 
   static const limitCount = 20;
 
   Stream<SyncBatchProgress> execute() async* {
-    // Get the total of unsync item
+    final schema = SyncSchema.category;
+    // =========================================================
+    // Stage 1: PUSH LOCAL CATEGORIES TO SERVER (0.0 -> 0.5)
+    // =========================================================
     final currentStatus = await _syncRepository.getCategorySyncStatus();
-    final total = currentStatus.total;
-    int remaining = currentStatus.notSynced;
+    final int pushTotal = currentStatus.notSynced;
+    int pushRemaining = pushTotal;
 
-    if (remaining == 0) {
+    if (pushTotal > 0) {
+      while (pushRemaining > 0) {
+        final result = await _syncRepository.syncCategory(limitCount);
+
+        if (result.isLeft()) {
+          throw result.fold((l) => l, (r) => null)!;
+        }
+
+        final newStatus = await _syncRepository.getCategorySyncStatus();
+        pushRemaining = newStatus.notSynced;
+
+        // 0% -> 50%
+        double progress = ((pushTotal - pushRemaining) / pushTotal) * 0.5;
+
+        yield SyncBatchProgress(
+          type: SyncType.category,
+          current: pushTotal - pushRemaining,
+          total: pushTotal,
+          overallProgress: progress,
+        );
+      }
+    } else {
       yield SyncBatchProgress(
         type: SyncType.category,
-        current: total,
-        total: total,
+        current: 0,
+        total: 0,
+        overallProgress: 0.5,
+      );
+    }
+
+    // =========================================================
+    // Stage 2: PULL SERVER CATEGORIES TO LOCAL (0.5 -> 1.0)
+    // =========================================================
+    if (_syncLocalStorage.hasReachedEnd(schema)) {
+      yield SyncBatchProgress(
+        type: SyncType.category,
+        current: 100,
+        total: 100,
         overallProgress: 1.0,
       );
       return;
     }
 
-    while (remaining > 0) {
-      final result = await _syncRepository.syncCategory(limitCount);
+    bool hasMore = true;
+    while (hasMore) {
+      final pullResult = await _syncRepository.loadCateByPageFromServer();
 
-      if (result.isLeft()) {
-        final error = result.fold((l) => l, (r) => null);
-        throw error!;
+      if (pullResult.isLeft()) {
+        throw pullResult.fold((l) => l, (r) => null)!;
       }
 
-      final newStatus = await _syncRepository.getCategorySyncStatus();
-      remaining = newStatus.notSynced;
+      hasMore = pullResult.getOrElse(() => false);
+
+      // 0.5 => 1.0
+      int currentPage = _syncLocalStorage.getLastPage(schema);
+      double pullProgress =
+          0.5 +
+          (0.5 * (hasMore ? (currentPage / (currentPage + 1)) * 0.9 : 1.0));
 
       yield SyncBatchProgress(
         type: SyncType.category,
-        current: total - remaining,
-        total: total,
-        overallProgress: (total - remaining) / total,
+        current: currentPage,
+        total: -1,
+        overallProgress: pullProgress,
       );
     }
   }
-
-
 }
-
-
-// Future<void> seedTestData() async {
-//   final List<CategoryLocalModel> testData = List.generate(100, (index) {
-//     final isEven = index % 2 == 0;
-//     return CategoryLocalModel.fromRemote({
-//       "created_at": DateTime.now().toIso8601String(),
-//       "description": "Mô tả test số $index",
-//       "idServer": const Uuid().v4(),
-//       "isSynced": false,
-//       "name": isEven ? "Khoản thu $index" : "Khoản chi $index",
-//       "type": isEven ? "INCOME" : "EXPENSE",
-//       "updated_at": null,
-//       "user_id": null,
-//     });
-//   });
-//
-//   await getIt<CategoryLocalDatasource>().saveAll(testData);
-// }

@@ -120,7 +120,6 @@ class AnalyticsLocalDatasource {
         runningExpense += tx.amount;
       }
     }
-    double runningBalance = runningIncome - runningExpense;
 
     // Fetch Current Range Transactions
     final currentTransactions = await _isar.transactionLocalModels

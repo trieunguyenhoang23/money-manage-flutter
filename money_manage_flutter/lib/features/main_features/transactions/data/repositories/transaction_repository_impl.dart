@@ -1,7 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/core_external.dart';
-import 'package:money_manage_flutter/features/main_features/transactions/data/datasource/sync/transaction_sync_store.dart';
 import '../../../../../infrastructure/file/models/file_picked.dart';
 import '../../../../category/data/datasource/local/category_local_datasource.dart';
 import '../../../../category/data/model/local/category_local_model.dart';
@@ -9,20 +8,21 @@ import '../../domain/repositories/transaction_repository.dart';
 import '../datasource/local/transactions_local_datasource.dart';
 import '../datasource/remote/transactions_remote_datasource.dart';
 import '../datasource/sync/transaction_sync_key.dart';
+import '../datasource/sync/transaction_sync_store.dart';
 import '../model/local/transaction_local_model.dart';
 
 @LazySingleton(as: TransactionRepository)
 class TransactionRepositoryImpl implements TransactionRepository {
   final TransactionsRemoteDatasource _remoteDatasource;
   final TransactionsLocalDatasource _localDatasource;
-  final SyncManager _syncManager;
+  final OnlineActionGuard _onlineActionGuard;
   final TransactionSyncStore _syncStore;
   final CategoryLocalDatasource _categoryLocalDatasource;
 
   TransactionRepositoryImpl(
     this._remoteDatasource,
     this._localDatasource,
-    this._syncManager,
+    this._onlineActionGuard,
     this._syncStore,
     this._categoryLocalDatasource,
   );
@@ -60,10 +60,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
     );
 
     // Add more properties if logged in
-    await _syncManager.runIfMeetStandard((
-      currentActiveUserId,
-      networkStatus,
-    ) async {
+    await _onlineActionGuard.run((currentActiveUserId, networkStatus) async {
       String imageName =
           '${currentActiveUserId}_${DateTime.now().millisecondsSinceEpoch}.${imageFile?.extension}';
       // Upload Transaction to Server
@@ -95,7 +92,6 @@ class TransactionRepositoryImpl implements TransactionRepository {
     return Right(transaction);
   }
 
-
   @override
   Future<List<TransactionLocalModel>> loadTransByMonth(
     int page,
@@ -115,10 +111,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
       limitCount: limitCount,
     );
 
-    await _syncManager.runIfMeetStandard((
-      currentActiveUserId,
-      networkStatus,
-    ) async {
+    await _onlineActionGuard.run((currentActiveUserId, networkStatus) async {
       /// Check sync Status
       if (_syncStore.isFullyReachedEnd(syncKey)) return;
 
@@ -192,10 +185,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
     required TransactionLocalModel transaction,
   }) async {
     dynamic syncResult = true;
-    await _syncManager.runIfMeetStandard((
-      currentActiveUserId,
-      networkStatus,
-    ) async {
+    await _onlineActionGuard.run((currentActiveUserId, networkStatus) async {
       if (transaction.idServer == null) {
         syncResult = false;
         return;
@@ -237,10 +227,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
     /// Just update if any data change
     if (hasChanged) {
-      await _syncManager.runIfMeetStandard((
-        currentActiveUserId,
-        networkStatus,
-      ) async {
+      await _onlineActionGuard.run((currentActiveUserId, networkStatus) async {
         String imageName =
             '${currentActiveUserId}_${DateTime.now().millisecondsSinceEpoch}.${imageFile?.extension}';
 

@@ -1,10 +1,8 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
-import 'package:money_manage_flutter/core/constant/string_constant.dart';
-import 'package:money_manage_flutter/features/main_features/transactions/data/datasource/sync/transaction_sync_store.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../category/data/datasource/sync/category_sync_store.dart';
 import '../../../../category/domain/repositories/category_repository.dart';
+import '../../../../sync/data/datasource/local/sync_local_storage.dart';
+import '../../../transactions/data/datasource/sync/transaction_sync_store.dart';
 import '../../../transactions/domain/repositories/transaction_repository.dart';
 import '../repositories/user_repository.dart';
 
@@ -13,7 +11,7 @@ class LogoutUseCase {
   final UserRepository _userRepository;
   final CategoryRepository _categoryRepository;
   final TransactionRepository _transactionRepository;
-  final CategorySyncStore _categorySyncStore;
+  final SyncLocalStorage _syncLocalStorage;
   final FlutterSecureStorage _secureStorage;
   final TransactionSyncStore _transactionSyncStore;
 
@@ -21,7 +19,7 @@ class LogoutUseCase {
     this._userRepository,
     this._categoryRepository,
     this._transactionRepository,
-    this._categorySyncStore,
+    this._syncLocalStorage,
     this._secureStorage,
     this._transactionSyncStore,
   );
@@ -32,7 +30,9 @@ class LogoutUseCase {
     await _userRepository.clearSession();
 
     /// Reset loading data store
-    await _categorySyncStore.resetSync();
+    await _syncLocalStorage.resetSync(SyncSchema.category);
+    await _syncLocalStorage.resetSync(SyncSchema.transaction);
+    await _syncLocalStorage.resetSync(SyncSchema.reminder);
     await _transactionSyncStore.clearAllSyncProgress();
 
     await _secureStorage.deleteAll();

@@ -25,39 +25,36 @@ class SyncErrorWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(0.05.sw),
       ),
       child: Padding(
-        padding: EdgeInsets.all(0.05.sw),
+        padding: EdgeInsets.all(0.015.sw),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.cloud_off,
-              color: ColorConstant.error500,
-              size: 48,
-            ),
-            const SizedBox(height: 12),
-            TextGGStyle(
-              context.lang.sync_error(syncType.name),
-              0.035.sw,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-            const SizedBox(height: 8),
-            TextGGStyle(
-              errorMessage,
-              0.025.sw,
-              fontWeight: FontWeight.bold,
-              color: ColorConstant.neutral200,
-              textAlign: TextAlign.center,
+            const Expanded(
+              flex: 3,
+              child: Icon(Icons.cloud_off, color: ColorConstant.error500),
             ),
 
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh),
-              label: Text(context.lang.retry),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ColorConstant.error500,
-                foregroundColor: Colors.white,
+            Flexible(
+              flex: 3,
+              child: TextGGStyle(
+                errorMessage,
+                0.025.sw,
+                fontWeight: FontWeight.bold,
+                color: ColorConstant.neutral200,
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const Spacer(),
+            Flexible(
+              flex: 3,
+              child: ElevatedButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh),
+                label: Text(context.lang.retry),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ColorConstant.error500,
+                  foregroundColor: Colors.white,
+                ),
               ),
             ),
           ],

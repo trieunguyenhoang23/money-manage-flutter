@@ -24,8 +24,6 @@ import '../../features/category/data/datasource/local/category_local_datasource.
     as _i197;
 import '../../features/category/data/datasource/remote/category_remote_datasource.dart'
     as _i702;
-import '../../features/category/data/datasource/sync/category_sync_store.dart'
-    as _i644;
 import '../../features/category/data/repositories/category_repository_impl.dart'
     as _i528;
 import '../../features/category/domain/repositories/category_repository.dart'
@@ -84,6 +82,8 @@ import '../../features/main_features/transactions/domain/usecase/remove_transact
     as _i269;
 import '../../features/main_features/transactions/domain/usecase/update_transaction_usecase.dart'
     as _i947;
+import '../../features/sync/data/datasource/local/sync_local_storage.dart'
+    as _i852;
 import '../../features/sync/data/datasource/remote/sync_remote_datasource.dart'
     as _i472;
 import '../../features/sync/data/repositories/sync_repository_impl.dart'
@@ -101,7 +101,7 @@ import '../../infrastructure/social_auth/apple_auth_service.dart' as _i502;
 import '../../infrastructure/social_auth/google_auth_service.dart' as _i219;
 import '../../infrastructure/social_auth/social_auth_factory.dart' as _i22;
 import '../network/auth_interceptor.dart' as _i908;
-import '../network/sync_manager.dart' as _i848;
+import '../network/online_action_guard.dart' as _i64;
 import 'module_di.dart' as _i633;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -135,8 +135,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i261.TransactionSyncStore>(
       () => _i261.TransactionSyncStore(gh<_i460.SharedPreferences>()),
     );
-    gh.lazySingleton<_i644.CategorySyncStore>(
-      () => _i644.CategorySyncStore(gh<_i460.SharedPreferences>()),
+    gh.lazySingleton<_i852.SyncLocalStorage>(
+      () => _i852.SyncLocalStorage(gh<_i460.SharedPreferences>()),
     );
     gh.singleton<_i820.IFileService>(
       () => _i835.FileServiceImpl(
@@ -178,8 +178,8 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i361.Dio>(instanceName: 'dioNoCache'),
       ),
     );
-    gh.lazySingleton<_i848.SyncManager>(
-      () => _i848.SyncManager(
+    gh.lazySingleton<_i64.OnlineActionGuard>(
+      () => _i64.OnlineActionGuard(
         gh<_i436.NetworkInfo>(),
         gh<_i809.UserLocalDatasource>(),
         gh<_i558.FlutterSecureStorage>(),
@@ -200,21 +200,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i472.SyncRemoteDatasource>(
       () => _i472.SyncRemoteDatasource(gh<_i989.DioService>()),
     );
-    gh.lazySingleton<_i579.AnalyticsRepository>(
-      () => _i706.AnalyticsRepositoryImpl(
-        gh<_i773.AnalyticsLocalDatasource>(),
-        gh<_i940.AnalyticsRemoteDatasource>(),
-        gh<_i858.SyncManager>(),
-        gh<_i858.CategorySyncStore>(),
-      ),
-    );
-    gh.lazySingleton<_i874.TransactionRepository>(
-      () => _i716.TransactionRepositoryImpl(
-        gh<_i407.TransactionsRemoteDatasource>(),
-        gh<_i1013.TransactionsLocalDatasource>(),
-        gh<_i858.SyncManager>(),
-        gh<_i261.TransactionSyncStore>(),
+    gh.lazySingleton<_i869.CategoryRepository>(
+      () => _i528.CategoryRepositoryImpl(
+        gh<_i702.CategoryRemoteDatasource>(),
         gh<_i197.CategoryLocalDatasource>(),
+        gh<_i858.OnlineActionGuard>(),
+        gh<_i852.SyncLocalStorage>(),
       ),
     );
     gh.lazySingleton<_i168.UserRepository>(
@@ -222,7 +213,54 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i809.UserLocalDatasource>(),
         gh<_i1026.UserRemoteDatasource>(),
         gh<_i989.SocialAuthFactory>(),
-        gh<_i848.SyncManager>(),
+        gh<_i64.OnlineActionGuard>(),
+      ),
+    );
+    gh.lazySingleton<_i579.AnalyticsRepository>(
+      () => _i706.AnalyticsRepositoryImpl(
+        gh<_i773.AnalyticsLocalDatasource>(),
+        gh<_i940.AnalyticsRemoteDatasource>(),
+        gh<_i858.OnlineActionGuard>(),
+        gh<_i852.SyncLocalStorage>(),
+      ),
+    );
+    gh.lazySingleton<_i845.CreateCategoryUseCase>(
+      () => _i845.CreateCategoryUseCase(gh<_i869.CategoryRepository>()),
+    );
+    gh.lazySingleton<_i617.EditCategoryUseCase>(
+      () => _i617.EditCategoryUseCase(gh<_i869.CategoryRepository>()),
+    );
+    gh.lazySingleton<_i129.SyncRepository>(
+      () => _i91.SyncRepositoryImpl(
+        gh<_i702.CategoryRemoteDatasource>(),
+        gh<_i197.CategoryLocalDatasource>(),
+        gh<_i1013.TransactionsLocalDatasource>(),
+        gh<_i472.SyncRemoteDatasource>(),
+        gh<_i858.OnlineActionGuard>(),
+        gh<_i852.SyncLocalStorage>(),
+        gh<_i407.TransactionsRemoteDatasource>(),
+        gh<_i261.TransactionSyncStore>(),
+      ),
+    );
+    gh.lazySingleton<_i79.SyncTransactionUseCase>(
+      () => _i79.SyncTransactionUseCase(
+        gh<_i129.SyncRepository>(),
+        gh<_i852.SyncLocalStorage>(),
+      ),
+    );
+    gh.factory<_i773.SyncCateUseCase>(
+      () => _i773.SyncCateUseCase(
+        gh<_i129.SyncRepository>(),
+        gh<_i852.SyncLocalStorage>(),
+      ),
+    );
+    gh.lazySingleton<_i874.TransactionRepository>(
+      () => _i716.TransactionRepositoryImpl(
+        gh<_i407.TransactionsRemoteDatasource>(),
+        gh<_i1013.TransactionsLocalDatasource>(),
+        gh<_i858.OnlineActionGuard>(),
+        gh<_i261.TransactionSyncStore>(),
+        gh<_i197.CategoryLocalDatasource>(),
       ),
     );
     gh.lazySingleton<_i1011.GetOverviewBalanceUseCase>(
@@ -234,22 +272,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i767.GetOverviewUseCase>(
       () => _i767.GetOverviewUseCase(gh<_i579.AnalyticsRepository>()),
-    );
-    gh.lazySingleton<_i129.SyncRepository>(
-      () => _i91.SyncRepositoryImpl(
-        gh<_i197.CategoryLocalDatasource>(),
-        gh<_i1013.TransactionsLocalDatasource>(),
-        gh<_i472.SyncRemoteDatasource>(),
-        gh<_i848.SyncManager>(),
-      ),
-    );
-    gh.lazySingleton<_i869.CategoryRepository>(
-      () => _i528.CategoryRepositoryImpl(
-        gh<_i702.CategoryRemoteDatasource>(),
-        gh<_i197.CategoryLocalDatasource>(),
-        gh<_i858.SyncManager>(),
-        gh<_i644.CategorySyncStore>(),
-      ),
     );
     gh.lazySingleton<_i429.AuthUseCase>(
       () => _i429.AuthUseCase(gh<_i168.UserRepository>()),
@@ -275,27 +297,15 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i947.UpdateTransactionUseCase>(
       () => _i947.UpdateTransactionUseCase(gh<_i874.TransactionRepository>()),
     );
-    gh.lazySingleton<_i79.SyncTransactionUseCase>(
-      () => _i79.SyncTransactionUseCase(gh<_i129.SyncRepository>()),
-    );
-    gh.factory<_i773.SyncCateUseCase>(
-      () => _i773.SyncCateUseCase(gh<_i129.SyncRepository>()),
-    );
     gh.lazySingleton<_i100.LogoutUseCase>(
       () => _i100.LogoutUseCase(
         gh<_i168.UserRepository>(),
         gh<_i869.CategoryRepository>(),
         gh<_i874.TransactionRepository>(),
-        gh<_i644.CategorySyncStore>(),
+        gh<_i852.SyncLocalStorage>(),
         gh<_i558.FlutterSecureStorage>(),
         gh<_i261.TransactionSyncStore>(),
       ),
-    );
-    gh.lazySingleton<_i845.CreateCategoryUseCase>(
-      () => _i845.CreateCategoryUseCase(gh<_i869.CategoryRepository>()),
-    );
-    gh.lazySingleton<_i617.EditCategoryUseCase>(
-      () => _i617.EditCategoryUseCase(gh<_i869.CategoryRepository>()),
     );
     return this;
   }

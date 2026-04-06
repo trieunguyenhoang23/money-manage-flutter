@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
-import '../datasource/sync/category_sync_store.dart';
+import '../../../sync/data/datasource/local/sync_local_storage.dart';
 import '../../domain/repositories/category_repository.dart';
 import '../datasource/local/category_local_datasource.dart';
 import '../datasource/remote/category_remote_datasource.dart';
@@ -11,14 +11,14 @@ import 'package:money_manage_flutter/export/core.dart';
 class CategoryRepositoryImpl implements CategoryRepository {
   final CategoryRemoteDatasource _remoteDatasource;
   final CategoryLocalDatasource _localDatasource;
-  final SyncManager _syncManager;
-  final CategorySyncStore _categorySyncStore;
+  final OnlineActionGuard _onlineActionGuard;
+  final SyncLocalStorage _syncLocalStorage;
 
   CategoryRepositoryImpl(
     this._remoteDatasource,
     this._localDatasource,
-    this._syncManager,
-    this._categorySyncStore,
+    this._onlineActionGuard,
+    this._syncLocalStorage,
   );
 
   int limitCount = SizeAppUtils().isTablet ? 20 : 10;
@@ -40,10 +40,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
       );
 
       // Upload data to server if isLogin = true
-      await _syncManager.runIfMeetStandard((
-        currentActiveUserId,
-        networkStatus,
-      ) async {
+      await _onlineActionGuard.run((currentActiveUserId, networkStatus) async {
         await _remoteDatasource
             .uploadCategory(categoryLocalModel.toJson())
             .then((result) {
@@ -68,18 +65,15 @@ class CategoryRepositoryImpl implements CategoryRepository {
   Future<List<CategoryLocalModel>> loadCategoryByPage(int page) async {
     var localData = await _localDatasource.loadByPage(page, limitCount);
 
-    await _syncManager.runIfMeetStandard((
-      currentActiveUserId,
-      networkStatus,
-    ) async {
-      if (_categorySyncStore.hasReachedEnd()) return;
+    await _onlineActionGuard.run((currentActiveUserId, networkStatus) async {
+      if (_syncLocalStorage.hasReachedEnd(SyncSchema.category)) return;
 
       bool isPartialPage = localData.length < limitCount;
 
       /// If local data in this page doesn't meet limitCount
       if (isPartialPage) {
         /// Get last page to continue fetching dat from server
-        int lastFetched = _categorySyncStore.getLastPage();
+        int lastFetched = _syncLocalStorage.getLastPage(SyncSchema.category);
         int nextPage = lastFetched + 1;
 
         await _remoteDatasource.loadCateByPage(page, limitCount).then((
@@ -89,12 +83,12 @@ class CategoryRepositoryImpl implements CategoryRepository {
 
           /// Set last page if data is empty
           if (result.data.isEmpty) {
-            await _categorySyncStore.setReachedEnd(true);
+            await _syncLocalStorage.setReachedEnd(SyncSchema.category, true);
             return;
           }
 
           /// Save lastest fetching page
-          await _categorySyncStore.setLastPage(nextPage);
+          await _syncLocalStorage.setLastPage(SyncSchema.category, nextPage);
           final localModels = await parseListJsonIsolate(
             CategoryLocalModel.fromRemote,
             result.data,
@@ -118,10 +112,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
   ) async {
     var localData = await _localDatasource.loadByType(page, limitCount, type);
 
-    await _syncManager.runIfMeetStandard((
-      currentActiveUserId,
-      networkStatus,
-    ) async {
+    await _onlineActionGuard.run((currentActiveUserId, networkStatus) async {
       bool isPartialPage = localData.length < limitCount;
       if (isPartialPage) {
         // Fetch data from server
@@ -162,7 +153,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
 
       /// Just update if any properties change
       if (hasChanged) {
-        await _syncManager.runIfMeetStandard((
+        await _onlineActionGuard.run((
           currentActiveUserId,
           networkStatus,
         ) async {

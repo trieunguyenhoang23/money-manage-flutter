@@ -1,14 +1,10 @@
 import 'package:go_router/go_router.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
-import 'package:money_manage_flutter/features/main_features/transactions/presentation/provider/quick_select_cate_provider.dart';
-import 'package:money_manage_flutter/features/main_features/transactions/presentation/provider/quick_select_cate_provider.dart';
-import '../../../../core/di/injection.dart';
-import '../../../../core/enum/transaction_type.dart';
+import '../../../main_features/transactions/presentation/provider/quick_select_cate_provider.dart';
 import '../../data/model/local/category_local_model.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import '../provider/category_provider.dart';
-
 import '../../domain/usecase/edit_category_usecase.dart';
 import '../widget/trans_type_segment_widget.dart';
 

@@ -24,7 +24,7 @@ export 'package:money_manage_flutter/core/extension/date_extension.dart';
 
 /// Network
 export 'package:money_manage_flutter/core/network/api_result.dart';
-export 'package:money_manage_flutter/core/network/sync_manager.dart';
+export 'package:money_manage_flutter/core/network/online_action_guard.dart';
 
 /// Failure
 export 'package:money_manage_flutter/core/error/failure.dart';
@@ -39,6 +39,3 @@ export 'package:money_manage_flutter/core/di/injection.dart';
 
 /// Background
 export 'package:money_manage_flutter/core/background/background_task_helper.dart';
-
-/// Data
-export 'package:money_manage_flutter/features/category/data/datasource/sync/category_sync_store.dart';

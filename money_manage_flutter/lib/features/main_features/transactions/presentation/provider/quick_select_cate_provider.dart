@@ -25,7 +25,7 @@ class QuickSelectNotifier
   void addCategoryIfNeeded(CategoryLocalModel category) {
     if (state.isLoading) return;
     final current = state.value ?? [];
-    if (current.isNotEmpty) {
+    if (!current.contains(category)) {
       final exists = current.any((e) {
         return e.idServer == category.idServer;
       });

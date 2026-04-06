@@ -1,99 +1,92 @@
 import 'package:money_manage_flutter/export/core_external.dart';
+import '../../data/datasource/local/sync_local_storage.dart';
 import '../../data/model/sync_batch_progress.dart';
 import '../repositories/sync_repository.dart';
 
 @LazySingleton()
 class SyncTransactionUseCase {
   final SyncRepository _syncRepository;
+  final SyncLocalStorage _syncLocalStorage;
 
-  SyncTransactionUseCase(this._syncRepository);
+  SyncTransactionUseCase(this._syncRepository, this._syncLocalStorage);
 
   static const limitCount = 20;
 
   Stream<SyncBatchProgress> execute() async* {
-    // Get the total of unsync item
-    final currentStatus = await _syncRepository.getTransactionSyncStatus();
-    final total = currentStatus.total;
-    int remaining = currentStatus.notSynced;
+    final schema = SyncSchema.transaction;
 
-    if (remaining == 0) {
+    // =========================================================
+    // Stage 1: PUSH LOCAL DATA TO SERVER(0.0 -> 0.5 overallProgress)
+    // =========================================================
+    final currentStatus = await _syncRepository.getTransactionSyncStatus();
+    final int pushTotal = currentStatus.notSynced;
+    int pushRemaining = pushTotal;
+
+    if (pushTotal > 0) {
+      while (pushRemaining > 0) {
+        final result = await _syncRepository.syncTransaction(limitCount);
+        if (result.isLeft()) throw result.fold((l) => l, (r) => null)!;
+
+        final newStatus = await _syncRepository.getTransactionSyncStatus();
+        pushRemaining = newStatus.notSynced;
+
+        // 0% - 50%
+        double progress = ((pushTotal - pushRemaining) / pushTotal) * 0.5;
+
+        yield SyncBatchProgress(
+          type: SyncType.transaction,
+          current: pushTotal - pushRemaining,
+          total: pushTotal,
+          overallProgress: progress,
+        );
+      }
+    } else {
+      // If there are nothing, finish the first progress
       yield SyncBatchProgress(
-        type: SyncType.category,
-        current: total,
-        total: total,
+        type: SyncType.transaction,
+        current: 0,
+        total: 0,
+        overallProgress: 0.5,
+      );
+    }
+
+    // =========================================================
+    // Stage 2: PULL SERVER TO LOCAL (0.5 -> 1.0 overallProgress)
+    // =========================================================
+
+    if (_syncLocalStorage.hasReachedEnd(schema)) {
+      yield SyncBatchProgress(
+        type: SyncType.transaction,
+        current: 100,
+        total: 100,
         overallProgress: 1.0,
       );
       return;
     }
 
-    while (remaining > 0) {
-      final result = await _syncRepository.syncTransaction(limitCount);
+    bool hasMore = true;
+    while (hasMore) {
+      final pullResult = await _syncRepository.loadTransByPageFromServer();
 
-      if (result.isLeft()) {
-        final error = result.fold((l) => l, (r) => null);
-        throw error!;
+      if (pullResult.isLeft()) {
+        throw pullResult.fold((l) => l, (r) => null)!;
       }
 
-      final newStatus = await _syncRepository.getTransactionSyncStatus();
-      remaining = newStatus.notSynced;
+      hasMore = pullResult.getOrElse(() => false);
+
+      // Use page to load progress because don't determine the total of transaction
+      // 0.5 -> 1
+      int currentPage = _syncLocalStorage.getLastPage(schema);
+      double pullProgress =
+          0.5 +
+          (0.5 * (hasMore ? (currentPage / (currentPage + 1)) * 0.9 : 1.0));
 
       yield SyncBatchProgress(
-        type: SyncType.category,
-        current: total - remaining,
-        total: total,
-        overallProgress: (total - remaining) / total,
+        type: SyncType.transaction,
+        current: currentPage,
+        total: -1,
+        overallProgress: pullProgress,
       );
     }
   }
 }
-
-// Future<void> seed50TransactionsWithRealBytes() async {
-//   final categories = await getIt<CategoryLocalDatasource>().loadByPage(
-//     0,
-//     100,
-//   );
-//   if (categories.isEmpty) {
-//     print("Chưa có Category nào, hãy seed Category trước!");
-//     return;
-//   }
-//
-//   final Uint8List realBytes = base64Decode(
-//     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
-//   );
-//
-//   final List<TransactionLocalModel> testTransactions = List.generate(50, (
-//       index,
-//       ) {
-//     final category = categories[index % categories.length];
-//
-//     final bool hasImage = index % 3 == 0;
-//
-//     final double randomAmount = (index + 1) * 20000.0;
-//
-//     final transaction = TransactionLocalModel(
-//       idServer: const Uuid().v4(),
-//       type: category.type ?? TransactionType.EXPENSE,
-//       amount: randomAmount,
-//       note:
-//       "Giao dịch test #${index + 1} (${hasImage ? 'Có ảnh' : 'Không ảnh'})",
-//       categoryId: category.idServer ?? '',
-//       transactionAt: DateTime.now().subtract(Duration(hours: index)),
-//       createdAt: DateTime.now(),
-//       updatedAt: DateTime.now(),
-//       imageBytes: hasImage ? realBytes : null,
-//       isSynced: false,
-//     );
-//
-//     // Link Isar Category
-//     transaction.category.value = category;
-//
-//     return transaction;
-//   });
-//
-//   await getIt<TransactionsLocalDatasource>().saveAll(testTransactions);
-//
-//   print("✅ Đã seed 50 Transactions thành công!");
-//   print(
-//     "📸 Số lượng có ảnh: ${testTransactions.where((t) => t.imageBytes != null).length}",
-//   );
-// }

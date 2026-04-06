@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import 'package:money_manage_flutter/export/core.dart';
-import '../../../profile/data/datasource/local/user_local_datasource.dart';
+import '../../../../sync/data/datasource/local/sync_local_storage.dart';
 import '../../domain/repositories/analytics_repository.dart';
 import '../datasource/local/analytics_local_datasource.dart';
 import '../datasource/remote/analytics_remote_datasource.dart';
@@ -12,14 +12,14 @@ import '../model/overview_analytics_model.dart';
 class AnalyticsRepositoryImpl implements AnalyticsRepository {
   final AnalyticsRemoteDatasource _analyticsRemoteDatasource;
   final AnalyticsLocalDatasource _analyticsLocalDatasource;
-  final SyncManager _syncManager;
-  final CategorySyncStore _categorySyncStore;
+  final OnlineActionGuard _onlineActionGuard;
+  final SyncLocalStorage _syncLocalStorage;
 
   AnalyticsRepositoryImpl(
     this._analyticsLocalDatasource,
     this._analyticsRemoteDatasource,
-    this._syncManager,
-    this._categorySyncStore,
+    this._onlineActionGuard,
+    this._syncLocalStorage,
   );
 
   @override
@@ -28,12 +28,10 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
     double income = await _analyticsLocalDatasource.getIncome();
     double expense = await _analyticsLocalDatasource.getExpense();
 
-    await _syncManager.runIfMeetStandard((currentUserId, isConnected) async {
+    await _onlineActionGuard.run((currentUserId, isConnected) async {
       /// Only fetching data from server when transaction lazy loading hasn't finished
-      if (!_categorySyncStore.hasReachedEnd()
-      /// FIX: Check fetch all data transaction from Server
-      // && !_syncLazyLoading.hasReachedEnd(SyncSchema.transaction)
-      ) {
+      if (!_syncLocalStorage.hasReachedEnd(SyncSchema.category) &&
+          !_syncLocalStorage.hasReachedEnd(SyncSchema.transaction)) {
         await _analyticsRemoteDatasource.getFinancialData().then((result) {
           if (result.isFailure) return Left(result.error?.message);
 
@@ -61,11 +59,9 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
         );
 
     String? error;
-    await _syncManager.runIfMeetStandard((currentUserId, isConnected) async {
-      if (!_categorySyncStore.hasReachedEnd()
-      /// FIX: Check fetch all data transaction from Server
-      // && !_syncLazyLoading.hasReachedEnd(SyncSchema.transaction)
-      ) {
+    await _onlineActionGuard.run((currentUserId, isConnected) async {
+      if (!_syncLocalStorage.hasReachedEnd(SyncSchema.category) &&
+          !_syncLocalStorage.hasReachedEnd(SyncSchema.transaction)) {
         final result = await _analyticsRemoteDatasource.getCategoryAnalytics(
           type,
           dateStart.formatServerStart,
@@ -97,11 +93,8 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
         .getOverview(dateStart, dateEnd);
     String? error;
 
-    await _syncManager.runIfMeetStandard((currentUserId, isConnected) async {
-      if (true
-      /// FIX: Check fetch all data transaction from Server
-      // !_syncLazyLoading.hasReachedEnd(SyncSchema.transaction)
-      ) {
+    await _onlineActionGuard.run((currentUserId, isConnected) async {
+      if (!_syncLocalStorage.hasReachedEnd(SyncSchema.transaction)) {
         final result = await _analyticsRemoteDatasource.getOverviewAnalytics(
           dateStart.formatServerStart,
           dateEnd.formatServerEnd,

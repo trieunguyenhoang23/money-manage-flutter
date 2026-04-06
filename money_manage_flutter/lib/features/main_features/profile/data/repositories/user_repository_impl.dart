@@ -1,6 +1,6 @@
 import 'package:injectable/injectable.dart';
 import 'package:dartz/dartz.dart';
-import 'package:money_manage_flutter/core/network/sync_manager.dart';
+import 'package:money_manage_flutter/core/network/online_action_guard.dart';
 import '../../../../../core/error/failure.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../datasource/local/user_local_datasource.dart';
@@ -13,13 +13,13 @@ class UserRepositoryImpl implements UserRepository {
   final UserLocalDatasource _localDatasource;
   final UserRemoteDatasource _remoteDatasource;
   final SocialAuthFactory _socialAuthFactory;
-  final SyncManager _syncManager;
+  final OnlineActionGuard _onlineActionGuard;
 
   UserRepositoryImpl(
     this._localDatasource,
     this._remoteDatasource,
     this._socialAuthFactory,
-    this._syncManager,
+    this._onlineActionGuard,
   );
 
   @override
@@ -71,7 +71,7 @@ class UserRepositoryImpl implements UserRepository {
   Future<void> updateCurrency(String newCurrency) async {
     await _localDatasource.updateCurrency(newCurrency);
 
-    await _syncManager.runIfMeetStandard((currentUserId, networkStatus) async {
+    await _onlineActionGuard.run((currentUserId, networkStatus) async {
       final localUser = await _localDatasource.getCurrentUser();
       if (localUser != null) {
         await _remoteDatasource.updateUserProperties({'currency': newCurrency});
