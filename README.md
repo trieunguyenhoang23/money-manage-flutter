@@ -16,10 +16,10 @@ Personal Finance Manager helps users track income and expenses, create custom ca
 
 - **Login & Sync**: Log in and sync data across multiple devices. ✅ **Complete**
 - **Custom Categories**: Create custom income and expense categories. ✅ **Complete**
-- **Manage Transactions**: Record income and expenses. ⏳ **In Progress**
+- **Manage Transactions**: Record income and expenses. ✅ **Complete**
+- **Filter & Sort**: Sort income/expenses by type, date, ... ✅ **Complete**
+- **Data Analysis**: Analyze financial data for insights. ✅ **Complete**
 - **Recurring Entries**: Automatically generate daily, weekly, or monthly income/expense records. ⏳ **In Progress**
-- **Filter & Sort**: Sort income/expenses by type, date, ... ⏳ **In Progress**
-- **Data Analysis**: Analyze financial data for insights. ⏳ **In Progress**
 
 #### 4. 🏛️ Architecture
 ![Architecture Diagram](diagram/architecture.png)
