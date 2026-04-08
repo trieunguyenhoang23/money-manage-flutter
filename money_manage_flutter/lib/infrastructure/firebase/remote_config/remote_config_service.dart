@@ -9,7 +9,9 @@ class RemoteConfigService {
     await _setConfigurationFirebase();
 
     try {
-      await _remoteConfig.fetchAndActivate();
+      await _remoteConfig.fetchAndActivate().timeout(
+        const Duration(seconds: 5),
+      );
       _remoteConfig.fetch();
     } catch (e) {
       debugPrint('Error initFirebaseRemoteConfig $e');

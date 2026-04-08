@@ -12,6 +12,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../features/category/data/model/local/category_local_model.dart';
 import '../../features/main_features/profile/data/model/local/user_local_model.dart';
 import '../../features/main_features/transactions/data/model/local/transaction_local_model.dart';
+import '../../features/sync/data/sync_task/category_sync_task.dart';
+import '../../features/sync/data/sync_task/transaction_sync_task.dart';
+import '../../features/sync/domain/sync_task/i_sync_task.dart';
 import '../network/auth_interceptor.dart';
 
 @module
@@ -61,11 +64,8 @@ abstract class ModuleDI {
   Future<Isar> get isar async {
     final dir = await getApplicationDocumentsDirectory();
 
-    // Check is default db opened
-    // If opened (from other Isolate), Isar.getInstance() will return that isolate
-    final existingIsar = Isar.getInstance();
-    if (existingIsar != null && existingIsar.isOpen) {
-      return existingIsar;
+    if (Isar.instanceNames.isNotEmpty) {
+      return Isar.getInstance()!;
     }
 
     final schemas = [
@@ -74,7 +74,12 @@ abstract class ModuleDI {
       TransactionLocalModelSchema,
     ];
 
-    return await Isar.open(schemas, directory: dir.path, inspector: kDebugMode);
+    return await Isar.open(
+      schemas,
+      directory: dir.path,
+      inspector: kDebugMode,
+      name: 'default',
+    );
   }
 
   @lazySingleton
@@ -82,6 +87,14 @@ abstract class ModuleDI {
 
   @lazySingleton
   Connectivity get connectivity => Connectivity();
+
+  @injectable
+  List<ISyncTask> provideSyncTasks(
+    CategorySyncTask categoryTask,
+    TransactionSyncTask transactionTask,
+  ) {
+    return [categoryTask, transactionTask];
+  }
 
   // @lazySingleton
   // List<NotificationHandler> provideNotificationHandlers(

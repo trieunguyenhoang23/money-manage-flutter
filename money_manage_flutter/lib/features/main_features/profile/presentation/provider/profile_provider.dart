@@ -1,9 +1,11 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:money_manage_flutter/export/core.dart';
-import 'package:money_manage_flutter/features/main_features/analytics/presentation/provider/overview_balance_provider.dart';
-import 'package:money_manage_flutter/features/sync/domain/sync_manager.dart';
+import 'package:money_manage_flutter/features/sync/presentation/provider/sync_provider.dart';
 import '../../../../../infrastructure/social_auth/social_auth_factory.dart';
 import '../../../../category/presentation/provider/category_provider.dart';
+import '../../../../sync/data/model/sync_batch_progress.dart';
+import '../../../../sync/presentation/provider/sync_manager_provider.dart';
+import '../../../analytics/presentation/provider/overview_balance_provider.dart';
 import '../../../transactions/presentation/provider/transaction_provider.dart';
 import '../../data/datasource/local/user_local_datasource.dart';
 import '../../data/model/local/user_local_model.dart';
@@ -50,8 +52,7 @@ class ProfileNotifier extends AsyncNotifier<ProfileState> {
           );
 
       ref.refresh(overviewBalanceProvider);
-
-      await getIt<SyncManager>().initSync();
+      ref.read(syncManagerProvider.notifier).initSync(type: SyncType.all);
 
       /// Register sync data in background
       Future.delayed(const Duration(seconds: 3), () {
@@ -70,6 +71,9 @@ class ProfileNotifier extends AsyncNotifier<ProfileState> {
       ref.invalidate(loadingCategoryByTypeProvider(TransactionType.INCOME));
       ref.invalidate(loadingCategoryByTypeProvider(TransactionType.EXPENSE));
       ref.invalidate(overviewBalanceProvider);
+      ref.invalidate(syncManagerProvider);
+      ref.invalidate(categorySyncProvider);
+      ref.invalidate(transactionSyncProvider);
     });
   }
 }

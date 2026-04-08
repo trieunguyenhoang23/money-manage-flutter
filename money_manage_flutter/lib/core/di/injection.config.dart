@@ -90,19 +90,27 @@ import '../../features/sync/data/repositories/category_sync_repository_impl.dart
     as _i405;
 import '../../features/sync/data/repositories/transaction_sync_repository_impl.dart'
     as _i309;
+import '../../features/sync/data/sync_task/category_sync_task.dart' as _i951;
+import '../../features/sync/data/sync_task/transaction_sync_task.dart' as _i539;
 import '../../features/sync/domain/repositories/category_sync_repository.dart'
     as _i975;
 import '../../features/sync/domain/repositories/transaction_sync_repository.dart'
     as _i831;
-import '../../features/sync/domain/sync_manager.dart' as _i791;
+import '../../features/sync/domain/sync_task/i_sync_task.dart' as _i418;
 import '../../features/sync/domain/usecase/sync_category_usecase.dart' as _i773;
 import '../../features/sync/domain/usecase/sync_transaction_usecase.dart'
     as _i79;
+import '../../features/sync/presentation/provider/sync_manager_provider.dart'
+    as _i323;
 import '../../infrastructure/file/file_service.dart' as _i835;
 import '../../infrastructure/file/i_file_service.dart' as _i820;
 import '../../infrastructure/file/img_processor.dart' as _i575;
-import '../../infrastructure/network/dio_service.dart' as _i960;
-import '../../infrastructure/network/network_info.dart' as _i436;
+import '../../infrastructure/network/dio/dio_service.dart' as _i1071;
+import '../../infrastructure/network/dio/network_info.dart' as _i267;
+import '../../infrastructure/network/socket/i_socket_client_service.dart'
+    as _i857;
+import '../../infrastructure/network/socket/sync_socket_service_impl.dart'
+    as _i623;
 import '../../infrastructure/social_auth/apple_auth_service.dart' as _i502;
 import '../../infrastructure/social_auth/google_auth_service.dart' as _i219;
 import '../../infrastructure/social_auth/social_auth_factory.dart' as _i22;
@@ -164,8 +172,8 @@ extension GetItInjectableX on _i174.GetIt {
       () => moduleDI.dioNoCacheInstance(gh<_i908.AuthInterceptor>()),
       instanceName: 'dioNoCache',
     );
-    gh.lazySingleton<_i436.NetworkInfo>(
-      () => _i436.NetworkInfoImpl(gh<_i895.Connectivity>()),
+    gh.lazySingleton<_i267.NetworkInfo>(
+      () => _i267.NetworkInfoImpl(gh<_i895.Connectivity>()),
     );
     gh.lazySingleton<_i22.SocialAuthFactory>(
       () => _i22.SocialAuthFactory(
@@ -178,15 +186,15 @@ extension GetItInjectableX on _i174.GetIt {
       instanceName: 'dioWithCache',
       preResolve: true,
     );
-    gh.lazySingleton<_i960.DioService>(
-      () => _i960.DioService(
+    gh.lazySingleton<_i1071.DioService>(
+      () => _i1071.DioService(
         gh<_i361.Dio>(instanceName: 'dioWithCache'),
         gh<_i361.Dio>(instanceName: 'dioNoCache'),
       ),
     );
     gh.lazySingleton<_i64.OnlineActionGuard>(
       () => _i64.OnlineActionGuard(
-        gh<_i436.NetworkInfo>(),
+        gh<_i267.NetworkInfo>(),
         gh<_i809.UserLocalDatasource>(),
         gh<_i558.FlutterSecureStorage>(),
       ),
@@ -213,6 +221,13 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i858.OnlineActionGuard>(),
         gh<_i852.SyncLocalStorage>(),
       ),
+    );
+    gh.lazySingleton<_i857.ISocketClientService>(
+      () => _i623.SocketClientServiceImpl(
+        gh<_i858.OnlineActionGuard>(),
+        gh<_i558.FlutterSecureStorage>(),
+      ),
+      dispose: (i) => i.dispose(),
     );
     gh.lazySingleton<_i975.CategorySyncRepository>(
       () => _i405.CategorySyncRepositoryImpl(
@@ -307,13 +322,11 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i852.SyncLocalStorage>(),
       ),
     );
-    gh.lazySingleton<_i791.SyncManager>(
-      () => _i791.SyncManager(
-        gh<_i773.SyncCateUseCase>(),
-        gh<_i79.SyncTransactionUseCase>(),
-        gh<_i64.OnlineActionGuard>(),
-      ),
-      dispose: (i) => i.dispose(),
+    gh.lazySingleton<_i539.TransactionSyncTask>(
+      () => _i539.TransactionSyncTask(gh<_i79.SyncTransactionUseCase>()),
+    );
+    gh.lazySingleton<_i951.CategorySyncTask>(
+      () => _i951.CategorySyncTask(gh<_i773.SyncCateUseCase>()),
     );
     gh.lazySingleton<_i100.LogoutUseCase>(
       () => _i100.LogoutUseCase(
@@ -323,6 +336,18 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i852.SyncLocalStorage>(),
         gh<_i558.FlutterSecureStorage>(),
         gh<_i261.TransactionSyncStore>(),
+      ),
+    );
+    gh.factory<List<_i418.ISyncTask>>(
+      () => moduleDI.provideSyncTasks(
+        gh<_i951.CategorySyncTask>(),
+        gh<_i539.TransactionSyncTask>(),
+      ),
+    );
+    gh.factory<_i323.SyncManagerNotifier>(
+      () => _i323.SyncManagerNotifier(
+        gh<_i858.OnlineActionGuard>(),
+        gh<List<_i418.ISyncTask>>(),
       ),
     );
     return this;

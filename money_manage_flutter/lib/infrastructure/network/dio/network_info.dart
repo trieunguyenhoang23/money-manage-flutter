@@ -1,4 +1,4 @@
-import '../../export/core_external.dart';
+import 'package:money_manage_flutter/export/core_external.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 abstract class NetworkInfo {
@@ -16,7 +16,6 @@ class NetworkInfoImpl implements NetworkInfo {
   @override
   Future<bool> get isConnected async {
     final result = await _connectivity.checkConnectivity();
-    // Nếu kết nối không phải là 'none' thì coi như có mạng
     return !result.contains(ConnectivityResult.none);
   }
 

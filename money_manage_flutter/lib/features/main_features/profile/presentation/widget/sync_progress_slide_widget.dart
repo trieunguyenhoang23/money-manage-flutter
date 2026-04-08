@@ -1,56 +1,34 @@
 import 'dart:async';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import 'package:money_manage_flutter/export/core.dart';
-import 'package:money_manage_flutter/features/sync/domain/sync_manager.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../../../../sync/data/model/sync_batch_progress.dart';
-import '../../../../sync/domain/repositories/category_sync_repository.dart';
-import '../../../../sync/domain/repositories/transaction_sync_repository.dart';
-import '../../../../sync/domain/usecase/sync_category_usecase.dart';
-import '../../../../sync/domain/usecase/sync_transaction_usecase.dart';
 import '../../../../sync/presentation/widget/sync_progress_builder_widget.dart';
 
-class SyncProgressSlideWidget extends StatefulWidget {
+class SyncProgressSlideWidget extends ConsumerStatefulWidget {
   const SyncProgressSlideWidget({super.key});
 
   @override
-  State<SyncProgressSlideWidget> createState() =>
+  ConsumerState<SyncProgressSlideWidget> createState() =>
       _SyncProgressSlideWidgetState();
 }
 
-class _SyncProgressSlideWidgetState extends State<SyncProgressSlideWidget> {
+class _SyncProgressSlideWidgetState
+    extends ConsumerState<SyncProgressSlideWidget> {
   PageController pageController = PageController(initialPage: 0);
   late Timer timer;
   int currentPage = 0;
-
-  List<Widget> syncWidget = [
-    SyncProgressBuilderWidget(
-      syncStreamFactory: () => getIt<SyncManager>().cateStream,
-      onCompleted: () {},
-      onRetry: () {},
-      syncType: SyncType.category,
-      getSyncStatus: getIt<CategorySyncRepository>().getCategorySyncStatus,
-    ),
-    SyncProgressBuilderWidget(
-      syncStreamFactory: () => getIt<SyncManager>().transStream,
-      onCompleted: () {},
-      onRetry: () {},
-      syncType: SyncType.transaction,
-      getSyncStatus:
-          getIt<TransactionSyncRepository>().getTransactionSyncStatus,
-    ),
-  ];
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
     timer = Timer.periodic(const Duration(seconds: 5), (Timer timer) {
-      if (currentPage < syncWidget.length - 1) {
-        currentPage++;
-      } else {
-        currentPage = 0;
-      }
+      if (!mounted) return;
+      setState(() {
+        currentPage = (currentPage + 1) % 2;
+      });
       pageController.animateToPage(
         currentPage,
         duration: const Duration(milliseconds: 350),
@@ -69,6 +47,11 @@ class _SyncProgressSlideWidgetState extends State<SyncProgressSlideWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> syncWidget = const [
+      SyncProgressBuilderWidget(syncType: SyncType.category),
+      SyncProgressBuilderWidget(syncType: SyncType.transaction),
+    ];
+
     double w = 1.sw - 0.05.sw;
     double h = w * 130 / 339;
 

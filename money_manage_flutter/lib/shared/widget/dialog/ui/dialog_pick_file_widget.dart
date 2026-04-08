@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
+import 'package:money_manage_flutter/infrastructure/file/i_file_service.dart';
 import '../../../../infrastructure/file/models/file_picked.dart';
 import '../../../style/padding_style.dart';
 
@@ -11,7 +12,7 @@ class DialogPickFileWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     FilePicked? imageBytes;
-
+    final fileService = getIt<IFileService>();
     int widthStandard = 512, heightStandard = 512;
 
     return PaddingStyle(

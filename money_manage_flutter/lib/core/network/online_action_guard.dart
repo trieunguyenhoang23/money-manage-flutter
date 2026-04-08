@@ -2,7 +2,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../export/core_external.dart';
 import '../../export/ui_external.dart';
 import '../../features/main_features/profile/data/datasource/local/user_local_datasource.dart';
-import '../../infrastructure/network/network_info.dart';
+import '../../infrastructure/network/dio/network_info.dart';
 import '../constant/string_constant.dart';
 
 @lazySingleton

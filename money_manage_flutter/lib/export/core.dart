@@ -34,7 +34,6 @@ export 'package:money_manage_flutter/core/enum/auth_enum.dart';
 export 'package:money_manage_flutter/core/enum/transaction_type.dart';
 
 /// DI
-export 'package:money_manage_flutter/core/di/di_shortcuts.dart';
 export 'package:money_manage_flutter/core/di/injection.dart';
 
 /// Background

@@ -1,5 +1,6 @@
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/shared.dart';
+import 'package:money_manage_flutter/features/sync/presentation/widget/sync_indicator_widget.dart';
 import '../../../export/ui_external.dart';
 
 class AppBarWidget extends StatelessWidget implements PreferredSize {
@@ -64,6 +65,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSize {
         color: ColorConstant.primary,
       ),
       actions: [
+        const SyncIndicatorWidget(),
         if (actionBtn != null) ...[
           ...actionBtn!,
           SizedBox(width: horizontalPadding),
