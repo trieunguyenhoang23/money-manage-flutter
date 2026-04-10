@@ -3,7 +3,9 @@ import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/router.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import 'package:money_manage_flutter/export/shared.dart';
+import 'package:money_manage_flutter/features/main_features/transactions/presentation/provider/transaction_filter_provider.dart';
 import '../../../profile/presentation/provider/currency_provider.dart';
+import '../../data/datasource/sync/transaction_sync_key.dart';
 import '../../data/model/local/transaction_local_model.dart';
 import '../../domain/usecase/remove_transaction_usecase.dart';
 import '../provider/transaction_provider.dart';
@@ -32,8 +34,7 @@ class TransactionItemWidget extends ConsumerWidget {
                     Consumer(
                       builder: (context, ref, _) {
                         return SlidableAction(
-                          onPressed: (context) async =>
-                              await _onDelete(context, ref),
+                          onPressed: (context) async => await _onDelete(),
                           backgroundColor: Colors.red,
                           foregroundColor: ColorConstant.neutral200,
                           icon: Icons.delete,
@@ -148,7 +149,7 @@ class TransactionItemWidget extends ConsumerWidget {
                                         Icons.image,
                                         color: ColorConstant.warning700,
                                       ),
-                                    SizedBox(width: cc.maxWidth * 0.025,),
+                                    SizedBox(width: cc.maxWidth * 0.025),
                                     Icon(
                                       item.isSynced
                                           ? Icons.cloud
@@ -173,29 +174,32 @@ class TransactionItemWidget extends ConsumerWidget {
     );
   }
 
-  Future<void> _onDelete(BuildContext context, WidgetRef ref) async {
-    final container = ProviderScope.containerOf(context, listen: false);
+  Future<void> _onDelete() async {
+    BuildContext context = appNavigatorKey.currentState!.context;
 
     final title = context.lang.transaction_delete_item_title;
     final content = context.lang.transaction_delete_item_content;
 
-    DialogUtils.handleDecision(
+    final isConfirmed = await DialogUtils.handleDecision(
       context,
       title: title,
       content: content,
-      onConfirm: () async {
-        final result = await getIt<RemoveTransactionUseCase>().execute(item);
+    );
 
-        result.fold(
-          (error) {
-            if (context.mounted) {
-              DialogUtils.handleDecision(context, title: error.message);
-            }
-          },
-          (isSuccess) {
-            container.invalidate(loadingTransactionProvider);
-          },
+    if (!isConfirmed) return;
+    final result = await getIt<RemoveTransactionUseCase>().execute(item);
+
+    result.fold(
+      (error) {
+        DialogUtils.handleDecision(context, title: error.message);
+      },
+      (isSuccess) {
+        final container = ProviderScope.containerOf(context, listen: false);
+        final syncKey = container.read(transactionFilterProvider);
+        final notifier = container.read(
+          loadingTransactionProvider(syncKey).notifier,
         );
+        notifier.refresh();
       },
     );
   }

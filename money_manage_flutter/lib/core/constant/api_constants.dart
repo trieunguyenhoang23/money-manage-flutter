@@ -12,6 +12,10 @@ class UserAuthAPI {
 }
 
 class UserBaseAPI {
+  /// GET
+  static String get get_user_currency =>
+      '${APIConstants.bareUrl}/get/users/currency';
+
   /// PATCH
   static String get patch_user => '${APIConstants.bareUrl}/patch/users';
 }

@@ -27,6 +27,7 @@ class SplashProvider extends AsyncNotifier<double> {
     List<Future<void> Function()> tasks = [
       _initFirebase,
       ref.read(syncManagerProvider.notifier).initSync,
+
     ];
 
     if (kDebugMode) {

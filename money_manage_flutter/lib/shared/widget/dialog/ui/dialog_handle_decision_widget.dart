@@ -47,6 +47,7 @@ class DecisionDialog extends StatelessWidget {
                     cc.maxWidth * 0.06,
                     fontWeight: FontWeight.bold,
                     textAlign: TextAlign.center,
+                    isAutoSizeText: false,
                   ),
                 ),
 
@@ -68,15 +69,17 @@ class DecisionDialog extends StatelessWidget {
                 _buildAction(
                   label: confirmLabel ?? context.lang.confirm,
                   onTap: () {
-                    context.pop();
-                    onConfirm != null ? onConfirm!() : context.pop();
+                    if (onConfirm != null) {
+                      onConfirm!();
+                    }
+                    context.pop(true);
                   },
                   color: confirmColor ?? ColorConstant.primary,
                 ),
                 _buildAction(
                   label: cancelLabel ?? context.lang.cancel,
                   onTap: () {
-                    onCancel != null ? onCancel!() : context.pop();
+                    onCancel != null ? onCancel!() : context.pop(false);
                   },
                   color: ColorConstant.error400,
                   isLast: true,

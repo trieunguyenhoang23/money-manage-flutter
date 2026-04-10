@@ -1,16 +1,17 @@
 import 'package:money_manage_flutter/export/ui_external.dart';
-import '../../../../core/enum/transaction_type.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/core.dart';
 
 class TransTypeSegmentWidget extends StatefulWidget {
   final TransactionType selectedType;
+  final bool isCanPickType;
   final Function(TransactionType newType) updateType;
 
   const TransTypeSegmentWidget({
     super.key,
     required this.selectedType,
     required this.updateType,
+    this.isCanPickType = true,
   });
 
   @override
@@ -22,44 +23,52 @@ class _TransTypeSegmentWidgetState extends State<TransTypeSegmentWidget> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     selectedType = widget.selectedType;
   }
 
   @override
   Widget build(BuildContext context) {
+    final allSegments = [
+      (
+        type: TransactionType.INCOME,
+        label: context.lang.income,
+        icon: Icons.add_circle_outline,
+      ),
+      (
+        type: TransactionType.EXPENSE,
+        label: context.lang.expense,
+        icon: Icons.remove_circle_outline,
+      ),
+    ];
+
     return SegmentedButton<TransactionType>(
-      segments: [
-        ButtonSegment(
-          value: TransactionType.INCOME,
-          label: TextGGStyle(
-            context.lang.income,
-            0.03.sw,
-            isAutoSizeText: false,
-          ),
-          icon: const Icon(Icons.add_circle_outline),
-        ),
-        ButtonSegment(
-          value: TransactionType.EXPENSE,
-          label: TextGGStyle(
-            context.lang.expense,
-            0.03.sw,
-            isAutoSizeText: false,
-          ),
-          icon: const Icon(Icons.remove_circle_outline),
-        ),
-      ],
+      segments: allSegments
+          .where((s) => widget.isCanPickType || s.type == selectedType)
+          .map(
+            (s) => ButtonSegment(
+              value: s.type,
+              label: TextGGStyle(s.label, 0.03.sw, isAutoSizeText: false),
+              icon: Icon(s.icon),
+            ),
+          )
+          .toList(),
       selected: {selectedType},
-      onSelectionChanged: (Set<TransactionType> newSelection) {
-        setState(() {
-          selectedType = newSelection.first;
-        });
-        widget.updateType(newSelection.first);
-      },
+      onSelectionChanged: widget.isCanPickType
+          ? (newSelection) {
+              setState(() => selectedType = newSelection.first);
+              widget.updateType(newSelection.first);
+            }
+          : null,
       style: SegmentedButton.styleFrom(
         selectedBackgroundColor: selectedType.color.withValues(alpha: 0.2),
         selectedForegroundColor: selectedType.color,
+        disabledBackgroundColor: selectedType.color.withValues(alpha: 0.2),
+        disabledForegroundColor: selectedType.color,
+        side: BorderSide(
+          color: selectedType.color.withValues(alpha: 0.5),
+          width: 1,
+        ),
       ),
     );
   }

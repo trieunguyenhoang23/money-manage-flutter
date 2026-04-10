@@ -31,7 +31,7 @@ class _EditCategoryScreenState extends ConsumerState<EditCategoryScreen> {
     nameTextController = TextEditingController(text: item.name);
     descTextController = TextEditingController(text: item.description);
 
-    selectedType = widget.item.type ?? TransactionType.EXPENSE;
+    selectedType = widget.item.type ?? TransactionType.INCOME;
   }
 
   @override
@@ -51,6 +51,51 @@ class _EditCategoryScreenState extends ConsumerState<EditCategoryScreen> {
 
     double hBtn = sWPadding * 43 / 319;
 
+    List<Widget> widgets = [
+      SizedBox(
+        height: hNameField,
+        child: TextInputEditWidget(
+          hintText: context.lang.name,
+          textController: nameTextController,
+          maxLength: 50,
+          onChange: (value) {},
+          onSubmit: (value) {},
+          onClearText: () {},
+        ),
+      ),
+      SizedBox(
+        height: hDescField,
+        child: TextInputEditWidget(
+          hintText: context.lang.description,
+          textController: descTextController,
+          maxLength: 200,
+          onChange: (value) {},
+          onSubmit: (value) {},
+          onClearText: () {},
+        ),
+      ),
+      TransTypeSegmentWidget(
+        selectedType: selectedType,
+        isCanPickType: false,
+        updateType: (newTransType) {
+          selectedType = newTransType;
+        },
+      ),
+      BtnMainWidget(
+        w: sWPadding,
+        h: hBtn,
+        radius: hBtn * 0.05,
+        color: ColorConstant.primary,
+        onTap: _onCreatePressed,
+        child: TextGGStyle(
+          context.lang.update,
+          hBtn * 0.4,
+          color: Colors.white,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    ];
+
     return Scaffold(
       appBar: AppBarWidget(
         title: context.lang.category_edit,
@@ -59,58 +104,10 @@ class _EditCategoryScreenState extends ConsumerState<EditCategoryScreen> {
       body: PaddingStyle(
         child: CustomScrollView(
           slivers: [
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: hNameField,
-                child: TextInputEditWidget(
-                  hintText: context.lang.name,
-                  textController: nameTextController,
-                  maxLength: 50,
-                  onChange: (value) {},
-                  onSubmit: (value) {},
-                  onClearText: () {},
-                ),
-              ),
-            ),
-            const SliverToBoxAdapter(child: SpacingStyle()),
-            SliverToBoxAdapter(
-              child: SizedBox(
-                height: hDescField,
-                child: TextInputEditWidget(
-                  hintText: context.lang.description,
-                  textController: descTextController,
-                  maxLength: 200,
-                  onChange: (value) {},
-                  onSubmit: (value) {},
-                  onClearText: () {},
-                ),
-              ),
-            ),
-            const SliverToBoxAdapter(child: SpacingStyle()),
-            SliverToBoxAdapter(
-              child: TransTypeSegmentWidget(
-                selectedType: selectedType,
-                updateType: (newTransType) {
-                  selectedType = newTransType;
-                },
-              ),
-            ),
-            const SliverToBoxAdapter(child: SpacingStyle()),
-            SliverToBoxAdapter(
-              child: BtnMainWidget(
-                w: sWPadding,
-                h: hBtn,
-                radius: hBtn * 0.05,
-                color: ColorConstant.primary,
-                onTap: _onCreatePressed,
-                child: TextGGStyle(
-                  context.lang.update,
-                  hBtn * 0.4,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
+            for (var widget in widgets) ...[
+              SliverToBoxAdapter(child: widget),
+              const SliverToBoxAdapter(child: SpacingStyle()),
+            ],
           ],
         ),
       ),

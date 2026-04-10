@@ -2,8 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
-import 'package:money_manage_flutter/core/di/injection.dart';
-import 'package:money_manage_flutter/infrastructure/network/socket/i_socket_client_service.dart';
 import '../../export/core.dart';
 import '../../features/main_features/profile/data/datasource/local/user_local_datasource.dart';
 

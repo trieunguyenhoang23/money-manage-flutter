@@ -3,6 +3,7 @@ import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import '../../../analytics/presentation/provider/overview_balance_provider.dart';
 import '../../data/model/local/transaction_local_model.dart';
+import '../provider/transaction_filter_provider.dart';
 import '../provider/transaction_provider.dart';
 import '../provider/transaction_update_provider.dart';
 import '../widget/transaction_form/category_picked_widget.dart';
@@ -100,7 +101,15 @@ class _EditTransactionScreenState extends ConsumerState<EditTransactionScreen> {
                 }
               },
               (updateTransaction) {
-                ref.invalidate(loadingTransactionProvider);
+                final container = ProviderScope.containerOf(
+                  context,
+                  listen: false,
+                );
+                final syncKey = container.read(transactionFilterProvider);
+                final notifier = container.read(
+                  loadingTransactionProvider(syncKey).notifier,
+                );
+                notifier.refresh();
 
                 /// Refresh Overview Balance to update new data
                 ref.refresh(overviewBalanceProvider);

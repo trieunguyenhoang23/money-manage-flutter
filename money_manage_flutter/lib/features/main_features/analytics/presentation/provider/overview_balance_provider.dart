@@ -69,7 +69,7 @@ class OverviewBalanceNotifier extends AsyncNotifier<OverviewBalanceState> {
 }
 
 final overviewBalanceProvider =
-    AsyncNotifierProvider<OverviewBalanceNotifier, OverviewBalanceState>(() {
+    AsyncNotifierProvider.autoDispose<OverviewBalanceNotifier, OverviewBalanceState>(() {
       return OverviewBalanceNotifier();
     });
 

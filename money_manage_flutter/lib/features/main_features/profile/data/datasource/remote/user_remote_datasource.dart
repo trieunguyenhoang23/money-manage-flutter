@@ -9,6 +9,12 @@ class UserRemoteDatasource {
 
   UserRemoteDatasource(this._dioService);
 
+  /// GET
+  Future<ApiResult> getUserCurrency()async{
+    return await _dioService.getWithCache(UserBaseAPI.get_user_currency);
+  }
+
+  /// POST
   Future<dynamic> verifyAuthenticate({
     required Map<String, dynamic> jsonBody,
   }) async {

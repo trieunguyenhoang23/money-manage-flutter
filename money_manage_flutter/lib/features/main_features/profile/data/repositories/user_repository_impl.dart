@@ -81,6 +81,15 @@ class UserRepositoryImpl implements UserRepository {
 
   @override
   Future<String> getCurrency() async {
-    return await _localDatasource.getCurrentCurrency();
+    String currency = await _localDatasource.getCurrentCurrency();
+
+    await _onlineActionGuard.run((currentUserId, networkStatus) async {
+      final result = await _remoteDatasource.getUserCurrency();
+      if (result.isFailure) return;
+
+      currency = result.data['currency'];
+    });
+
+    return currency;
   }
 }

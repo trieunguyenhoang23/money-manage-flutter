@@ -43,7 +43,7 @@ class ProfileNotifier extends AsyncNotifier<ProfileState> {
       ref.invalidate(loadingTransactionProvider);
       ref.invalidate(loadingCategoryProvider);
 
-      /// Update UI only => isSyncData: false
+      /// Update UI only (Don't need to update data to server) => isSyncData: false
       await ref
           .read(currencyProvider.notifier)
           .updateCurrency(

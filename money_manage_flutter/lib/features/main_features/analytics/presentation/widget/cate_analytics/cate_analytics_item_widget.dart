@@ -29,20 +29,29 @@ class CateAnalyticsItemWidget extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 0.1 * cc.maxWidth,
-                          height: 0.1 * cc.maxWidth,
-                          color: generateUniqueColorById(item.id),
-                        ),
-                        SizedBox(width: 0.05 * cc.maxWidth),
-                        TextGGStyle(item.name, textSize1),
-                      ],
+                    Expanded(
+                      flex: 6,
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 0.1 * cc.maxWidth,
+                            height: 0.1 * cc.maxWidth,
+                            color: generateUniqueColorById(item.id),
+                          ),
+                          SizedBox(width: 0.05 * cc.maxWidth),
+                          Expanded(
+                            child: TextGGStyle(
+                              item.name,
+                              textSize1,
+                              maxLines: 2,
+                              isAutoSizeText: false,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    SizedBox(width: 0.05 * cc.maxWidth),
-
                     Flexible(
+                      flex: 4,
                       child: Consumer(
                         builder: (context, ref, _) {
                           final currency =

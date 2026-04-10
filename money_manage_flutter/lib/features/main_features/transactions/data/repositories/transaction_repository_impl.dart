@@ -184,7 +184,8 @@ class TransactionRepositoryImpl implements TransactionRepository {
   Future<Either<Failure, bool>> removeTransaction({
     required TransactionLocalModel transaction,
   }) async {
-    dynamic syncResult = true;
+    bool syncResult = true;
+    String? error;
     await _onlineActionGuard.run((currentActiveUserId, networkStatus) async {
       if (transaction.idServer == null) {
         syncResult = false;
@@ -195,7 +196,8 @@ class TransactionRepositoryImpl implements TransactionRepository {
         result,
       ) {
         if (result.isFailure) {
-          syncResult = Fail(result);
+          syncResult = false;
+          error = result.error?.message;
           return;
         }
         syncResult = true;
@@ -204,8 +206,10 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
     if (syncResult) {
       await _localDatasource.removeTransaction(transaction);
+      return const Right(true);
     }
-    return Right(syncResult);
+
+    return Left(ServerFailure(error ?? ''));
   }
 
   @override

@@ -29,11 +29,10 @@ class SocketClientServiceImpl implements ISocketClientService {
         'forceNew': true,
       });
 
-      _socket?.onConnect((_) async{
+      _socket?.onConnect((_) async {
         final sId = _socket?.id;
         debugPrint('Connected to Socket Server: $sId');
 
-        // LƯU VÀO STORAGE NGAY KHI CONNECT
         if (sId != null) {
           await _secureStorage.write(key: 'last_socket_id', value: sId);
         }

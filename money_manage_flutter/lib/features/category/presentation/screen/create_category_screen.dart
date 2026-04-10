@@ -19,7 +19,7 @@ class CreateCategoryScreen extends ConsumerStatefulWidget {
 class _CreateCategoryScreenState extends ConsumerState<CreateCategoryScreen> {
   TextEditingController nameTextController = TextEditingController();
   TextEditingController descTextController = TextEditingController();
-  TransactionType selectedType = TransactionType.EXPENSE;
+  TransactionType selectedType = TransactionType.INCOME;
 
   @override
   void dispose() {

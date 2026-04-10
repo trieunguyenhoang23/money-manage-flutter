@@ -39,13 +39,6 @@ class _CategoryGridViewWidgetState
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final notifier = ref.read(provider.notifier);
-
-      // Load lần đầu
-      if (notifier.page == 0) {
-        notifier.loadMore();
-      }
-
       // Listen animation list change
       refListener = ref.listenManual(provider, (prev, next) {
         final prevList = (prev as dynamic)?.visibleList as List? ?? [];
@@ -98,6 +91,12 @@ class _CategoryGridViewWidgetState
           ],
         ),
       );
+    }
+
+    if (state.visibleList.isEmpty && !state.isLoading) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        notifier.loadMore();
+      });
     }
 
     return RefreshIndicator(

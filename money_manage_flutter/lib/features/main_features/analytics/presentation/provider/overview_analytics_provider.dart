@@ -81,6 +81,6 @@ class OverviewGraphNotifier extends AsyncNotifier<OverviewGraphState> {
 }
 
 final overviewGraphProvider =
-    AsyncNotifierProvider<OverviewGraphNotifier, OverviewGraphState>(
+    AsyncNotifierProvider.autoDispose<OverviewGraphNotifier, OverviewGraphState>(
       () => OverviewGraphNotifier(),
     );
