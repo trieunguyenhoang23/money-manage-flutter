@@ -10,7 +10,7 @@ class UserRemoteDatasource {
   UserRemoteDatasource(this._dioService);
 
   /// GET
-  Future<ApiResult> getUserCurrency()async{
+  Future<ApiResult> getUserCurrency() async {
     return await _dioService.getWithCache(UserBaseAPI.get_user_currency);
   }
 
@@ -31,8 +31,7 @@ class UserRemoteDatasource {
   }
 
   Future<ApiResult> updateUserProperties(
-    Map<String, dynamic> jsonBodyRequest,
-  ) async {
+      Map<String, dynamic> jsonBodyRequest,) async {
     return await _dioService.patch(UserBaseAPI.patch_user, jsonBodyRequest);
   }
 }

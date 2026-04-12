@@ -47,6 +47,48 @@ extension DateTimeLocaleX on DateTime? {
       999,
     ).toUtc().toIso8601String();
   }
+
+  /// Line graph
+  // Calculate the X-coordinate based on the distance from the start date
+  double calculateXValue(DateTime start, String groupType) {
+    if (this == null) return 0;
+
+    final current = this!;
+
+    switch (groupType) {
+      case 'year':
+        return (current.year - start.year).toDouble();
+
+      case 'month':
+        return ((current.year - start.year) * 12 +
+                (current.month - start.month))
+            .toDouble();
+
+      case 'day':
+      default:
+        // Reset to 00:00:00 to calculate the standard date interval
+        final s = DateTime(start.year, start.month, start.day);
+        final c = DateTime(current.year, current.month, current.day);
+        return c.difference(s).inDays.toDouble();
+    }
+  }
+
+  // Format showing for line graph
+  String toGraphLabel(String groupType) {
+    if (this == null) return '';
+
+    final DateTime date = this!;
+
+    switch (groupType) {
+      case 'year':
+        return date.year.toString();
+      case 'month':
+        return "${date.month}/${date.year % 100}";
+      case 'day':
+      default:
+        return "${date.day}/${date.month}";
+    }
+  }
 }
 
 extension DateTimeRangeLocaleX on DateTimeRange? {

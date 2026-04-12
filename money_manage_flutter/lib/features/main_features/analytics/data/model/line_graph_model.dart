@@ -1,12 +1,17 @@
 import 'package:fl_chart/fl_chart.dart';
+import 'package:money_manage_flutter/core/extension/date_extension.dart';
+import '../../../../../export/ui_external.dart';
 
 class LineGraphModel {
   final List<FlSpot> incomeSpots;
   final List<FlSpot> expenseSpots;
   final List<FlSpot> balanceSpots;
-  final List<String> xLabels;
+  final Map<double, String> xLabels;
   final String groupType;
   final double maxY;
+  final double maxX;
+  final double xInterval;
+  final double yInterval;
 
   LineGraphModel({
     required this.incomeSpots,
@@ -14,6 +19,59 @@ class LineGraphModel {
     required this.balanceSpots,
     required this.xLabels,
     required this.groupType,
+    required this.maxX,
     required this.maxY,
+    required this.xInterval,
+    required this.yInterval,
   });
+
+  factory LineGraphModel.calculate({
+    required List<FlSpot> incomeSpots,
+    required List<FlSpot> expenseSpots,
+    required List<FlSpot> balanceSpots,
+    required String groupType,
+    required double rawMaxY,
+    required DateTimeRange range,
+  }) {
+    final double maxX = range.end.calculateXValue(range.start, groupType);
+
+    /// Create Label
+    final xLabels = <double, String>{};
+    for (int i = 0; i <= maxX.toInt(); i++) {
+      DateTime date;
+      if (groupType == 'year') {
+        date = DateTime(
+          range.start.year + i,
+          range.start.month,
+          range.start.day,
+        );
+      } else if (groupType == 'month') {
+        date = DateTime(range.start.year, range.start.month + i, 1);
+      } else {
+        date = range.start.add(Duration(days: i));
+      }
+      xLabels[i.toDouble()] = date.toGraphLabel(groupType);
+    }
+
+    /// Calculate Interval
+    // Y
+    final maxY = rawMaxY == 0 ? 100.0 : rawMaxY * 1.2;
+    final yInterval = maxY / 5;
+
+    // X
+    double xInterval = maxX > 5 ? (maxX / 5).floorToDouble() : 1.0;
+    if (xInterval < 1) xInterval = 1;
+
+    return LineGraphModel(
+      incomeSpots: incomeSpots..sort((a, b) => a.x.compareTo(b.x)),
+      expenseSpots: expenseSpots..sort((a, b) => a.x.compareTo(b.x)),
+      balanceSpots: balanceSpots..sort((a, b) => a.x.compareTo(b.x)),
+      xLabels: xLabels,
+      groupType: groupType,
+      maxY: maxY,
+      maxX: maxX,
+      xInterval: xInterval,
+      yInterval: yInterval,
+    );
+  }
 }

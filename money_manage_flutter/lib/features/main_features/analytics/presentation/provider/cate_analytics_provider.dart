@@ -35,6 +35,7 @@ final cateAnalyticsProvider = FutureProvider.family
       Tuple3<List<PieChartSectionData>, List<CategoryAnalytics>, double>,
       AnalyticsParam
     >((ref, param) async {
+      /// Use case
       final useCase = getIt<GetCategoriesAnalyticsUseCase>();
       final result = await useCase.execute(
         param.type,

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import 'package:money_manage_flutter/export/shared.dart';
@@ -10,6 +11,11 @@ class DateRangePickWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final dateRangeState = ref.watch(dateRangeProvider);
     final dateRangeNotifier = ref.read(dateRangeProvider.notifier);
+
+    if (kDebugMode) {
+      print('Date start ${dateRangeState.start.formatServerStart}');
+      print('Date end ${dateRangeState.end.formatServerEnd}');
+    }
 
     return InkWell(
       onTap: () async {

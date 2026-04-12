@@ -186,9 +186,12 @@ class _PeriodSum {
 }
 
 String _getGroupKey(DateTime date, String groupBy) {
-  if (groupBy == 'year') return "${date.year}";
-  if (groupBy == 'month') {
-    return "${date.year}-${date.month.toString().padLeft(2, '0')}";
+  if (groupBy == 'year') {
+    return "${date.year}-01-01";
   }
+  if (groupBy == 'month') {
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-01";
+  }
+
   return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
 }

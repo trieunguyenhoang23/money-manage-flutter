@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:fl_chart/fl_chart.dart';
-import '../../../../../core/di/injection.dart';
+import 'package:money_manage_flutter/export/core.dart';
 import '../../../../../export/ui_external.dart';
 import '../../data/model/line_graph_model.dart';
 import '../../data/model/overview_analytics_model.dart';
@@ -24,63 +24,55 @@ class OverviewGraphNotifier extends AsyncNotifier<OverviewGraphState> {
       range.end,
     );
 
-    return result.fold((error) => OverviewGraphState(error: error.toString()), (
-      data,
-    ) {
-      final List<FlSpot> incomeSpots = [];
-      final List<FlSpot> expenseSpots = [];
-      final List<FlSpot> balanceSpots = [];
-      double currentMaxY = 0;
-
-      for (final point in data.points) {
-        final double x = _calculateXValue(
-          point.label,
-          range.start,
-          data.groupType,
-        );
-
-        incomeSpots.add(FlSpot(x, point.income));
-        expenseSpots.add(FlSpot(x, point.expense));
-        balanceSpots.add(FlSpot(x, point.balance));
-
-        final highest = [
-          point.income,
-          point.expense,
-          point.balance,
-        ].reduce((a, b) => a > b ? a : b);
-        if (highest > currentMaxY) currentMaxY = highest;
-      }
-
-      final graphModel = LineGraphModel(
-        incomeSpots: incomeSpots..sort((a, b) => a.x.compareTo(b.x)),
-        expenseSpots: expenseSpots..sort((a, b) => a.x.compareTo(b.x)),
-        balanceSpots: balanceSpots..sort((a, b) => a.x.compareTo(b.x)),
-        xLabels: [],
-        groupType: data.groupType,
-        maxY: currentMaxY == 0 ? 100 : currentMaxY * 1.2,
-      );
-
-      return OverviewGraphState(
-        graphModel: graphModel,
-        overViewAnalytics: data,
-      );
-    });
+    return result.fold(
+      (error) => OverviewGraphState(error: error.toString()),
+      (data) => _mapToState(data, range),
+    );
   }
 
-  double _calculateXValue(String label, DateTime start, String groupType) {
-    final date = DateTime.parse(groupType == 'month' ? "$label-01" : label);
-    if (groupType == 'month') {
-      return ((date.year - start.year) * 12 + (date.month - start.month))
-          .toDouble();
+  OverviewGraphState _mapToState(OverviewAnalytics data, DateTimeRange range) {
+    final incomeSpots = <FlSpot>[];
+    final expenseSpots = <FlSpot>[];
+    final balanceSpots = <FlSpot>[];
+    double currentMaxY = 0;
+
+    for (final point in data.points) {
+      // 1. Calculate axis-X
+      final date = DateTime.tryParse(point.label);
+
+      if (date == null) continue;
+      final x = date.calculateXValue(range.start, data.groupType);
+
+      // 2. Add coordinate
+      incomeSpots.add(FlSpot(x, point.income));
+      expenseSpots.add(FlSpot(x, point.expense));
+      balanceSpots.add(FlSpot(x, point.balance));
+
+      // 3. Up date MaxY (Padding 20%)
+      currentMaxY = [
+        currentMaxY,
+        point.income,
+        point.expense,
+        point.balance,
+      ].reduce((a, b) => a > b ? a : b);
     }
-    return date
-        .difference(DateTime(start.year, start.month, start.day))
-        .inDays
-        .toDouble();
+
+    return OverviewGraphState(
+      graphModel: LineGraphModel.calculate(
+        incomeSpots: incomeSpots,
+        expenseSpots: expenseSpots,
+        balanceSpots: balanceSpots,
+        range: range,
+        groupType: data.groupType,
+        rawMaxY: currentMaxY,
+      ),
+      overViewAnalytics: data,
+    );
   }
 }
 
 final overviewGraphProvider =
-    AsyncNotifierProvider.autoDispose<OverviewGraphNotifier, OverviewGraphState>(
-      () => OverviewGraphNotifier(),
-    );
+    AsyncNotifierProvider.autoDispose<
+      OverviewGraphNotifier,
+      OverviewGraphState
+    >(() => OverviewGraphNotifier());
