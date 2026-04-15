@@ -1,25 +1,26 @@
 ### Money Manage App | Flutter | 03/2026 - Present | IN PROGRESS
 
 #### 1. 🚀 Project Overview
-Personal Finance Manager helps users track income and expenses, create custom categories, and sync data across multiple devices. It provides automatic reminders and data analysis features to give insights into financial habits.
+Personal Finance Manager helps users track income and expenses, create custom categories, and sync data across multiple devices. It provides data analysis features to give insights into financial habits.
 
 #### 2. 🛠 Tech Stack
-- **Architecture**: Clean Architecture with Injectable & GetIt.
+- **Architecture**: Clean Architecture, MVVM.
 - **State Management**: Riverpod.
-- **Database**: Isar, Hive (Cache), Secure Storage.
-- **Networking**: Dio with Interceptors (Retry & Cache logic).
-- **Backend**: LoopBack 4, Firebase (Analytics, Crashlytics, Remote Config, FCM).
+- **Database**: Isar.
+- **Networking**: Dio, Interceptors (implementing Retry logic, JWT Auth and Cache).
+- **Backend**: LoopBack 4, MongoDb.
 - **Navigation**: GoRouter.
+- **Real-time**: socket_io_client.
+- **Others**: Injectable, GetIt, Firebase, Fl_chart.
 
 #### 3. ✨ Use Case Diagram & Features
 ![Usecase Diagram](diagram/usecase.jpg)  
 
-- **Login & Sync**: Log in and sync data across multiple devices. ✅ **Complete**
-- **Custom Categories**: Create custom income and expense categories. ✅ **Complete**
-- **Manage Transactions**: Record income and expenses. ✅ **Complete**
-- **Filter & Sort**: Sort income/expenses by type, date, ... ✅ **Complete**
-- **Data Analysis**: Analyze financial data for insights. ✅ **Complete**
-- **Recurring Entries**: Automatically generate daily, weekly, or monthly income/expense records. ⏳ **In Progress**
+- **Login & Sync**: Log in and sync data across multiple devices.
+- **Custom Categories**: Create custom income and expense categories.
+- **Manage Transactions**: Record income and expenses.
+- **Filter & Sort**: Sort income/expenses by type, date.
+- **Data Analysis**: Analyze financial data for insights.
 
 #### 4. 🏛️ Architecture
 ![Architecture Diagram](diagram/architecture.png)
@@ -33,11 +34,9 @@ Personal Finance Manager helps users track income and expenses, create custom ca
 ![Entity Relationship Diagram](diagram/erd.jpg)
 - **User → Category**: A User can create multiple Categories (1 - N).
 - **User → AuthProvider**: A User can have multiple authentication providers (e.g., Google, Apple, Facebook) (1 - N).
-- **User → Reminder**: A User can set up multiple Reminders for recurring income or expense (1 - N).
 - **User → Transaction**: A User can have multiple Transactions (income/expense records) (1 - N).
-- **Category → Reminder**: A Category can have multiple Reminders associated with it. (1 - N)
 - **Category → Transaction**: A Category can have multiple Transactions. Each transaction must belong to a specific category (income or expense) (1 - N).
-- **Reminder → Transaction**: A Reminder can be linked to multiple Transactions, especially for recurring transactions (1 - N).
+
 
 #### 6. 📂 Folder Structure
 ```bash
