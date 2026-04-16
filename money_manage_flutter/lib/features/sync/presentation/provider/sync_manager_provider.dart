@@ -53,23 +53,35 @@ class SyncManagerNotifier extends Notifier<SyncState> {
     try {
       task.reset();
 
+      final initialProgress = SyncBatchProgress(
+        type: task.type,
+        current: 0,
+        total: 0,
+        overallProgress: 0.01,
+      );
+
+      // Send progress 0% immediately to avoid UI freeze
+      task.controller.add(initialProgress);
+      _updateStateProgress(task.type, initialProgress);
+
       await for (final p in task.execute()) {
         task.controller.add(p);
-
-        final newProgressMap = Map<SyncType, SyncBatchProgress>.from(
-          state.progress,
-        );
-
-        newProgressMap[task.type] = p;
-
-        state = state.copyWith(
-          progress: newProgressMap,
-          isSyncing: _checkGlobalSyncStatus(newProgressMap),
-        );
+        _updateStateProgress(task.type, p);
       }
     } catch (e) {
       state = state.copyWith(isSyncing: false);
     }
+  }
+
+  void _updateStateProgress(SyncType type, SyncBatchProgress p) {
+    final newProgressMap = Map<SyncType, SyncBatchProgress>.from(
+      state.progress,
+    );
+    newProgressMap[type] = p;
+    state = state.copyWith(
+      progress: newProgressMap,
+      isSyncing: _checkGlobalSyncStatus(newProgressMap),
+    );
   }
 
   Stream<SyncBatchProgress> streamByType(SyncType type) {

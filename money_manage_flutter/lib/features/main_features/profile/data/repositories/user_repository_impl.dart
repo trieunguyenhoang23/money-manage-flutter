@@ -62,12 +62,6 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<String> getCurrentUserId() async {
-    final localUser = await _localDatasource.getCurrentUser();
-    return localUser?.idServer ?? '';
-  }
-
-  @override
   Future<void> updateCurrency(String newCurrency) async {
     await _localDatasource.updateCurrency(newCurrency);
 

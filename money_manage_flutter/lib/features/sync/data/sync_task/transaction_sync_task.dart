@@ -1,7 +1,7 @@
 import 'package:rxdart/rxdart.dart';
 import '../../../../export/core_external.dart';
 import '../../domain/sync_task/i_sync_task.dart';
-import '../../domain/usecase/sync_transaction_usecase.dart';
+import '../../domain/usecase/sync_transaction/sync_transaction_usecase.dart';
 import '../model/sync_batch_progress.dart';
 
 @lazySingleton
@@ -25,8 +25,9 @@ class TransactionSyncTask implements ISyncTask {
 
   @override
   void reset() {
-    _controller.close();
-    _controller = BehaviorSubject<SyncBatchProgress>();
+    _controller.add(
+      SyncBatchProgress(type: type, current: 0, total: 0, overallProgress: 0),
+    );
   }
 
   void dispose() {

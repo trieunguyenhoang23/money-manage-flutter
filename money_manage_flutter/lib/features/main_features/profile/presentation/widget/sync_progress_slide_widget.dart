@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -48,8 +49,8 @@ class _SyncProgressSlideWidgetState
   @override
   Widget build(BuildContext context) {
     final List<Widget> syncWidget = const [
-      SyncProgressBuilderWidget(syncType: SyncType.category),
       SyncProgressBuilderWidget(syncType: SyncType.transaction),
+      SyncProgressBuilderWidget(syncType: SyncType.category),
     ];
 
     double w = 1.sw - 0.05.sw;
@@ -70,7 +71,7 @@ class _SyncProgressSlideWidgetState
               controller: pageController,
               itemCount: syncWidget.length,
               itemBuilder: (context, index) {
-                return syncWidget[index];
+                return KeepAliveWidget(child: syncWidget[index]);
               },
             ),
           ),

@@ -5,7 +5,6 @@ import 'package:money_manage_flutter/core/constant/string_constant.dart';
 import 'package:money_manage_flutter/core/di/injection.dart';
 import 'package:money_manage_flutter/export/infrastructure.dart';
 import 'package:money_manage_flutter/features/sync/presentation/provider/sync_manager_provider.dart';
-import 'package:money_manage_flutter/infrastructure/network/socket/i_socket_client_service.dart';
 import '../../../firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -20,15 +19,12 @@ class SplashProvider extends AsyncNotifier<double> {
   @override
   FutureOr<double> build() async {
     await initialize();
+    ref.read(syncManagerProvider.notifier).initSync();
     return 1;
   }
 
   Future<void> initialize() async {
-    List<Future<void> Function()> tasks = [
-      _initFirebase,
-      ref.read(syncManagerProvider.notifier).initSync,
-
-    ];
+    List<Future<void> Function()> tasks = [_initFirebase];
 
     if (kDebugMode) {
       String accessToken =

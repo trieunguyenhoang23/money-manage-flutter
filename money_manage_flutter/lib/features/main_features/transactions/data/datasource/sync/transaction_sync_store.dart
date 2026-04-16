@@ -13,7 +13,7 @@ class TransactionSyncStore {
   static const String _prefix = 'sync_trans';
 
   String _buildKey(TransactionSyncKey key, String subType) {
-    return '${_prefix}_${subType}_${key.year}_${key.month}_${key.type?.name ?? 'all'}';
+    return key.toKey('${_prefix}_$subType');
   }
 
   // --- READ ---
@@ -53,15 +53,9 @@ class TransactionSyncStore {
         month: key.month,
         type: otherType,
       );
+
       final otherEnded =
-          _prefs.getBool(
-            TransactionSyncKey(
-              year: key.year,
-              month: key.month,
-              type: otherType,
-            ).toKey(_buildKey(otherKey, 'end')),
-          ) ??
-          false;
+          _prefs.getBool(otherKey.toKey(_buildKey(otherKey, 'end'))) ?? false;
 
       if (otherEnded) {
         // Both are exhausted -> Mark all
@@ -70,14 +64,7 @@ class TransactionSyncStore {
           month: key.month,
           type: null,
         );
-        await _prefs.setBool(
-          TransactionSyncKey(
-            year: key.year,
-            month: key.month,
-            type: null,
-          ).toKey(_buildKey(allKey, 'end')),
-          true,
-        );
+        await _prefs.setBool(allKey.toKey(_buildKey(allKey, 'end')), true);
       }
     }
   }

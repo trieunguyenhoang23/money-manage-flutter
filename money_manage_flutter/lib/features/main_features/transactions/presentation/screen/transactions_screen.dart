@@ -1,9 +1,8 @@
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
-import 'package:money_manage_flutter/core/constant/color_constant.dart';
+import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/router.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
-import '../../../../../core/router/navigator_router.dart';
 import '../../../../../shared/widget/btn/btn_floating_widget.dart';
 import '../widget/month_select_widget.dart';
 import '../widget/transaction_filter_widget.dart';
@@ -27,6 +26,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           physics: const BouncingScrollPhysics(),
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
+              /// Calculate header overlap height
               SliverOverlapAbsorber(
                 handle: ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(
                   context,
@@ -57,6 +57,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             builder: (context) {
               return CustomScrollView(
                 slivers: [
+                  /// Receive input from SliverOverlapAbsorber and creating padding space with a height
+                  /// exactly equal to the height of appbar
                   SliverOverlapInjector(
                     handle:
                         ExtendedNestedScrollView.sliverOverlapAbsorberHandleFor(

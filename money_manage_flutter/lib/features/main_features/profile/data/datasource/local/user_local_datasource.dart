@@ -10,7 +10,6 @@ import '../../model/local/user_local_model.dart';
 class UserLocalDatasource {
   final Isar _isar;
   final SharedPreferences _preferences;
-
   final FlutterSecureStorage _secureStorage;
 
   UserLocalDatasource(this._isar, this._secureStorage, this._preferences);

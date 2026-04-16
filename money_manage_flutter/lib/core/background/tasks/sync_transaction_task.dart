@@ -1,5 +1,5 @@
 import '../../../export/ui_external.dart';
-import '../../../features/sync/domain/usecase/sync_transaction_usecase.dart';
+import '../../../features/sync/domain/usecase/sync_transaction/sync_transaction_usecase.dart';
 import '../../di/injection.dart';
 import 'i_background_task.dart';
 

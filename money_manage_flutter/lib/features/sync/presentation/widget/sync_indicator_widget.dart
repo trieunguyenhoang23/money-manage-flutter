@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:money_manage_flutter/core/constant/color_constant.dart';
-
 import '../provider/socket_provider.dart';
 import '../provider/sync_manager_provider.dart';
 
