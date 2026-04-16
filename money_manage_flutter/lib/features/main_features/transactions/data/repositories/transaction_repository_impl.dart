@@ -1,9 +1,9 @@
 import 'package:dartz/dartz.dart';
 import 'package:money_manage_flutter/export/core.dart';
-import 'package:money_manage_flutter/export/core_external.dart';
+import '../../../../../export/core_external.dart';
 import '../../../../../infrastructure/file/models/file_picked.dart';
-import '../../../../category/data/datasource/local/category_local_datasource.dart';
 import '../../../../category/data/model/local/category_local_model.dart';
+import '../../../../sync/domain/service/transaction/transaction_pull_service.dart';
 import '../../domain/repositories/transaction_repository.dart';
 import '../datasource/local/transactions_local_datasource.dart';
 import '../datasource/remote/transactions_remote_datasource.dart';
@@ -17,14 +17,14 @@ class TransactionRepositoryImpl implements TransactionRepository {
   final TransactionsLocalDatasource _localDatasource;
   final OnlineActionGuard _onlineActionGuard;
   final TransactionSyncStore _syncStore;
-  final CategoryLocalDatasource _categoryLocalDatasource;
+  final TransactionPullService _transactionPullService;
 
   TransactionRepositoryImpl(
     this._remoteDatasource,
     this._localDatasource,
     this._onlineActionGuard,
     this._syncStore,
-    this._categoryLocalDatasource,
+    this._transactionPullService,
   );
 
   int limitCount = SizeAppUtils().isTablet ? 20 : 10;
@@ -93,91 +93,52 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
-  Future<List<TransactionLocalModel>> loadTransByMonth(
-    int page,
-    int month,
-    int year, {
+  Future<List<TransactionLocalModel>> getLocalTransactions({
+    required int page,
+    required int month,
+    required int year,
     TransactionType? type,
+    required int limit,
+  }) {
+    return _localDatasource.loadTransByMonth(
+      page: page,
+      month: month,
+      year: year,
+      type: type,
+      limitCount: limit,
+    );
+  }
+
+  @override
+  Future<Either<Failure, List<TransactionLocalModel>>>
+  fetchAndSaveRemoteTransactions({
+    required int page,
+    required int month,
+    required int year,
+    TransactionType? type,
+    required int limit,
   }) async {
-    /// Declare key for month & year
-    final syncKey = TransactionSyncKey(year: year, month: month, type: type);
-
-    // Fetch data from server first
-    var localData = await _localDatasource.loadTransByMonth(
-      page: page,
-      month: month,
-      year: year,
-      type: type,
-      limitCount: limitCount,
+    final result = await _remoteDatasource.loadTransByMonth(
+      page,
+      limit,
+      month,
+      year,
+      type: type?.name.toUpperCase(),
     );
 
-    await _onlineActionGuard.run((currentActiveUserId, networkStatus) async {
-      /// Check sync Status
-      if (_syncStore.isFullyReachedEnd(syncKey)) return;
+    if (result.isFailure) {
+      return Left(ServerFailure(result.error?.message ?? ''));
+    }
 
-      /// Call API if the current page don't have enough data
-      final progress = _syncStore.getProgress(syncKey);
-      final bool isDataMissing = localData.length < limitCount;
-      final bool isRequestingNewPage = page >= progress.nextPage;
-
-      if (!isDataMissing && !isRequestingNewPage) return;
-
-      /// Important:
-      /// if missing data on the current page, reload that page
-      /// if it's a completely new page, load the next page
-      int pageToFetch = isDataMissing ? page : progress.nextPage;
-
-      // Call API
-      final result = await _remoteDatasource.loadTransByMonth(
-        pageToFetch,
-        limitCount,
-        month,
-        year,
-        type: type?.name.toUpperCase(),
-      );
-
-      if (result.isFailure) return;
-
-      if (result.data.isEmpty) {
-        /// Mark data as expired for this month/year/type
-        await _syncStore.markReachedEnd(syncKey);
-        return;
-      }
-
-      // Save remote data to local
-      final localModels = await parseListJsonIsolate(
-        TransactionLocalModel.fromRemote,
-        result.data,
-      );
-
-      /// Save category if needed
-      final categories = result.data
-          .map((item) => item['category'])
-          .whereType<Map<String, dynamic>>()
-          .map<CategoryLocalModel>(
-            (json) => CategoryLocalModel.fromRemote(json),
-          )
-          .toSet() // Duplicate Filter (Unique)
-          .toList();
-
-      if (categories.isNotEmpty) {
-        await _categoryLocalDatasource.saveAll(categories);
-      }
-
-      await _localDatasource.saveAll(localModels);
-
-      // Update sync progress for this key was successful
-      await _syncStore.savePage(syncKey, pageToFetch + 1);
-    });
-
-    // Fetch data from local again
-    return await _localDatasource.loadTransByMonth(
-      page: page,
-      month: month,
-      year: year,
-      type: type,
-      limitCount: limitCount,
+    final localModels = await parseListJsonIsolate(
+      TransactionLocalModel.fromRemote,
+      result.data,
     );
+
+    await _transactionPullService.saveCategoryIfNeeded(result.data);
+    await _localDatasource.saveAll(localModels);
+
+    return Right(localModels);
   }
 
   @override

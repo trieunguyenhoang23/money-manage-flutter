@@ -44,13 +44,13 @@ class TransactionSyncRepositoryImpl implements TransactionSyncRepository {
     }
 
     // Save category that transaction belong
-    await _transactionPullService.saveCategoryIfNeeded(syncDelta);
+    await _transactionPullService.saveCategoryIfNeeded(syncDelta.data);
 
     // Remove transaction
-    await _transactionPullService.removeTransaction(syncDelta);
+    await _transactionPullService.removeTransaction(syncDelta.data);
 
     // Update transaction
-    await _transactionPullService.saveUpdatedTransaction(syncDelta);
+    await _transactionPullService.saveUpdatedTransaction(syncDelta.data);
 
     return Right(syncDelta);
   }

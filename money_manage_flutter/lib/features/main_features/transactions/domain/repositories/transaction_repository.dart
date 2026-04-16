@@ -5,11 +5,28 @@ import '../../../../category/data/model/local/category_local_model.dart';
 import '../../data/model/local/transaction_local_model.dart';
 
 abstract class TransactionRepository {
-  Future<List<TransactionLocalModel>> loadTransByMonth(
-    int page,
-    int month,
-    int year, {
+  // Future<List<TransactionLocalModel>> loadTransByMonth(
+  //   int page,
+  //   int month,
+  //   int year, {
+  //   TransactionType? type,
+  // });
+
+  Future<List<TransactionLocalModel>> getLocalTransactions({
+    required int page,
+    required int month,
+    required int year,
     TransactionType? type,
+    required int limit,
+  });
+
+  Future<Either<Failure, List<TransactionLocalModel>>>
+  fetchAndSaveRemoteTransactions({
+    required int page,
+    required int month,
+    required int year,
+    TransactionType? type,
+    required int limit,
   });
 
   Future<List<CategoryLocalModel>> getCategoryThroughTrans(

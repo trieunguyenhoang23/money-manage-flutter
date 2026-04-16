@@ -3,7 +3,6 @@ import '../../../../category/data/datasource/local/category_local_datasource.dar
 import '../../../../category/data/model/local/category_local_model.dart';
 import '../../../../main_features/transactions/data/datasource/local/transactions_local_datasource.dart';
 import '../../../../main_features/transactions/data/model/local/transaction_local_model.dart';
-import '../../../data/model/sync_delta_model.dart';
 
 @lazySingleton
 class TransactionPullService {
@@ -15,8 +14,8 @@ class TransactionPullService {
     this._transactionsLocalDatasource,
   );
 
-  Future<void> saveCategoryIfNeeded(SyncDeltaModel syncDelta) async {
-    final categories = syncDelta.data
+  Future<void> saveCategoryIfNeeded(List<dynamic> rawData) async {
+    final categories = rawData
         .map((item) => item['category'])
         .whereType<Map<String, dynamic>>()
         .map<CategoryLocalModel>((json) => CategoryLocalModel.fromRemote(json))
@@ -28,9 +27,9 @@ class TransactionPullService {
     }
   }
 
-  Future<void> removeTransaction(SyncDeltaModel syncDelta) async {
+  Future<void> removeTransaction(List<dynamic> rawData) async {
     // Filter list ID need to remove
-    final toDeleteIds = syncDelta.data
+    final toDeleteIds = rawData
         .where((item) => item['is_deleted'] == true)
         .map((item) => item['id'].toString())
         .toList();
@@ -42,10 +41,10 @@ class TransactionPullService {
   }
 
   Future<List<TransactionLocalModel>> saveUpdatedTransaction(
-    SyncDeltaModel syncDelta,
+    List<dynamic> rawData,
   ) async {
     // Filter updated data
-    final toUpdate = syncDelta.data
+    final toUpdate = rawData
         .where((item) => item['is_deleted'] != true)
         .map((item) => TransactionLocalModel.fromRemote(item))
         .toList();

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
