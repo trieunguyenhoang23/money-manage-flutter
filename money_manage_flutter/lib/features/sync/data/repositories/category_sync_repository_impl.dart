@@ -19,14 +19,12 @@ class CategorySyncRepositoryImpl implements CategorySyncRepository {
     this._onlineActionGuard,
   );
 
-  int limitCount = SizeAppUtils().isTablet ? 20 : 10;
-
   @override
-  Future<Either<Failure, SyncDeltaModel>> loadCateDelta({
+  Future<Either<Failure, SyncDeltaModel>> pullCategoryDelta({
     String? lastTimeSync,
-    int page = 0,
+    required int page,
+    required int limitCount,
   }) async {
-    // 1. Gọi Remote API
     final result = await _syncRemoteDatasource.getCategorySyncDelta(
       lastTimeSync: lastTimeSync,
       page: page,
@@ -39,34 +37,22 @@ class CategorySyncRepositoryImpl implements CategorySyncRepository {
       );
     }
 
-    // 2. Parse wrapper data
-    final List<dynamic> rawList = result.data['data'] ?? [];
-    final bool hasMore = result.data['hasMore'] ?? false;
-    final String serverTime = result.data['serverTime'] ?? '';
+    final SyncDeltaModel syncDelta = SyncDeltaModel.fromJson(result.data);
 
-    if (rawList.isEmpty) {
-      return Right(
-        SyncDeltaModel(data: [], hasMore: false, serverTime: serverTime),
-      );
+    if (syncDelta.data.isEmpty) {
+      return Right(syncDelta);
     }
 
-    // 3. Chuyển đổi sang Local Model
+    // Parse data
     final remoteData = await parseListJsonIsolate(
       CategoryLocalModel.fromRemote,
-      rawList,
+      syncDelta.data,
     );
 
-    // 4. Lưu vào Local (Chỉ cần saveAll vì không có logic xóa)
-    // Isar .putAll sẽ tự cập nhật các bản ghi cũ dựa trên ID
+    // Save to local
     await _categoryLocalDatasource.saveAll(remoteData);
 
-    return Right(
-      SyncDeltaModel(
-        data: remoteData,
-        hasMore: hasMore,
-        serverTime: serverTime,
-      ),
-    );
+    return Right(syncDelta);
   }
 
   @override
@@ -77,7 +63,7 @@ class CategorySyncRepositoryImpl implements CategorySyncRepository {
   }
 
   @override
-  Future<Either<Failure, int>> syncCategory(int limitCount) async {
+  Future<Either<Failure, int>> pushCategoryDelta(int limitCount) async {
     Either<Failure, int> result = const Left(NetworkFailure("Not Internet"));
 
     await _onlineActionGuard.run((currentUserId, isConnected) async {
@@ -91,6 +77,7 @@ class CategorySyncRepositoryImpl implements CategorySyncRepository {
           return;
         }
 
+        // Create payload Json
         final manifest = {
           'categories': categories.map((e) => e.toJson()).toList(),
         };

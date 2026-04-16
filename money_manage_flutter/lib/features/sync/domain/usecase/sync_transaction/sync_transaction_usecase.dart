@@ -1,8 +1,7 @@
 import 'package:money_manage_flutter/export/core_external.dart';
-import '../../../../../core/utils/size_app_utils.dart';
 import '../../../data/model/sync_batch_progress.dart';
-import 'pull_transaction_use_case.dart';
-import 'push_transaction_use_case.dart';
+import 'pull_transaction_usecase.dart';
+import 'push_transaction_usecase.dart';
 
 @LazySingleton()
 class SyncTransactionUseCase {
@@ -10,8 +9,6 @@ class SyncTransactionUseCase {
   final PullTransactionUseCase _pullUseCase;
 
   SyncTransactionUseCase(this._pushUseCase, this._pullUseCase);
-
-  int limitCount = SizeAppUtils().isTablet ? 20 : 1;
 
   Stream<SyncBatchProgress> execute() async* {
     try {

@@ -3,12 +3,13 @@ import '../../../../core/error/failure.dart';
 import '../../data/model/sync_delta_model.dart';
 
 abstract class CategorySyncRepository {
-  Future<Either<Failure, SyncDeltaModel>> loadCateDelta({
+  Future<Either<Failure, SyncDeltaModel>> pullCategoryDelta({
     String? lastTimeSync,
-    int page = 0,
+    required int page,
+    required int limitCount,
   });
 
   Future<({int total, int notSynced})> getCategorySyncStatus();
 
-  Future<Either<Failure, int>> syncCategory(int limitCount);
+  Future<Either<Failure, int>> pushCategoryDelta(int limitCount);
 }

@@ -17,7 +17,7 @@ class PullTransactionUseCase {
     this._transactionSyncStore,
   );
 
-  int limitCount = SizeAppUtils().isTablet ? 20 : 1;
+  int get _limit => SizeAppUtils().isTablet ? 20 : 10;
 
   Stream<SyncBatchProgress> execute() async* {
     final schema = SyncSchema.transaction;
@@ -27,42 +27,43 @@ class PullTransactionUseCase {
     int currentPage = 0;
 
     while (hasMore) {
-      final pullResult = await _transactionSyncRepository.pullTransactionDelta(
+      final result = await _transactionSyncRepository.pullTransactionDelta(
         lastTimeSync: lastSync,
         page: currentPage,
-        limitCount: limitCount,
+        limitCount: _limit,
       );
 
-      final syncResponse = pullResult.fold(
+      final response = result.fold(
         (failure) => throw failure,
-        (response) => response,
+        (success) => success,
       );
 
-      hasMore = syncResponse.hasMore;
+      hasMore = response.hasMore;
+      double progress = _calculateProgress(currentPage, hasMore);
 
-      // Don't know the total number of pages, gradually increase the progress bar but limit it to 0.95
-      double pullProgress = 0.5 + (0.45 * (1 - (1 / (currentPage + 1))));
-      // Reach to 1.0 when finish
-      if (!hasMore) pullProgress = 1.0;
+      if (!hasMore) {
+        await _updateSyncMetadata(schema, response.serverTime);
+      }
 
       yield SyncBatchProgress(
         type: SyncType.transaction,
         current: currentPage + 1,
-        total: -1,
-        overallProgress: pullProgress,
+        total: -1, // Don't know exact page
+        overallProgress: progress,
       );
-
-      if (!hasMore) {
-        await _updateSyncMetadata(schema, syncResponse.serverTime);
-        await _transactionSyncStore.clearAllSyncProgress();
-      }
 
       currentPage++;
     }
   }
 
+  double _calculateProgress(int page, bool hasMore) {
+    if (!hasMore) return 1.0;
+    return 0.5 + (0.45 * (1 - (1 / (page + 1))));
+  }
+
   Future<void> _updateSyncMetadata(SyncSchema schema, String serverTime) async {
     await _syncLocalStorage.setLastSyncTime(schema, serverTime);
     await _syncLocalStorage.setFirstSyncCompleted(schema, true);
+    await _transactionSyncStore.clearAllSyncProgress();
   }
 }

@@ -32,11 +32,13 @@ class CategoryRepositoryImpl implements CategoryRepository {
     TransactionType type,
   ) async {
     try {
+      final now = DateTime.now();
       CategoryLocalModel categoryLocalModel = CategoryLocalModel(
         name: name,
         description: desc,
         type: type,
-        createdAt: DateTime.now(),
+        createdAt: now,
+        updatedAt: now,
       );
 
       // Upload data to server if isLogin = true

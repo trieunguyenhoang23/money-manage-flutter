@@ -101,11 +101,16 @@ import '../../features/sync/domain/service/transaction/transaction_pull_service.
 import '../../features/sync/domain/service/transaction/transaction_push_service.dart'
     as _i834;
 import '../../features/sync/domain/sync_task/i_sync_task.dart' as _i418;
-import '../../features/sync/domain/usecase/sync_category_usecase.dart' as _i773;
-import '../../features/sync/domain/usecase/sync_transaction/pull_transaction_use_case.dart'
-    as _i799;
-import '../../features/sync/domain/usecase/sync_transaction/push_transaction_use_case.dart'
-    as _i217;
+import '../../features/sync/domain/usecase/sync_category/pull_category_usecase.dart'
+    as _i363;
+import '../../features/sync/domain/usecase/sync_category/push_category_usecase.dart'
+    as _i750;
+import '../../features/sync/domain/usecase/sync_category/sync_category_usecase.dart'
+    as _i5;
+import '../../features/sync/domain/usecase/sync_transaction/pull_transaction_usecase.dart'
+    as _i89;
+import '../../features/sync/domain/usecase/sync_transaction/push_transaction_usecase.dart'
+    as _i940;
 import '../../features/sync/domain/usecase/sync_transaction/sync_transaction_usecase.dart'
     as _i85;
 import '../../features/sync/presentation/provider/sync_manager_provider.dart'
@@ -261,6 +266,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i64.OnlineActionGuard>(),
       ),
     );
+    gh.factory<_i750.PushCategoryUseCase>(
+      () => _i750.PushCategoryUseCase(gh<_i975.CategorySyncRepository>()),
+    );
     gh.lazySingleton<_i579.AnalyticsRepository>(
       () => _i706.AnalyticsRepositoryImpl(
         gh<_i773.AnalyticsLocalDatasource>(),
@@ -293,14 +301,14 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i197.CategoryLocalDatasource>(),
       ),
     );
-    gh.factory<_i773.SyncCateUseCase>(
-      () => _i773.SyncCateUseCase(
+    gh.factory<_i363.PullCategoryUseCase>(
+      () => _i363.PullCategoryUseCase(
         gh<_i975.CategorySyncRepository>(),
         gh<_i852.SyncLocalStorage>(),
       ),
     );
-    gh.lazySingleton<_i799.PullTransactionUseCase>(
-      () => _i799.PullTransactionUseCase(
+    gh.lazySingleton<_i89.PullTransactionUseCase>(
+      () => _i89.PullTransactionUseCase(
         gh<_i831.TransactionSyncRepository>(),
         gh<_i852.SyncLocalStorage>(),
         gh<_i261.TransactionSyncStore>(),
@@ -316,8 +324,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i767.GetOverviewUseCase>(
       () => _i767.GetOverviewUseCase(gh<_i579.AnalyticsRepository>()),
     );
-    gh.lazySingleton<_i217.PushTransactionUseCase>(
-      () => _i217.PushTransactionUseCase(gh<_i831.TransactionSyncRepository>()),
+    gh.lazySingleton<_i940.PushTransactionUseCase>(
+      () => _i940.PushTransactionUseCase(gh<_i831.TransactionSyncRepository>()),
     );
     gh.lazySingleton<_i429.AuthUseCase>(
       () => _i429.AuthUseCase(gh<_i168.UserRepository>()),
@@ -345,12 +353,15 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i85.SyncTransactionUseCase>(
       () => _i85.SyncTransactionUseCase(
-        gh<_i217.PushTransactionUseCase>(),
-        gh<_i799.PullTransactionUseCase>(),
+        gh<_i940.PushTransactionUseCase>(),
+        gh<_i89.PullTransactionUseCase>(),
       ),
     );
-    gh.lazySingleton<_i951.CategorySyncTask>(
-      () => _i951.CategorySyncTask(gh<_i773.SyncCateUseCase>()),
+    gh.factory<_i5.SyncCateUseCase>(
+      () => _i5.SyncCateUseCase(
+        gh<_i750.PushCategoryUseCase>(),
+        gh<_i363.PullCategoryUseCase>(),
+      ),
     );
     gh.lazySingleton<_i100.LogoutUseCase>(
       () => _i100.LogoutUseCase(
@@ -364,6 +375,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i539.TransactionSyncTask>(
       () => _i539.TransactionSyncTask(gh<_i85.SyncTransactionUseCase>()),
+    );
+    gh.lazySingleton<_i951.CategorySyncTask>(
+      () => _i951.CategorySyncTask(gh<_i5.SyncCateUseCase>()),
     );
     gh.factory<List<_i418.ISyncTask>>(
       () => moduleDI.provideSyncTasks(

@@ -49,8 +49,8 @@ class _SyncProgressSlideWidgetState
   @override
   Widget build(BuildContext context) {
     final List<Widget> syncWidget = const [
-      SyncProgressBuilderWidget(syncType: SyncType.transaction),
       SyncProgressBuilderWidget(syncType: SyncType.category),
+      SyncProgressBuilderWidget(syncType: SyncType.transaction),
     ];
 
     double w = 1.sw - 0.05.sw;

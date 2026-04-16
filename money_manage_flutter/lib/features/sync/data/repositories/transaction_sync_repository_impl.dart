@@ -2,7 +2,6 @@ import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import '../../../main_features/transactions/data/datasource/local/transactions_local_datasource.dart';
-import '../../../main_features/transactions/data/model/local/transaction_local_model.dart';
 import '../../domain/repositories/transaction_sync_repository.dart';
 import '../../domain/service/transaction/transaction_pull_service.dart';
 import '../../domain/service/transaction/transaction_push_service.dart';
@@ -51,16 +50,9 @@ class TransactionSyncRepositoryImpl implements TransactionSyncRepository {
     await _transactionPullService.removeTransaction(syncDelta);
 
     // Update transaction
-    List<TransactionLocalModel> updatedList = await _transactionPullService
-        .saveUpdatedTransaction(syncDelta);
+    await _transactionPullService.saveUpdatedTransaction(syncDelta);
 
-    return Right(
-      SyncDeltaModel(
-        data: updatedList,
-        hasMore: syncDelta.hasMore,
-        serverTime: syncDelta.serverTime,
-      ),
-    );
+    return Right(syncDelta);
   }
 
   @override

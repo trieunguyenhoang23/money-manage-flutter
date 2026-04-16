@@ -5,7 +5,7 @@ import '../../model/local/category_local_model.dart';
 
 @LazySingleton()
 class CategoryLocalDatasource {
-  Isar _isar;
+  final Isar _isar;
 
   CategoryLocalDatasource(this._isar);
 
