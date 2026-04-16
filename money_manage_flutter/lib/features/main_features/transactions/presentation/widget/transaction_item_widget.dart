@@ -192,13 +192,13 @@ class TransactionItemWidget extends ConsumerWidget {
       (error) {
         DialogUtils.handleDecision(context, title: error.message);
       },
-      (isSuccess) {
+      (isSuccess) async {
         final container = ProviderScope.containerOf(context, listen: false);
         final syncKey = container.read(transactionFilterProvider);
         final notifier = container.read(
           loadingTransactionProvider(syncKey).notifier,
         );
-        notifier.refresh();
+        await notifier.refresh();
       },
     );
   }

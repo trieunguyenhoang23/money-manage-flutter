@@ -34,7 +34,6 @@ class LogoutUseCase {
     await _syncLocalStorage.resetSync(SyncSchema.transaction);
     await _syncLocalStorage.resetSync(SyncSchema.reminder);
     await _transactionSyncStore.clearAllSyncProgress();
-
     await _secureStorage.deleteAll();
   }
 }

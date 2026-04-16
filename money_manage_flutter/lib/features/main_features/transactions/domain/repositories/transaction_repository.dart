@@ -5,13 +5,6 @@ import '../../../../category/data/model/local/category_local_model.dart';
 import '../../data/model/local/transaction_local_model.dart';
 
 abstract class TransactionRepository {
-  // Future<List<TransactionLocalModel>> loadTransByMonth(
-  //   int page,
-  //   int month,
-  //   int year, {
-  //   TransactionType? type,
-  // });
-
   Future<List<TransactionLocalModel>> getLocalTransactions({
     required int page,
     required int month,
@@ -35,10 +28,8 @@ abstract class TransactionRepository {
   );
 
   Future<Either<Failure, TransactionLocalModel>> addTransaction({
-    required double amount,
-    required String note,
+    required TransactionLocalModel transaction,
     required CategoryLocalModel category,
-    required DateTime transactionAt,
     FilePicked? imageFile,
   });
 
@@ -46,6 +37,7 @@ abstract class TransactionRepository {
     required Map<String, dynamic> updateJsonRequestBody,
     required TransactionLocalModel oldItem,
     required CategoryLocalModel newCate,
+    required bool isDeleteImg,
     FilePicked? imageFile,
   });
 

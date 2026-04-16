@@ -318,6 +318,21 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i940.PushTransactionUseCase>(
       () => _i940.PushTransactionUseCase(gh<_i831.TransactionSyncRepository>()),
     );
+    gh.lazySingleton<_i874.TransactionRepository>(
+      () => _i716.TransactionRepositoryImpl(
+        gh<_i407.TransactionsRemoteDatasource>(),
+        gh<_i1013.TransactionsLocalDatasource>(),
+        gh<_i858.OnlineActionGuard>(),
+        gh<_i54.TransactionPullService>(),
+      ),
+    );
+    gh.lazySingleton<_i233.LoadingTransactionUseCase>(
+      () => _i233.LoadingTransactionUseCase(
+        gh<_i874.TransactionRepository>(),
+        gh<_i261.TransactionSyncStore>(),
+        gh<_i858.OnlineActionGuard>(),
+      ),
+    );
     gh.lazySingleton<_i429.AuthUseCase>(
       () => _i429.AuthUseCase(gh<_i168.UserRepository>()),
     );
@@ -327,19 +342,25 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1069.LoadingCategoryUseCase>(
       () => _i1069.LoadingCategoryUseCase(gh<_i869.CategoryRepository>()),
     );
-    gh.lazySingleton<_i874.TransactionRepository>(
-      () => _i716.TransactionRepositoryImpl(
-        gh<_i407.TransactionsRemoteDatasource>(),
-        gh<_i1013.TransactionsLocalDatasource>(),
-        gh<_i858.OnlineActionGuard>(),
-        gh<_i261.TransactionSyncStore>(),
-        gh<_i54.TransactionPullService>(),
-      ),
+    gh.lazySingleton<_i168.GetPopularCategoryUseCase>(
+      () => _i168.GetPopularCategoryUseCase(gh<_i874.TransactionRepository>()),
+    );
+    gh.lazySingleton<_i269.RemoveTransactionUseCase>(
+      () => _i269.RemoveTransactionUseCase(gh<_i874.TransactionRepository>()),
+    );
+    gh.lazySingleton<_i947.UpdateTransactionUseCase>(
+      () => _i947.UpdateTransactionUseCase(gh<_i874.TransactionRepository>()),
     );
     gh.lazySingleton<_i85.SyncTransactionUseCase>(
       () => _i85.SyncTransactionUseCase(
         gh<_i940.PushTransactionUseCase>(),
         gh<_i89.PullTransactionUseCase>(),
+      ),
+    );
+    gh.lazySingleton<_i373.CreateTransactionUseCase>(
+      () => _i373.CreateTransactionUseCase(
+        gh<_i874.TransactionRepository>(),
+        gh<_i261.TransactionSyncStore>(),
       ),
     );
     gh.factory<_i5.SyncCateUseCase>(
@@ -357,25 +378,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i558.FlutterSecureStorage>(),
         gh<_i261.TransactionSyncStore>(),
       ),
-    );
-    gh.lazySingleton<_i233.LoadingTransactionUseCase>(
-      () => _i233.LoadingTransactionUseCase(
-        gh<_i874.TransactionRepository>(),
-        gh<_i261.TransactionSyncStore>(),
-        gh<_i64.OnlineActionGuard>(),
-      ),
-    );
-    gh.lazySingleton<_i373.CreateTransactionUseCase>(
-      () => _i373.CreateTransactionUseCase(gh<_i874.TransactionRepository>()),
-    );
-    gh.lazySingleton<_i168.GetPopularCategoryUseCase>(
-      () => _i168.GetPopularCategoryUseCase(gh<_i874.TransactionRepository>()),
-    );
-    gh.lazySingleton<_i269.RemoveTransactionUseCase>(
-      () => _i269.RemoveTransactionUseCase(gh<_i874.TransactionRepository>()),
-    );
-    gh.lazySingleton<_i947.UpdateTransactionUseCase>(
-      () => _i947.UpdateTransactionUseCase(gh<_i874.TransactionRepository>()),
     );
     gh.lazySingleton<_i539.TransactionSyncTask>(
       () => _i539.TransactionSyncTask(gh<_i85.SyncTransactionUseCase>()),

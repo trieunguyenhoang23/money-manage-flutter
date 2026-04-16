@@ -1,4 +1,5 @@
 import 'package:money_manage_flutter/export/core_external.dart';
+import 'package:money_manage_flutter/features/main_features/transactions/data/datasource/sync/transaction_sync_key.dart';
 import '../../../../../core/utils/size_app_utils.dart';
 import '../../../../main_features/transactions/data/datasource/sync/transaction_sync_store.dart';
 import '../../../data/datasource/local/sync_local_storage.dart';
@@ -64,6 +65,11 @@ class PullTransactionUseCase {
   Future<void> _updateSyncMetadata(SyncSchema schema, String serverTime) async {
     await _syncLocalStorage.setLastSyncTime(schema, serverTime);
     await _syncLocalStorage.setFirstSyncCompleted(schema, true);
-    await _transactionSyncStore.clearAllSyncProgress();
+
+    /// Reset Transaction Sync Key
+    DateTime dateTime = DateTime.parse(serverTime);
+    await _transactionSyncStore.reset(
+      TransactionSyncKey(year: dateTime.year, month: dateTime.month),
+    );
   }
 }

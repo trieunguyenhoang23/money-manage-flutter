@@ -18,10 +18,26 @@ class UpdateTransactionUseCase {
     required CategoryLocalModel newCate,
     FilePicked? imageFile,
   }) async {
+    bool hasChanged = oldItem.merge(
+      amountTemp: updateJsonRequestBody['amount'] ?? oldItem.amount,
+      noteTemp: updateJsonRequestBody['note'] ?? oldItem.note,
+      transactionAtTemp: updateJsonRequestBody['transaction_at'] != null
+          ? DateTime.parse(updateJsonRequestBody['transaction_at'])
+          : oldItem.transactionAt,
+      cateTemp: newCate,
+      newImageBytes: imageFile?.bytes,
+    );
+
+    /// Just update if any data change
+    bool isDeleteImg = updateJsonRequestBody['delete_image'] ?? false;
+
+    if (!hasChanged && !isDeleteImg) return Right(oldItem);
+
     return await _repository.updateTransaction(
       updateJsonRequestBody: updateJsonRequestBody,
       oldItem: oldItem,
       newCate: newCate,
+      isDeleteImg: isDeleteImg,
       imageFile: imageFile,
     );
   }

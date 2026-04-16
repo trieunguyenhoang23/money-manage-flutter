@@ -160,7 +160,7 @@ class TransactionsLocalDatasource {
   }
 
   Future<void> removeTransaction(TransactionLocalModel transaction) async {
-    _isar.writeTxn(() async {
+    await _isar.writeTxn(() async {
       await _isar.transactionLocalModels.delete(transaction.id);
     });
   }

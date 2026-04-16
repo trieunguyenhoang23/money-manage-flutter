@@ -30,6 +30,7 @@ class LoadingTransactionUseCase {
     await _onlineActionGuard.run((userId, status) async {
       /// Check sync Status
       if (_shouldSkipSync(syncKey)) return;
+      print('_shouldSkipSync(syncKey) ${_shouldSkipSync(syncKey)}');
 
       final progress = _transactionSyncStore.getProgress(syncKey);
 

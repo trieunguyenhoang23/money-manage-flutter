@@ -7,8 +7,6 @@ import '../../../../sync/domain/service/transaction/transaction_pull_service.dar
 import '../../domain/repositories/transaction_repository.dart';
 import '../datasource/local/transactions_local_datasource.dart';
 import '../datasource/remote/transactions_remote_datasource.dart';
-import '../datasource/sync/transaction_sync_key.dart';
-import '../datasource/sync/transaction_sync_store.dart';
 import '../model/local/transaction_local_model.dart';
 
 @LazySingleton(as: TransactionRepository)
@@ -16,18 +14,14 @@ class TransactionRepositoryImpl implements TransactionRepository {
   final TransactionsRemoteDatasource _remoteDatasource;
   final TransactionsLocalDatasource _localDatasource;
   final OnlineActionGuard _onlineActionGuard;
-  final TransactionSyncStore _syncStore;
   final TransactionPullService _transactionPullService;
 
   TransactionRepositoryImpl(
     this._remoteDatasource,
     this._localDatasource,
     this._onlineActionGuard,
-    this._syncStore,
     this._transactionPullService,
   );
-
-  int limitCount = SizeAppUtils().isTablet ? 20 : 10;
 
   @override
   Future<List<CategoryLocalModel>> getCategoryThroughTrans(
@@ -39,35 +33,18 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
   @override
   Future<Either<Failure, TransactionLocalModel>> addTransaction({
-    required double amount,
-    required String note,
+    required TransactionLocalModel transaction,
     required CategoryLocalModel category,
-    required DateTime transactionAt,
     FilePicked? imageFile,
   }) async {
-    final now = DateTime.now();
-
-    TransactionLocalModel transaction = TransactionLocalModel(
-      amount: amount,
-      note: note,
-      type: category.type ?? TransactionType.EXPENSE,
-      categoryId: category.idServer!,
-      transactionAt: transactionAt,
-      createdAt: now,
-      updatedAt: now,
-      imageBytes: imageFile?.bytes,
-      isSynced: false,
-    );
-
     // Add more properties if logged in
     await _onlineActionGuard.run((currentActiveUserId, networkStatus) async {
-      String imageName =
-          '${currentActiveUserId}_${DateTime.now().millisecondsSinceEpoch}.${imageFile?.extension}';
       // Upload Transaction to Server
       final result = await _remoteDatasource.uploadTransaction(
         transaction.toJson(),
         image_description_buffer: imageFile?.bytes,
-        image_name: imageName,
+        image_name:
+            '${currentActiveUserId}_${DateTime.now().millisecondsSinceEpoch}.${imageFile?.extension}',
       );
 
       if (result.isSuccess) {
@@ -80,14 +57,6 @@ class TransactionRepositoryImpl implements TransactionRepository {
     });
 
     await _localDatasource.putTransaction(transaction, category);
-
-    // Reset sync key
-    final syncKey = TransactionSyncKey(
-      year: transactionAt.year,
-      month: transactionAt.month,
-      type: null, // Reset tab ALL
-    );
-    await _syncStore.reset(syncKey);
 
     return Right(transaction);
   }
@@ -153,16 +122,16 @@ class TransactionRepositoryImpl implements TransactionRepository {
         return;
       }
 
-      await _remoteDatasource.removeTransaction(transaction.idServer!).then((
-        result,
-      ) {
-        if (result.isFailure) {
-          syncResult = false;
-          error = result.error?.message;
-          return;
-        }
-        syncResult = true;
-      });
+      final result = await _remoteDatasource.removeTransaction(
+        transaction.idServer ?? '',
+      );
+
+      if (result.isFailure) {
+        syncResult = false;
+        error = result.error?.message;
+        return;
+      }
+      syncResult = true;
     });
 
     if (syncResult) {
@@ -173,55 +142,38 @@ class TransactionRepositoryImpl implements TransactionRepository {
     return Left(ServerFailure(error ?? ''));
   }
 
+
   @override
   Future<Either<Failure, TransactionLocalModel>> updateTransaction({
     required Map<String, dynamic> updateJsonRequestBody,
     required TransactionLocalModel oldItem,
     required CategoryLocalModel newCate,
+    required bool isDeleteImg,
     FilePicked? imageFile,
   }) async {
-    bool hasChanged = oldItem.merge(
-      amountTemp: updateJsonRequestBody['amount'] ?? oldItem.amount,
-      noteTemp: updateJsonRequestBody['note'] ?? oldItem.note,
-      transactionAtTemp: updateJsonRequestBody['transaction_at'] != null
-          ? DateTime.parse(updateJsonRequestBody['transaction_at'])
-          : oldItem.transactionAt,
-      cateTemp: newCate,
-      newImageBytes: imageFile?.bytes,
-    );
+    await _onlineActionGuard.run((currentActiveUserId, networkStatus) async {
+      // Update Transaction to Server
+      final result = await _remoteDatasource.updateTransaction(
+        id: oldItem.idServer ?? '',
+        updateJsonRequestBody,
+        image_description_buffer: imageFile?.bytes,
+        image_name:
+            '${currentActiveUserId}_${DateTime.now().millisecondsSinceEpoch}.${imageFile?.extension}',
+      );
 
-    /// Just update if any data change
-    bool isDeleteImg = updateJsonRequestBody['delete_image'] ?? false;
+      if (result.isFailure) return;
 
-    if (hasChanged || isDeleteImg) {
-      await _onlineActionGuard.run((currentActiveUserId, networkStatus) async {
-        String imageName =
-            '${currentActiveUserId}_${DateTime.now().millisecondsSinceEpoch}.${imageFile?.extension}';
+      String? imgUrlTemp = isDeleteImg
+          ? null
+          : result.data['image_description'] ?? oldItem.imageUrl;
 
-        // Update Transaction to Server
-        await _remoteDatasource
-            .updateTransaction(
-              id: oldItem.idServer ?? '',
-              updateJsonRequestBody,
-              image_description_buffer: imageFile?.bytes,
-              image_name: imageName,
-            )
-            .then((result) async {
-              if (result.isFailure) return;
-
-              String? imgUrlTemp = isDeleteImg
-                  ? null
-                  : result.data['image_description'] ?? oldItem.imageUrl;
-
-              oldItem
-                ..imageUrl = imgUrlTemp
-                ..imageBytes = null
-                ..userId = currentActiveUserId
-                ..isSynced = true;
-            });
-      });
-      await _localDatasource.putTransaction(oldItem, newCate);
-    }
+      oldItem
+        ..imageUrl = imgUrlTemp
+        ..imageBytes = null
+        ..userId = currentActiveUserId
+        ..isSynced = true;
+    });
+    await _localDatasource.putTransaction(oldItem, newCate);
 
     return Right(oldItem);
   }
