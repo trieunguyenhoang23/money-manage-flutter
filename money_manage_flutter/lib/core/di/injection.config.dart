@@ -298,13 +298,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i852.SyncLocalStorage>(),
       ),
     );
-    gh.lazySingleton<_i89.PullTransactionUseCase>(
-      () => _i89.PullTransactionUseCase(
-        gh<_i831.TransactionSyncRepository>(),
-        gh<_i852.SyncLocalStorage>(),
-        gh<_i261.TransactionSyncStore>(),
-      ),
-    );
     gh.lazySingleton<_i1031.GetCategoriesAnalyticsUseCase>(
       () =>
           _i1031.GetCategoriesAnalyticsUseCase(gh<_i579.AnalyticsRepository>()),
@@ -350,6 +343,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i947.UpdateTransactionUseCase>(
       () => _i947.UpdateTransactionUseCase(gh<_i874.TransactionRepository>()),
+    );
+    gh.lazySingleton<_i89.PullTransactionUseCase>(
+      () => _i89.PullTransactionUseCase(
+        gh<_i831.TransactionSyncRepository>(),
+        gh<_i852.SyncLocalStorage>(),
+      ),
     );
     gh.lazySingleton<_i85.SyncTransactionUseCase>(
       () => _i85.SyncTransactionUseCase(

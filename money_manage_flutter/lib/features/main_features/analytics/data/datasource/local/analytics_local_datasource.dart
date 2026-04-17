@@ -1,11 +1,10 @@
 import 'package:injectable/injectable.dart';
 import 'package:isar_community/isar.dart';
 import 'package:money_manage_flutter/core/enum/transaction_type.dart';
+import 'package:money_manage_flutter/core/utils/string_utils.dart';
 import 'package:money_manage_flutter/features/category/data/model/local/category_local_model.dart';
 import 'package:money_manage_flutter/features/main_features/analytics/data/model/category_analytics_model.dart';
 import 'package:money_manage_flutter/features/main_features/transactions/data/model/local/transaction_local_model.dart';
-
-import '../../model/overview_analytics_model.dart';
 
 @LazySingleton()
 class AnalyticsLocalDatasource {
@@ -83,58 +82,37 @@ class AnalyticsLocalDatasource {
         .toList();
   }
 
-  Future<OverviewAnalytics> getOverview(
-    DateTime startDate,
-    DateTime endDate,
+  Future<Map<String, dynamic>> getCumulativeData(
+    DateTime start,
+    DateTime end,
+    String groupBy,
   ) async {
-    // Normalize Dates
-    final start = DateTime(
-      startDate.year,
-      startDate.month,
-      startDate.day,
-      0,
-      0,
-      0,
-    );
-    final end = DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59);
-
-    final diffInDays = end.difference(start).inDays;
-    String groupBy = (diffInDays <= 31)
-        ? 'day'
-        : (diffInDays <= 900)
-        ? 'month'
-        : 'year';
-
-    // Calculate Initial Totals (Opening Balance)
-    final pastTransactions = await _isar.transactionLocalModels
+    /// GET opening INCOME & EXPENSE
+    double runningIncome = await _isar.transactionLocalModels
         .filter()
         .transactionAtLessThan(start)
-        .findAll();
+        .typeEqualTo(TransactionType.INCOME)
+        .amountProperty()
+        .sum();
 
-    double runningIncome = 0;
-    double runningExpense = 0;
-    for (var tx in pastTransactions) {
-      if (tx.type == TransactionType.INCOME) {
-        runningIncome += tx.amount;
-      } else {
-        runningExpense += tx.amount;
-      }
-    }
+    double runningExpense = await _isar.transactionLocalModels
+        .filter()
+        .transactionAtLessThan(start)
+        .typeEqualTo(TransactionType.EXPENSE)
+        .amountProperty()
+        .sum();
 
-    // Fetch Current Range Transactions
-    final currentTransactions = await _isar.transactionLocalModels
+    /// GET transaction by date range
+    final transactions = await _isar.transactionLocalModels
         .filter()
         .transactionAtBetween(start, end)
         .sortByTransactionAt()
         .findAll();
 
-    // Fill missing slots (Jan, Feb, etc.)
+    /// Mapping data by label
     final Map<String, _PeriodSum> groupedMap = {};
-
-    // Aggregate actual data into slots
-    for (var tx in currentTransactions) {
-      final key = _getGroupKey(tx.transactionAt, groupBy);
-
+    for (var tx in transactions) {
+      final key = StringUtils.formatGroupKey(tx.transactionAt, groupBy);
       groupedMap.putIfAbsent(key, () => _PeriodSum());
 
       if (tx.type == TransactionType.INCOME) {
@@ -144,54 +122,28 @@ class AnalyticsLocalDatasource {
       }
     }
 
-    // Cumulative Transformation
-    final List<OverviewPoint> points = [];
     final sortedKeys = groupedMap.keys.toList()..sort();
+    final List<Map<String, dynamic>> cumulativeData = [];
 
-    double runningIncomeTemp = runningIncome;
-    double runningExpenseTemp = runningExpense;
-
-    for (int i = 0; i < sortedKeys.length; i++) {
-      final key = sortedKeys[i];
+    for (var key in sortedKeys) {
       final period = groupedMap[key]!;
 
-      // Update cumulative
-      runningIncomeTemp += period.income;
-      runningExpenseTemp += period.expense;
+      /// Cumulative logic
+      runningIncome += period.income;
+      runningExpense += period.expense;
 
-      final currentBalance = runningIncomeTemp - runningExpenseTemp;
-
-      TrendingPattern trend = i == 0
-          ? TrendingPattern.none
-          : OverviewPoint.calculateTrend(currentBalance, points[i - 1].balance);
-
-      points.add(
-        OverviewPoint(
-          label: key,
-          income: runningIncomeTemp,
-          expense: runningExpenseTemp,
-          balance: currentBalance,
-          trend: trend,
-        ),
-      );
+      cumulativeData.add({
+        'label': key,
+        'income': runningIncome, // In = Σ Income_t
+        'expense': runningExpense, // En = Σ Expense_t
+      });
     }
 
-    return OverviewAnalytics(groupType: groupBy, points: points);
+    return {'data': cumulativeData};
   }
 }
 
 class _PeriodSum {
   double income = 0;
   double expense = 0;
-}
-
-String _getGroupKey(DateTime date, String groupBy) {
-  if (groupBy == 'year') {
-    return "${date.year}-01-01";
-  }
-  if (groupBy == 'month') {
-    return "${date.year}-${date.month.toString().padLeft(2, '0')}-01";
-  }
-
-  return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
 }

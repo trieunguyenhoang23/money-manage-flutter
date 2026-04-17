@@ -1,7 +1,5 @@
 import 'package:money_manage_flutter/export/core_external.dart';
-import 'package:money_manage_flutter/features/main_features/transactions/data/datasource/sync/transaction_sync_key.dart';
 import '../../../../../core/utils/size_app_utils.dart';
-import '../../../../main_features/transactions/data/datasource/sync/transaction_sync_store.dart';
 import '../../../data/datasource/local/sync_local_storage.dart';
 import '../../../data/model/sync_batch_progress.dart';
 import '../../repositories/transaction_sync_repository.dart';
@@ -10,12 +8,10 @@ import '../../repositories/transaction_sync_repository.dart';
 class PullTransactionUseCase {
   final TransactionSyncRepository _transactionSyncRepository;
   final SyncLocalStorage _syncLocalStorage;
-  final TransactionSyncStore _transactionSyncStore;
 
   PullTransactionUseCase(
     this._transactionSyncRepository,
     this._syncLocalStorage,
-    this._transactionSyncStore,
   );
 
   int get _limit => SizeAppUtils().isTablet ? 20 : 10;
@@ -65,11 +61,5 @@ class PullTransactionUseCase {
   Future<void> _updateSyncMetadata(SyncSchema schema, String serverTime) async {
     await _syncLocalStorage.setLastSyncTime(schema, serverTime);
     await _syncLocalStorage.setFirstSyncCompleted(schema, true);
-
-    /// Reset Transaction Sync Key
-    DateTime dateTime = DateTime.parse(serverTime);
-    await _transactionSyncStore.reset(
-      TransactionSyncKey(year: dateTime.year, month: dateTime.month),
-    );
   }
 }

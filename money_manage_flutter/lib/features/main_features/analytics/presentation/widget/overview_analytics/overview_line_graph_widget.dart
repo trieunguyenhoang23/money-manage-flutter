@@ -104,7 +104,6 @@ class _LineBar extends LineChartBarData {
     double width = 2,
     bool filled = false,
   }) : super(
-         isCurved: true,
          curveSmoothness: 0.5,
          barWidth: width,
          dotData: const FlDotData(show: false),

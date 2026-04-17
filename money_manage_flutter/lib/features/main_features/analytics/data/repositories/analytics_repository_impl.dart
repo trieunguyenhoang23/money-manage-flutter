@@ -6,7 +6,6 @@ import '../../domain/repositories/analytics_repository.dart';
 import '../datasource/local/analytics_local_datasource.dart';
 import '../datasource/remote/analytics_remote_datasource.dart';
 import '../model/category_analytics_model.dart';
-import '../model/overview_analytics_model.dart';
 
 @LazySingleton(as: AnalyticsRepository)
 class AnalyticsRepositoryImpl implements AnalyticsRepository {
@@ -97,12 +96,13 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
   }
 
   @override
-  Future<Either<Failure, OverviewAnalytics>> getOverviewAnalytics(
+  Future<Either<Failure, Map<String, dynamic>>> getOverviewAnalytics(
     DateTime dateStart,
     DateTime dateEnd,
+    String groupBy,
   ) async {
-    OverviewAnalytics overviewAnalytics = await _analyticsLocalDatasource
-        .getOverview(dateStart, dateEnd);
+    Map<String, dynamic> overviewAnalytics = await _analyticsLocalDatasource
+        .getCumulativeData(dateStart, dateEnd, groupBy);
     String? error;
 
     await _onlineActionGuard.run((currentUserId, isConnected) async {
@@ -110,10 +110,12 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
         SyncSchema.transaction,
       );
 
+      /// Only fetch data from server if sync data hasn't done
       if (!isTransSynced) {
         final result = await _analyticsRemoteDatasource.getOverviewAnalytics(
           dateStart.formatServerStart,
           dateEnd.formatServerEnd,
+          groupBy,
         );
 
         if (result.isFailure) {
@@ -121,10 +123,8 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
           return;
         }
 
-        overviewAnalytics = await parseItemJsonIsolate(
-          OverviewAnalytics.fromJson,
-          result.data,
-        );
+        /// Assign the correct data from server
+        overviewAnalytics = result.data;
       }
     });
 

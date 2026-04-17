@@ -31,10 +31,15 @@ class AnalyticsRemoteDatasource {
   Future<ApiResult> getOverviewAnalytics(
     String startDate,
     String endDate,
+    String groupBy,
   ) async {
     return await _dioService.getNoCache(
       AnalyticsAPI.get_overview,
-      queryParameters: {'startDate': startDate, 'endDate': endDate},
+      queryParameters: {
+        'startDate': startDate,
+        'endDate': endDate,
+        'groupBy': groupBy,
+      },
     );
   }
 }

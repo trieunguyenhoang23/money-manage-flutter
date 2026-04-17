@@ -1,7 +1,6 @@
 import 'package:dartz/dartz.dart';
 import '../../../../../core/error/failure.dart';
 import '../../data/model/category_analytics_model.dart';
-import '../../data/model/overview_analytics_model.dart';
 
 abstract class AnalyticsRepository {
   Future<Either<Failure, Tuple3<double, double, double>>> getFinancialData();
@@ -12,8 +11,9 @@ abstract class AnalyticsRepository {
     DateTime dateEnd,
   );
 
-  Future<Either<Failure, OverviewAnalytics>> getOverviewAnalytics(
+  Future<Either<Failure, Map<String, dynamic>>> getOverviewAnalytics(
     DateTime dateStart,
     DateTime dateEnd,
+    String groupBy,
   );
 }

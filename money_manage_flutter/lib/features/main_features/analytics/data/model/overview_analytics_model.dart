@@ -52,7 +52,7 @@ class OverviewPoint {
     'trend': trend.name,
   };
 
-  static TrendingPattern calculateTrend(double current, double previous) {
+  static TrendingPattern identifyTrend(double current, double previous) {
     if (current > previous) return TrendingPattern.up;
     if (current < previous) return TrendingPattern.down;
     return TrendingPattern.flatten;

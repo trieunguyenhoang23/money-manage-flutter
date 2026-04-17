@@ -37,4 +37,15 @@ class StringUtils {
     }
     return val.toStringAsFixed(1);
   }
+
+  static String formatGroupKey(DateTime date, String groupBy) {
+    if (groupBy == 'year') {
+      return "${date.year}-01-01";
+    }
+    if (groupBy == 'month') {
+      return "${date.year}-${date.month.toString().padLeft(2, '0')}-01";
+    }
+
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+  }
 }

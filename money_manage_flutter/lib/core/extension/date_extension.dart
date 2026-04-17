@@ -25,27 +25,22 @@ extension DateTimeLocaleX on DateTime? {
 
   String get formatServerStart {
     if (this == null) return '';
-    return DateTime(
-      this!.year,
-      this!.month,
-      this!.day,
-      0,
-      0,
-      0,
-    ).toUtc().toIso8601String();
+    return this!.formatStartOfDay!.toUtc().toIso8601String();
   }
 
   String get formatServerEnd {
     if (this == null) return '';
-    return DateTime(
-      this!.year,
-      this!.month,
-      this!.day,
-      23,
-      59,
-      59,
-      999,
-    ).toUtc().toIso8601String();
+    return this!.formatEndOfDay!.toUtc().toIso8601String();
+  }
+
+  DateTime? get formatStartOfDay {
+    if (this == null) return null;
+    return DateTime(this!.year, this!.month, this!.day, 0, 0, 0);
+  }
+
+  DateTime? get formatEndOfDay {
+    if (this == null) return null;
+    return DateTime(this!.year, this!.month, this!.day, 23, 59, 59, 999);
   }
 
   /// Line graph
