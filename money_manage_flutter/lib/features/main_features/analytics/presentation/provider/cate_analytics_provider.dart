@@ -52,11 +52,10 @@ final cateAnalyticsProvider = FutureProvider.family
         if (totalSum == 0) return const Tuple3([], [], 0);
 
         List<PieChartSectionData> pieChartData = data.map((item) {
-          final percentage = (item.totalAmount / totalSum) * 100;
           return PieChartSectionData(
             color: generateUniqueColorById(item.id),
             value: item.totalAmount,
-            title: '${item.name} \n ${percentage.toStringAsFixed(1)}%',
+            title: '${item.name} \n ${item.percentage.toStringAsFixed(1)}%',
             radius: 50,
             titleStyle: GoogleFonts.montserrat(
               color: Colors.white,

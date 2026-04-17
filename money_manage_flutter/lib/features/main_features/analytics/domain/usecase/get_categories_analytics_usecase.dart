@@ -15,10 +15,22 @@ class GetCategoriesAnalyticsUseCase {
     DateTime dateStart,
     DateTime dateEnd,
   ) async {
-    return await _analyticsRepository.getSpendingCateAnalytics(
+    /// Standardization range time
+    final startStandardization = dateStart.formatStartOfDay!;
+    final endStandardization = dateEnd.formatEndOfDay!;
+
+    final result =  await _analyticsRepository.getSpendingCateAnalytics(
       type.name.toUpperCase(),
-      dateStart,
-      dateEnd,
+      startStandardization,
+      endStandardization,
     );
+
+    return result.map((list) {
+      final total = list.fold<double>(0, (sum, item) => sum + item.totalAmount);
+
+      return list.map((item) => item.copyWith(
+        percentage: total > 0 ? (item.totalAmount / total) * 100 : 0,
+      )).toList();
+    });
   }
 }

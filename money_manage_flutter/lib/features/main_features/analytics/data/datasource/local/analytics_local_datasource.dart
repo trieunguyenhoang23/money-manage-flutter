@@ -1,10 +1,9 @@
 import 'package:injectable/injectable.dart';
 import 'package:isar_community/isar.dart';
-import 'package:money_manage_flutter/core/enum/transaction_type.dart';
-import 'package:money_manage_flutter/core/utils/string_utils.dart';
+import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/features/category/data/model/local/category_local_model.dart';
-import 'package:money_manage_flutter/features/main_features/analytics/data/model/category_analytics_model.dart';
 import 'package:money_manage_flutter/features/main_features/transactions/data/model/local/transaction_local_model.dart';
+import '../../model/category_analytics_model.dart';
 
 @LazySingleton()
 class AnalyticsLocalDatasource {
@@ -33,17 +32,6 @@ class AnalyticsLocalDatasource {
     DateTime dateStart,
     DateTime dateEnd,
   ) async {
-    // Date range
-    final lower = DateTime(dateStart.year, dateStart.month, dateStart.day);
-    final upper = DateTime(
-      dateEnd.year,
-      dateEnd.month,
-      dateEnd.day,
-      23,
-      59,
-      59,
-    );
-
     final categories = await _isar.categoryLocalModels
         .filter()
         .typeEqualTo(type)
@@ -53,7 +41,7 @@ class AnalyticsLocalDatasource {
         .filter()
         .typeEqualTo(type)
         .and()
-        .transactionAtBetween(lower, upper)
+        .transactionAtBetween(dateStart, dateEnd)
         .findAll();
 
     return categories

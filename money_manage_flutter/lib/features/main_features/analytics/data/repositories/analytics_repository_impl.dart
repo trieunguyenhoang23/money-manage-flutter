@@ -72,6 +72,7 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
         SyncSchema.transaction,
       );
 
+
       if (!isCatSynced || !isTransSynced) {
         final result = await _analyticsRemoteDatasource.getCategoryAnalytics(
           type,
