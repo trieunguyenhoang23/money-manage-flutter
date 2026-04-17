@@ -69,7 +69,6 @@ class ProfileNotifier extends AsyncNotifier<ProfileState> {
     Future.microtask(() {
       ref.invalidate(loadingCategoryProvider);
       ref.invalidate(loadingTransactionProvider);
-      ref.invalidate(loadingCategoryByTypeProvider);
       ref.invalidate(overviewBalanceProvider);
       ref.invalidate(quickSelectCategoryProvider);
       ref.invalidate(syncManagerProvider);

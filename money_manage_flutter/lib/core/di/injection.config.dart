@@ -236,14 +236,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i472.SyncRemoteDatasource>(
       () => _i472.SyncRemoteDatasource(gh<_i989.DioService>()),
     );
-    gh.lazySingleton<_i869.CategoryRepository>(
-      () => _i528.CategoryRepositoryImpl(
-        gh<_i702.CategoryRemoteDatasource>(),
-        gh<_i197.CategoryLocalDatasource>(),
-        gh<_i858.OnlineActionGuard>(),
-        gh<_i852.SyncLocalStorage>(),
-      ),
-    );
     gh.lazySingleton<_i857.ISocketClientService>(
       () => _i623.SocketClientServiceImpl(
         gh<_i858.OnlineActionGuard>(),
@@ -275,6 +267,13 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i940.AnalyticsRemoteDatasource>(),
         gh<_i858.OnlineActionGuard>(),
         gh<_i852.SyncLocalStorage>(),
+      ),
+    );
+    gh.lazySingleton<_i869.CategoryRepository>(
+      () => _i528.CategoryRepositoryImpl(
+        gh<_i702.CategoryRemoteDatasource>(),
+        gh<_i197.CategoryLocalDatasource>(),
+        gh<_i858.OnlineActionGuard>(),
       ),
     );
     gh.lazySingleton<_i845.CreateCategoryUseCase>(
@@ -332,9 +331,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i870.UpdateCurrencyUseCase>(
       () => _i870.UpdateCurrencyUseCase(gh<_i168.UserRepository>()),
     );
-    gh.lazySingleton<_i1069.LoadingCategoryUseCase>(
-      () => _i1069.LoadingCategoryUseCase(gh<_i869.CategoryRepository>()),
-    );
     gh.lazySingleton<_i168.GetPopularCategoryUseCase>(
       () => _i168.GetPopularCategoryUseCase(gh<_i874.TransactionRepository>()),
     );
@@ -347,6 +343,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i89.PullTransactionUseCase>(
       () => _i89.PullTransactionUseCase(
         gh<_i831.TransactionSyncRepository>(),
+        gh<_i852.SyncLocalStorage>(),
+      ),
+    );
+    gh.lazySingleton<_i1069.LoadingCategoryUseCase>(
+      () => _i1069.LoadingCategoryUseCase(
+        gh<_i869.CategoryRepository>(),
         gh<_i852.SyncLocalStorage>(),
       ),
     );

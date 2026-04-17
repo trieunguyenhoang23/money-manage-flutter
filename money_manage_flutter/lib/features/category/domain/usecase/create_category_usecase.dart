@@ -25,7 +25,16 @@ class CreateCategoryUseCase {
       return Left(ValidationFailure(ValidationCode.descriptionEmpty));
     }
 
+    final now = DateTime.now();
+    CategoryLocalModel categoryLocalModel = CategoryLocalModel(
+      name: name,
+      description: desc,
+      type: type,
+      createdAt: now,
+      updatedAt: now,
+    );
+
     // If valid, proceed to repository
-    return await repository.createCategory(name, desc, type);
+    return await repository.createCategory(categoryLocalModel);
   }
 }

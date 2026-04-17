@@ -1,25 +1,23 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/error/failure.dart';
-import '../../../../core/enum/transaction_type.dart';
 import '../../data/model/local/category_local_model.dart';
 
 abstract class CategoryRepository {
   Future<Either<Failure, CategoryLocalModel>> createCategory(
-    String name,
-    String desc,
-    TransactionType type,
+    CategoryLocalModel categoryLocalModel,
   );
 
   Future<Either<Failure, CategoryLocalModel>> editCategory(
-      Map<String,dynamic> updatedJson,
-
-      CategoryLocalModel oldItem,
+    Map<String, dynamic> updatedJson,
+    CategoryLocalModel oldItem,
+    bool hasChanged,
   );
 
-  Future<List<CategoryLocalModel>> loadCategoryByPage(int page);
-
-  Future<List<CategoryLocalModel>> loadCategoryByType(int page, TransactionType type);
-
+  Future<List<CategoryLocalModel>> loadCategoryByPage(
+    int page,
+    int limitCount,
+    bool isSynced,
+  );
 
   Future<void> clearAllData();
 }

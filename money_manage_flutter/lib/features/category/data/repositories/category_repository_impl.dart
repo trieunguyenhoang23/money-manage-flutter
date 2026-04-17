@@ -1,6 +1,5 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
-import '../../../sync/data/datasource/local/sync_local_storage.dart';
 import '../../domain/repositories/category_repository.dart';
 import '../datasource/local/category_local_datasource.dart';
 import '../datasource/remote/category_remote_datasource.dart';
@@ -12,35 +11,20 @@ class CategoryRepositoryImpl implements CategoryRepository {
   final CategoryRemoteDatasource _remoteDatasource;
   final CategoryLocalDatasource _localDatasource;
   final OnlineActionGuard _onlineActionGuard;
-  final SyncLocalStorage _syncLocalStorage;
 
   CategoryRepositoryImpl(
     this._remoteDatasource,
     this._localDatasource,
     this._onlineActionGuard,
-    this._syncLocalStorage,
   );
-
-  int limitCount = SizeAppUtils().isTablet ? 20 : 10;
 
   /// CRUD
   ///POST
   @override
   Future<Either<Failure, CategoryLocalModel>> createCategory(
-    String name,
-    String desc,
-    TransactionType type,
+    CategoryLocalModel categoryLocalModel,
   ) async {
     try {
-      final now = DateTime.now();
-      CategoryLocalModel categoryLocalModel = CategoryLocalModel(
-        name: name,
-        description: desc,
-        type: type,
-        createdAt: now,
-        updatedAt: now,
-      );
-
       // Upload data to server if isLogin = true
       await _onlineActionGuard.run((currentActiveUserId, networkStatus) async {
         await _remoteDatasource
@@ -64,12 +48,12 @@ class CategoryRepositoryImpl implements CategoryRepository {
 
   /// GET
   @override
-  Future<List<CategoryLocalModel>> loadCategoryByPage(int page) async {
+  Future<List<CategoryLocalModel>> loadCategoryByPage(
+    int page,
+    int limitCount,
+    bool isSynced,
+  ) async {
     var localData = await _localDatasource.loadByPage(page, limitCount);
-
-    final isSynced = _syncLocalStorage.isFirstSyncCompleted(
-      SyncSchema.category,
-    );
 
     if (!isSynced && localData.length < limitCount) {
       await _onlineActionGuard.run((currentActiveUserId, networkStatus) async {
@@ -90,52 +74,14 @@ class CategoryRepositoryImpl implements CategoryRepository {
     return localData;
   }
 
-  @override
-  Future<List<CategoryLocalModel>> loadCategoryByType(
-    int page,
-    TransactionType type,
-  ) async {
-    var localData = await _localDatasource.loadByType(page, limitCount, type);
-
-    await _onlineActionGuard.run((currentActiveUserId, networkStatus) async {
-      bool isPartialPage = localData.length < limitCount;
-      if (isPartialPage) {
-        // Fetch data from server
-        await _remoteDatasource.loadCateByPage(page, limitCount).then((
-          result,
-        ) async {
-          if (result.isFailure) return;
-
-          final localModels = await parseListJsonIsolate(
-            CategoryLocalModel.fromRemote,
-            result.data,
-          );
-
-          // Save to local Isar
-          await _localDatasource.saveAll(localModels);
-          localData = await _localDatasource.loadByType(page, limitCount, type);
-        });
-      }
-    });
-
-    return localData;
-  }
-
   /// PATCH
   @override
   Future<Either<Failure, CategoryLocalModel>> editCategory(
     Map<String, dynamic> updatedJson,
     CategoryLocalModel oldItem,
+    bool hasChanged,
   ) async {
     try {
-      bool hasChanged = oldItem.merge(
-        newName: updatedJson['name'],
-        newDescription: updatedJson['description'],
-        newType: updatedJson['type'] != null
-            ? TransactionType.fromDynamic(updatedJson['type'])
-            : null,
-      );
-
       /// Just update if any properties change
       if (hasChanged) {
         await _onlineActionGuard.run((

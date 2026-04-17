@@ -1,5 +1,4 @@
 import 'package:hooks_riverpod/legacy.dart';
-import 'package:money_manage_flutter/core/enum/transaction_type.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import '../../../../core/di/injection.dart';
 import '../../data/model/local/category_local_model.dart';
@@ -17,18 +16,4 @@ final loadingCategoryProvider =
       );
     });
 
-final loadingCategoryByTypeProvider = StateNotifierProvider
-    .family<
-      PullToRefreshNotifier<CategoryLocalModel>,
-      PullToRefreshState<CategoryLocalModel>,
-      TransactionType
-    >((ref, type) {
-      return PullToRefreshNotifier(
-        fetchPage: (page) async {
-          return await getIt<LoadingCategoryUseCase>().execute(
-            page,
-            type: type,
-          );
-        },
-      );
-    });
+

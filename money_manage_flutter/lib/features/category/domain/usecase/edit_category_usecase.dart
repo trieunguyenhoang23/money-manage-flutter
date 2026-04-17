@@ -24,6 +24,14 @@ class EditCategoryUseCase {
       return Left(ValidationFailure(ValidationCode.descriptionEmpty));
     }
 
-    return await repository.editCategory(updatedJson, oldItem);
+    bool hasChanged = oldItem.merge(
+      newName: updatedJson['name'],
+      newDescription: updatedJson['description'],
+      newType: updatedJson['type'] != null
+          ? TransactionType.fromDynamic(updatedJson['type'])
+          : null,
+    );
+
+    return await repository.editCategory(updatedJson, oldItem, hasChanged);
   }
 }
