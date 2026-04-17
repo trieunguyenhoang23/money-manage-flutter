@@ -28,6 +28,7 @@ final socketObserverProvider = Provider<void>((ref) {
     ref.onDispose(() {
       subscription.cancel();
       socketService.dispose();
+      debugPrint('Subscription cancelled, but Socket kept alive');
     });
   }
 });
@@ -38,7 +39,10 @@ final syncObserverProvider = Provider<void>((ref) {
     next.progress.forEach((type, currentProgress) {
       final prevProgress = previous?.progress[type]?.overallProgress ?? 0.0;
 
-      if (currentProgress.overallProgress >= 1.0 && prevProgress < 1.0) {
+      if (currentProgress.overallProgress >= 1.0 &&
+          prevProgress < 1.0 &&
+          /// Not update UI when SyncType is all
+          ref.read(syncManagerProvider).currentSync != SyncType.all) {
         _handleSyncCompletion(ref, type);
       }
     });
@@ -54,8 +58,8 @@ void _handleSyncCompletion(Ref ref, SyncType type) {
       ref.invalidate(loadingTransactionProvider);
       break;
     case SyncType.all:
-      ref.invalidate(loadingCategoryProvider);
-      ref.invalidate(loadingTransactionProvider);
+      // ref.invalidate(loadingCategoryProvider);
+      // ref.invalidate(loadingTransactionProvider);
       break;
   }
 }

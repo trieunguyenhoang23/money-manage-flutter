@@ -1,5 +1,7 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 import 'package:dartz/dartz.dart';
+import 'package:money_manage_flutter/core/constant/string_constant.dart';
 import 'package:money_manage_flutter/core/network/online_action_guard.dart';
 import '../../../../../core/error/failure.dart';
 import '../../domain/repositories/user_repository.dart';
@@ -14,12 +16,14 @@ class UserRepositoryImpl implements UserRepository {
   final UserRemoteDatasource _remoteDatasource;
   final SocialAuthFactory _socialAuthFactory;
   final OnlineActionGuard _onlineActionGuard;
+  final FlutterSecureStorage _secureStorage;
 
   UserRepositoryImpl(
     this._localDatasource,
     this._remoteDatasource,
     this._socialAuthFactory,
     this._onlineActionGuard,
+    this._secureStorage,
   );
 
   @override
@@ -54,6 +58,26 @@ class UserRepositoryImpl implements UserRepository {
     } catch (e) {
       return Left(CacheFailure('Failed to save user session $e'));
     }
+  }
+
+  @override
+  Future<Either<Failure, bool>> logOut() async {
+    bool isLogout = false;
+    String? error;
+    await _onlineActionGuard.run((currentUserId, networkStatus) async {
+      final result = await _remoteDatasource.logout(
+        await _secureStorage.read(key: refreshTokenKey) ?? '',
+      );
+      if (result.isFailure) {
+        error = result.error!.message;
+        return;
+      }
+
+      isLogout = result.data['success'] ?? false;
+    });
+
+    if (error != null) return Left(ServerFailure(error!));
+    return Right(isLogout);
   }
 
   @override

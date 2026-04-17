@@ -4,11 +4,12 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:money_manage_flutter/core/constant/string_constant.dart';
 import 'package:money_manage_flutter/core/di/injection.dart';
 import 'package:money_manage_flutter/export/infrastructure.dart';
-import 'package:money_manage_flutter/features/sync/presentation/provider/sync_manager_provider.dart';
 import '../../../firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
+
+import '../../../infrastructure/network/socket/i_socket_client_service.dart';
 
 final splashProvider =
     AsyncNotifierProvider.autoDispose<SplashProvider, double>(
@@ -19,7 +20,6 @@ class SplashProvider extends AsyncNotifier<double> {
   @override
   FutureOr<double> build() async {
     await initialize();
-    ref.read(syncManagerProvider.notifier).initSync();
     return 1;
   }
 

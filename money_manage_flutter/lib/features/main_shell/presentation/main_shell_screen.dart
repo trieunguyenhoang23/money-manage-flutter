@@ -1,3 +1,5 @@
+import 'package:money_manage_flutter/shared/widget/component/connection_wifi_widget.dart';
+
 import 'main_tab.dart';
 import 'widget/bottom_navigation_widget.dart';
 import 'package:money_manage_flutter/export/router.dart';
@@ -54,60 +56,70 @@ class _MainShellScreenState extends State<MainShellScreen> {
           ],
         ),
         body: widget.navigationShell,
-        bottomNavigationBar: Container(
-          width: wBottomBar,
-          height: hBottomBar,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-              topLeft: bottomBarRadius,
-              topRight: bottomBarRadius,
-            ),
-            boxShadow: [
-              shadowStyle(ColorConstant.neutral300, const Offset(0, 5), 10),
-            ],
-            color: context.colorScheme.surface,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              ///Bottom Bar Item
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.generate(bottomTabBars.length, (index) {
-                  final tab = bottomTabBars[index];
-                  final isSelected =
-                      widget.navigationShell.currentIndex == index;
+        bottomNavigationBar: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const ConnectionWifiWidget(),
+            const SpacingStyle(),
+            Container(
+              width: wBottomBar,
+              height: hBottomBar,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: bottomBarRadius,
+                  topRight: bottomBarRadius,
+                ),
+                boxShadow: [
+                  shadowStyle(ColorConstant.neutral300, const Offset(0, 5), 10),
+                ],
+                color: context.colorScheme.surface,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  ///Bottom Bar Item
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: List.generate(bottomTabBars.length, (index) {
+                      final tab = bottomTabBars[index];
+                      final isSelected =
+                          widget.navigationShell.currentIndex == index;
 
-                  double wItem = (1.sw / bottomTabBars.length).clamp(75, 100);
-                  double hItem = ((41 / 80) * hBottomBar).clamp(50, 60);
-
-                  return InkWell(
-                    onTap: () {
-                      NavigationShellHolder.shell?.goBranch(
-                        index,
-                        initialLocation: true,
+                      double wItem = (1.sw / bottomTabBars.length).clamp(
+                        75,
+                        100,
                       );
-                    },
-                    child: SizedBox(
-                      width: wItem,
-                      height: hItem,
-                      child: BottomNavigationWidget(
-                        tab: tab,
-                        isSelected: isSelected,
-                      ),
-                    ),
-                  );
-                }),
+                      double hItem = ((41 / 80) * hBottomBar).clamp(50, 60);
+
+                      return InkWell(
+                        onTap: () {
+                          NavigationShellHolder.shell?.goBranch(
+                            index,
+                            initialLocation: true,
+                          );
+                        },
+                        child: SizedBox(
+                          width: wItem,
+                          height: hItem,
+                          child: BottomNavigationWidget(
+                            tab: tab,
+                            isSelected: isSelected,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                  Container(
+                    color: Colors.white,
+                    height:
+                        MediaQuery.paddingOf(context).bottom /
+                        MediaQuery.devicePixelRatioOf(context),
+                  ),
+                ],
               ),
-              Container(
-                color: Colors.white,
-                height:
-                    MediaQuery.paddingOf(context).bottom /
-                    MediaQuery.devicePixelRatioOf(context),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

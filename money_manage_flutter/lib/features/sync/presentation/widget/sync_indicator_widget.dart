@@ -9,10 +9,10 @@ class SyncIndicatorWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isSyncing = ref.watch(syncManagerProvider).isSyncing;
+    final syncManagerState = ref.watch(syncManagerProvider);
+    final isSyncing = syncManagerState.isSyncing;
     ref.watch(socketObserverProvider);
     ref.watch(syncObserverProvider);
-
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 500),
       layoutBuilder: (currentChild, previousChildren) {

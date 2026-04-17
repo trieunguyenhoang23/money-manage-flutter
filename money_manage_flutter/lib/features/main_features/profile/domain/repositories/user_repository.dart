@@ -5,6 +5,7 @@ import 'package:dartz/dartz.dart';
 
 abstract class UserRepository {
   Future<Either<Failure, UserLocalModel>> signIn(AuthMethod method);
+  Future<Either<Failure, bool>> logOut();
 
   Future<String> getCurrency();
 

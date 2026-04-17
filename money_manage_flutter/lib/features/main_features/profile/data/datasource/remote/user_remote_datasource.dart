@@ -31,7 +31,16 @@ class UserRemoteDatasource {
   }
 
   Future<ApiResult> updateUserProperties(
-      Map<String, dynamic> jsonBodyRequest,) async {
+    Map<String, dynamic> jsonBodyRequest,
+  ) async {
     return await _dioService.patch(UserBaseAPI.patch_user, jsonBodyRequest);
+  }
+
+  Future<ApiResult> logout(String refreshToken) async {
+    return await _dioService.post(
+      UserAuthAPI.post_log_out,
+      {},
+      headers: {'x-refresh-token': refreshToken},
+    );
   }
 }

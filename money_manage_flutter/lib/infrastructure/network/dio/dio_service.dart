@@ -72,7 +72,13 @@ class DioService {
     Object? body, {
     Map<String, dynamic>? headers,
   }) {
-    return _request(() => _cachedDio.post<T>(endpoint, data: body));
+    return _request(
+      () => _cachedDio.post<T>(
+        endpoint,
+        data: body,
+        options: Options(headers: {...?headers}),
+      ),
+    );
   }
 
   Future<ApiResult<T>> postNoAuthorize<T>(

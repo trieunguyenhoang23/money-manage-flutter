@@ -250,14 +250,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i858.OnlineActionGuard>(),
       ),
     );
-    gh.lazySingleton<_i168.UserRepository>(
-      () => _i790.UserRepositoryImpl(
-        gh<_i809.UserLocalDatasource>(),
-        gh<_i1026.UserRemoteDatasource>(),
-        gh<_i989.SocialAuthFactory>(),
-        gh<_i64.OnlineActionGuard>(),
-      ),
-    );
     gh.factory<_i750.PushCategoryUseCase>(
       () => _i750.PushCategoryUseCase(gh<_i975.CategorySyncRepository>()),
     );
@@ -289,6 +281,15 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i858.OnlineActionGuard>(),
         gh<_i54.TransactionPullService>(),
         gh<_i834.TransactionPushService>(),
+      ),
+    );
+    gh.lazySingleton<_i168.UserRepository>(
+      () => _i790.UserRepositoryImpl(
+        gh<_i809.UserLocalDatasource>(),
+        gh<_i1026.UserRemoteDatasource>(),
+        gh<_i989.SocialAuthFactory>(),
+        gh<_i64.OnlineActionGuard>(),
+        gh<_i558.FlutterSecureStorage>(),
       ),
     );
     gh.factory<_i363.PullCategoryUseCase>(

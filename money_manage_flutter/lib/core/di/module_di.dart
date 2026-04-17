@@ -23,7 +23,8 @@ abstract class ModuleDI {
   Future<SharedPreferences> get prefs => SharedPreferences.getInstance();
 
   @lazySingleton
-  FlutterSecureStorage get secureStorage => const FlutterSecureStorage();
+  FlutterSecureStorage get secureStorage =>
+      const FlutterSecureStorage(aOptions: AndroidOptions(resetOnError: true));
 
   @Named(dioNoCache)
   @lazySingleton
@@ -95,14 +96,4 @@ abstract class ModuleDI {
   ) {
     return [categoryTask, transactionTask];
   }
-
-  // @lazySingleton
-  // List<NotificationHandler> provideNotificationHandlers(
-  //         OpenDetailWallpaperHandler openDetailWallpaperHandler) =>
-  //     [openDetailWallpaperHandler];
-  //
-  // @lazySingleton
-  // IapPlatformHandler provideIapPlatformHandler() {
-  //   return Platform.isAndroid ? IapAndroidHandler() : IapIosHandler();
-  // }
 }

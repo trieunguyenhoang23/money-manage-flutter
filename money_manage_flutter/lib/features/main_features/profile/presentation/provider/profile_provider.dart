@@ -2,7 +2,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import '../../../../../infrastructure/social_auth/social_auth_factory.dart';
 import '../../../../category/presentation/provider/category_provider.dart';
-import '../../../../sync/data/model/sync_batch_progress.dart';
 import '../../../../sync/presentation/provider/sync_manager_provider.dart';
 import '../../../../sync/presentation/provider/sync_provider.dart';
 import '../../../analytics/presentation/provider/overview_balance_provider.dart';
@@ -37,7 +36,6 @@ class ProfileNotifier extends AsyncNotifier<ProfileState> {
     result.fold((error) => ToastUtils.showToastFailed(error.message), (
       userLocal,
     ) async {
-      // Cập nhật state bằng AsyncData
       state = AsyncData(state.value!.copyWith(userLocalModel: userLocal));
 
       /// Refresh data từ server
@@ -53,12 +51,12 @@ class ProfileNotifier extends AsyncNotifier<ProfileState> {
           );
 
       ref.refresh(overviewBalanceProvider);
-      ref.read(syncManagerProvider.notifier).initSync(type: SyncType.all);
+      ref.invalidate(syncManagerProvider);
 
-      /// Register sync data in background
-      Future.delayed(const Duration(seconds: 3), () {
-        BackgroundTaskHelper.scheduleSync();
-      });
+      // /// Register sync data in background
+      // Future.delayed(const Duration(seconds: 3), () {
+      //   BackgroundTaskHelper.scheduleSync();
+      // });
     });
   }
 

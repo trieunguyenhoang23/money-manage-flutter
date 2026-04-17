@@ -23,10 +23,21 @@ class SocketClientServiceImpl implements ISocketClientService {
     if (_socket?.connected == true) return;
 
     await _onlineActionGuard.run((currentUserId, isConnectInternet) async {
+      final String? accessToken = await _secureStorage.read(key: tokenKey);
+
+      if (accessToken == null) {
+        debugPrint('Socket Init Cancelled: No Access Token found');
+        return;
+      }
+
       _socket = IO.io(APIConstants.bareUrl, <String, dynamic>{
         'transports': ['websocket'],
+        /**/
         'autoConnect': true,
         'forceNew': true,
+        'auth': {
+          'token': accessToken, // Transmit access token
+        },
       });
 
       _socket?.onConnect((_) async {
@@ -36,7 +47,6 @@ class SocketClientServiceImpl implements ISocketClientService {
         if (sId != null) {
           await _secureStorage.write(key: 'last_socket_id', value: sId);
         }
-        _socket?.emit('store-user', currentUserId);
       });
 
       _socket?.onConnectError(

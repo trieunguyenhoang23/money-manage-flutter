@@ -13,7 +13,6 @@ class AuthUseCase {
 
   Future<Either<Failure, UserLocalModel>> execute(AuthMethod method) async {
     final signInResult = await _userRepository.signIn(method);
-
     return signInResult;
   }
 }

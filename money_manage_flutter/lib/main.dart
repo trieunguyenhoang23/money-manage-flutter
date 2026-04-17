@@ -1,9 +1,6 @@
 import 'export/shared.dart';
 import 'export/core.dart';
 import 'export/ui_external.dart';
-import 'package:flutter/foundation.dart';
-import 'package:workmanager/workmanager.dart';
-import 'core/background/callback_dispatcher.dart';
 import 'generated/l10n.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -15,7 +12,7 @@ void main() async {
   await configureDependencies();
   await initializeDateFormatting();
 
-  await Workmanager().initialize(callbackDispatcher, isInDebugMode: kDebugMode);
+  // await Workmanager().initialize(callbackDispatcher, isInDebugMode: kDebugMode);
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -56,4 +53,3 @@ class MyApp extends ConsumerWidget {
     );
   }
 }
-

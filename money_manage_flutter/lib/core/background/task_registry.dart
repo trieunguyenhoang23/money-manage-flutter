@@ -1,5 +1,3 @@
-import 'package:money_manage_flutter/core/di/injection.dart';
-
 import 'tasks/i_background_task.dart';
 import 'tasks/sync_category_task.dart';
 import 'tasks/sync_transaction_task.dart';
@@ -16,9 +14,9 @@ class TaskRegistry {
   ) async {
     final task = _tasks[taskName];
     if (task != null) {
-      configureDependencies();
       return await task.run(inputData);
     }
     return false;
   }
 }
+

@@ -25,11 +25,12 @@ class LogoutUseCase {
   );
 
   Future<void> execute() async {
+    await _userRepository.logOut();
+
     await _transactionRepository.clearAllData();
     await _categoryRepository.clearAllData();
     await _userRepository.clearSession();
 
-    /// Reset loading data store
     await _syncLocalStorage.resetSync(SyncSchema.category);
     await _syncLocalStorage.resetSync(SyncSchema.transaction);
     await _syncLocalStorage.resetSync(SyncSchema.reminder);

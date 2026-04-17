@@ -21,5 +21,5 @@ class NetworkInfoImpl implements NetworkInfo {
 
   @override
   Stream<List<ConnectivityResult>> get onConnectivityChanged =>
-      _connectivity.onConnectivityChanged;
+      _connectivity.onConnectivityChanged.distinct();
 }

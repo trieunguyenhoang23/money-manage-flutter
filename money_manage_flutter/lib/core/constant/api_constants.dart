@@ -9,6 +9,9 @@ class UserAuthAPI {
 
   static String get post_refresh_token =>
       '${APIConstants.bareUrl}/post/user-auth/refresh_token';
+
+  static String get post_log_out =>
+      '${APIConstants.bareUrl}/post/user-auth/logout';
 }
 
 class UserBaseAPI {
