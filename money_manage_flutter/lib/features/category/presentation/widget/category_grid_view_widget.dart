@@ -73,7 +73,18 @@ class _CategoryGridViewWidgetState
 
     double hBtn = wBtn * 75 / 319;
 
-    if (state.errorMessage != null && state.visibleList.isEmpty) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      if (state.visibleList.isEmpty &&
+          !state.isLoading &&
+          state.errorMessage == null &&
+          notifier.page == 0) {
+        notifier.loadMore();
+      }
+    });
+
+    if (state.errorMessage != null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -93,54 +104,65 @@ class _CategoryGridViewWidgetState
       );
     }
 
-    if (state.visibleList.isEmpty && !state.isLoading) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        notifier.loadMore();
-      });
+    if (state.visibleList.isEmpty) {
+      if (!state.isLoading) {
+        return Center(
+          child: BtnMainWidget(
+            onTap: () {
+              NavigatorRouter.pushNamed(
+                context,
+                CategoryRoutes.createNewCateName,
+              );
+            },
+            w: 0.1.sw,
+            h: 0.1.sw,
+            color: ColorConstant.primary,
+            child: const Icon(Icons.add, color: Colors.white),
+          ),
+        );
+      }
+      return const Center(child: LoadingWidget());
     }
 
     return RefreshIndicator(
       onRefresh: () async {
         await notifier.refresh();
       },
-      child: state.visibleList.isEmpty && state.isLoading
-          ? const Center(child: LoadingWidget())
-          : NotificationListener<ScrollNotification>(
-              onNotification: (ScrollNotification scrollInfo) {
-                if (scrollInfo.metrics.pixels >=
-                    scrollInfo.metrics.maxScrollExtent) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    notifier.loadMore();
-                  });
-                }
-                return false;
-              },
-              child: GridViewBuilder(
-                scrollController: scrollController,
-                crossAxisCount: SizeAppUtils().isTablet ? 2 : 1,
-                itemCount: state.visibleList.length,
-                itemBuilder: (context, index) {
-                  CategoryLocalModel item = state.visibleList[index];
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification scrollInfo) {
+          if (scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              notifier.loadMore();
+            });
+          }
+          return false;
+        },
+        child: GridViewBuilder(
+          scrollController: scrollController,
+          crossAxisCount: SizeAppUtils().isTablet ? 2 : 1,
+          itemCount: state.visibleList.length,
+          itemBuilder: (context, index) {
+            CategoryLocalModel item = state.visibleList[index];
 
-                  return InkWell(
-                    onTap: () {
-                      if (widget.isPickedCate) {
-                        /// Return data
-                        Navigator.pop(context, item);
-                      } else {
-                        NavigatorRouter.pushNamed(
-                          context,
-                          CategoryRoutes.editCateName,
-                          extra: item,
-                        );
-                      }
-                    },
-                    child: CategoryItemWidget(item: item),
+            return InkWell(
+              onTap: () {
+                if (widget.isPickedCate) {
+                  /// Return data
+                  Navigator.pop(context, item);
+                } else {
+                  NavigatorRouter.pushNamed(
+                    context,
+                    CategoryRoutes.editCateName,
+                    extra: item,
                   );
-                },
-                childAspectRatio: 275 / 85,
-              ),
-            ),
+                }
+              },
+              child: CategoryItemWidget(item: item),
+            );
+          },
+          childAspectRatio: 275 / 85,
+        ),
+      ),
     );
   }
 }

@@ -51,7 +51,7 @@ class LineGraphContent extends StatelessWidget {
         LineChartData(
           minX: 0,
           maxX: model.maxX,
-          minY: 0,
+          minY: model.minY,
           maxY: model.maxY,
           // Draw horizontal reference grid lines
           gridData: _buildGridData(model.maxY),
@@ -87,7 +87,7 @@ class LineGraphContent extends StatelessWidget {
       show: true,
       drawVerticalLine: false,
       // Divide Y-axis into 5 equal segments
-      horizontalInterval: maxY / 5,
+      horizontalInterval: model.yInterval,
       getDrawingHorizontalLine: (val) => FlLine(
         color: ColorConstant.neutral200.withValues(alpha: 0.1),
         strokeWidth: 1,
@@ -131,10 +131,10 @@ class GraphTitlesConfig {
         sideTitles: SideTitles(
           showTitles: true,
           // Space reserved for Y-axis labels
-          reservedSize: 40,
+          reservedSize: 50,
           interval: model.yInterval,
           getTitlesWidget: (val, _) =>
-              TextGGStyle(StringUtils.formatYAxis(val), 0.025.sw),
+              TextGGStyle(StringUtils.formatYAxis(val), 0.025.sw, maxLines: 1),
         ),
       ),
 

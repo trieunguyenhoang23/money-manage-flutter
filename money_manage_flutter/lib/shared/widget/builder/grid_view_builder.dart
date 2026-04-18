@@ -25,9 +25,8 @@ class GridViewBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      // cacheExtent: double.infinity,
       scrollDirection: isScrollHorizontal ? Axis.horizontal : Axis.vertical,
-      // clipBehavior: Clip.none,
+      physics: const AlwaysScrollableScrollPhysics(),
       controller: scrollController,
       padding: EdgeInsets.zero,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

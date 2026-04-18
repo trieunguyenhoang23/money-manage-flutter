@@ -9,14 +9,14 @@ import '../widget/transaction_filter_widget.dart';
 import '../widget/transaction_grid_view_widget.dart';
 import '../widget/year_select_widget.dart';
 
-class TransactionsScreen extends StatefulWidget {
+class TransactionsScreen extends ConsumerStatefulWidget {
   const TransactionsScreen({super.key});
 
   @override
-  State<TransactionsScreen> createState() => _TransactionsScreenState();
+  ConsumerState<TransactionsScreen> createState() => _TransactionsScreenState();
 }
 
-class _TransactionsScreenState extends State<TransactionsScreen> {
+class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -66,7 +66,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                         ),
                   ),
                   const SliverToBoxAdapter(child: SpacingStyle()),
-                  const SliverFillRemaining(child: TransactionGridViewWidget()),
+                  const SliverFillRemaining(
+                    child: KeepAliveWidget(
+                      child: TransactionGridViewWidget(),
+                    ),
+                  ),
                 ],
               );
             },

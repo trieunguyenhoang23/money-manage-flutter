@@ -35,6 +35,7 @@ class OverviewGraphNotifier extends AsyncNotifier<OverviewGraphState> {
     final expenseSpots = <FlSpot>[];
     final balanceSpots = <FlSpot>[];
     double currentMaxY = 0;
+    double currentMinY = 0;
 
     for (final point in data.points) {
       // 1. Calculate axis-X
@@ -48,13 +49,12 @@ class OverviewGraphNotifier extends AsyncNotifier<OverviewGraphState> {
       expenseSpots.add(FlSpot(x, point.expense));
       balanceSpots.add(FlSpot(x, point.balance));
 
-      // 3. Up date MaxY (Padding 20%)
-      currentMaxY = [
-        currentMaxY,
-        point.income,
-        point.expense,
-        point.balance,
-      ].reduce((a, b) => a > b ? a : b);
+      // 3. Up date MaxY, MinY (Padding 20%)
+      final values = [point.income, point.expense, point.balance];
+      for (var v in values) {
+        if (v > currentMaxY) currentMaxY = v;
+        if (v < currentMinY) currentMinY = v;
+      }
     }
 
     return OverviewGraphState(
@@ -65,6 +65,7 @@ class OverviewGraphNotifier extends AsyncNotifier<OverviewGraphState> {
         range: range,
         groupType: data.groupType,
         rawMaxY: currentMaxY,
+        rawMinY: currentMinY,
       ),
       overViewAnalytics: data,
     );

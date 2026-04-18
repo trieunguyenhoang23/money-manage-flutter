@@ -9,6 +9,7 @@ class LineGraphModel {
   final Map<double, String> xLabels;
   final String groupType;
   final double maxY;
+  final double minY;
   final double maxX;
   final double xInterval;
   final double yInterval;
@@ -21,6 +22,7 @@ class LineGraphModel {
     required this.groupType,
     required this.maxX,
     required this.maxY,
+    required this.minY,
     required this.xInterval,
     required this.yInterval,
   });
@@ -31,6 +33,7 @@ class LineGraphModel {
     required List<FlSpot> balanceSpots,
     required String groupType,
     required double rawMaxY,
+    required double rawMinY,
     required DateTimeRange range,
   }) {
     final double maxX = range.end.calculateXValue(range.start, groupType);
@@ -56,7 +59,8 @@ class LineGraphModel {
     /// Calculate Interval
     // Y
     final maxY = rawMaxY == 0 ? 100.0 : rawMaxY * 1.2;
-    final yInterval = maxY / 5;
+    double minY = rawMinY < 0 ? rawMinY * 1.2 : 0;
+    final yInterval = (maxY - minY) / 5;
 
     // X
     double xInterval = maxX > 5 ? (maxX / 5).floorToDouble() : 1.0;
@@ -69,6 +73,7 @@ class LineGraphModel {
       xLabels: xLabels,
       groupType: groupType,
       maxY: maxY,
+      minY: minY,
       maxX: maxX,
       xInterval: xInterval,
       yInterval: yInterval,

@@ -22,6 +22,14 @@ class CreateTransactionScreen extends ConsumerStatefulWidget {
 class _CreateTransactionScreenState
     extends ConsumerState<CreateTransactionScreen> {
   final _formKey = GlobalKey<FormState>();
+  ScrollController scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    scrollController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +52,7 @@ class _CreateTransactionScreenState
           child: Form(
             key: _formKey,
             child: CustomScrollView(
+              controller: scrollController,
               slivers: [
                 for (var item in items) ...[
                   const SliverToBoxAdapter(child: SpacingStyle()),
@@ -105,6 +114,12 @@ class _CreateTransactionScreenState
           },
         );
       });
+    } else {
+      scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
     }
   }
 }

@@ -2,8 +2,6 @@ import 'package:go_router/go_router.dart';
 import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
-import '../../../../core/di/injection.dart';
-import '../../../../core/enum/transaction_type.dart';
 import '../../domain/usecase/create_category_usecase.dart';
 import '../provider/category_provider.dart';
 import '../widget/trans_type_segment_widget.dart';

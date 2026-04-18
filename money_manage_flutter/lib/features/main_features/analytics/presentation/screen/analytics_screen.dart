@@ -16,6 +16,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   @override
   Widget build(BuildContext context) {
     List<Widget> analyticsWidgets = [
+      const OverviewBalanceWidget(),
       AnalyticsWidget(
         title: context.lang.analytic_overview,
         iconData: Icons.stacked_line_chart,
@@ -31,7 +32,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     return PaddingStyle(
       child: CustomScrollView(
         slivers: [
-          const SliverToBoxAdapter(child: OverviewBalanceWidget()),
           for (var widget in analyticsWidgets) ...[
             const SliverToBoxAdapter(child: SpacingStyle()),
             SliverToBoxAdapter(child: widget),

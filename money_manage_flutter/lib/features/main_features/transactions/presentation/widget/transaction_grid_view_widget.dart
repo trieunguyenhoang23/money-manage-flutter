@@ -4,6 +4,7 @@ import 'package:money_manage_flutter/export/core.dart';
 import '../../data/model/local/transaction_local_model.dart';
 import '../provider/transaction_filter_provider.dart';
 import '../provider/transaction_provider.dart';
+import '../transaction_routes.dart';
 import 'transaction_item_widget.dart';
 
 class TransactionGridViewWidget extends ConsumerStatefulWidget {
@@ -64,7 +65,7 @@ class _TransactionGridViewWidgetState
     double wBtn = 0.4.sw;
     double hBtn = wBtn * 75 / 319;
 
-    if (state.errorMessage != null && state.visibleList.isEmpty) {
+    if (state.errorMessage != null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -84,40 +85,58 @@ class _TransactionGridViewWidgetState
       );
     }
 
+    if (state.visibleList.isEmpty) {
+      if (!state.isLoading) {
+        return Center(
+          child: BtnMainWidget(
+            onTap: () {
+              NavigatorRouter.pushNamed(
+                context,
+                TransactionsRoutes.createNewTransactionName,
+              );
+            },
+            w: 0.1.sw,
+            h: 0.1.sw,
+            color: ColorConstant.primary,
+            child: const Icon(Icons.add, color: Colors.white),
+          ),
+        );
+      }
+
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return RefreshIndicator(
       onRefresh: () async {
-        await notifier.refresh();
+        notifier.refresh();
       },
-      child: state.visibleList.isEmpty && state.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : NotificationListener<ScrollNotification>(
-              onNotification: (ScrollNotification scrollInfo) {
-                if (scrollInfo.metrics.pixels >=
-                    scrollInfo.metrics.maxScrollExtent) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (!state.isLoading && state.visibleList.isNotEmpty) {
-                      Future.microtask(() => notifier.loadMore());
-                    }
-                  });
-                }
-                return false;
-              },
-              child: GridViewBuilder(
-                scrollController: scrollController,
-                crossAxisCount: SizeAppUtils().isTablet ? 2 : 1,
-                itemCount: state.visibleList.length,
-                itemBuilder: (context, index) {
-                  TransactionLocalModel item = state.visibleList[index];
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (ScrollNotification scrollInfo) {
+          if (scrollInfo.metrics.pixels >= scrollInfo.metrics.maxScrollExtent) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!state.isLoading && state.visibleList.isNotEmpty) {
+                Future.microtask(() => notifier.loadMore());
+              }
+            });
+          }
+          return false;
+        },
+        child: GridViewBuilder(
+          scrollController: scrollController,
+          crossAxisCount: SizeAppUtils().isTablet ? 2 : 1,
+          itemCount: state.visibleList.length,
+          itemBuilder: (context, index) {
+            TransactionLocalModel item = state.visibleList[index];
 
-                  return LayoutBuilder(
-                    builder: (context, cc) {
-                      return TransactionItemWidget(item: item);
-                    },
-                  );
-                },
-                childAspectRatio: 4,
-              ),
-            ),
+            return LayoutBuilder(
+              builder: (context, cc) {
+                return TransactionItemWidget(item: item);
+              },
+            );
+          },
+          childAspectRatio: 4,
+        ),
+      ),
     );
   }
 }

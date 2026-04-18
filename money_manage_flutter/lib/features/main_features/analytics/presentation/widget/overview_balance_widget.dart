@@ -100,7 +100,6 @@ class OverViewItemWidget extends StatelessWidget {
                 child: TextGGStyle(title, cc.maxHeight * 0.2, maxLines: 1),
               ),
             ),
-
             Flexible(
               flex: 5,
               child: Consumer(
@@ -123,15 +122,26 @@ class OverViewItemWidget extends StatelessWidget {
                     );
                   }
 
-                  return TextGGStyle(
-                    StringUtils.formatPrice(
-                      amountState.toString(),
-                      currency.value ?? 'VND',
-                    ),
-                    cc.maxHeight * 0.25,
-                    maxLines: 1,
-                    fontWeight: FontWeight.bold,
-                    color: color,
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: TextGGStyle(
+                            StringUtils.formatPrice(
+                              amountState.toString(),
+                              currency.value ?? 'VND',
+                            ),
+                            textAlign: TextAlign.center,
+                            cc.maxHeight * 0.25,
+                            maxLines: 2,
+                            fontWeight: FontWeight.bold,
+                            color: amountState < 0 ? Colors.red : color,
+                          ),
+                        ),
+                      ),
+                      if (amountState < 0)
+                        const Icon(Icons.trending_down, color: Colors.red),
+                    ],
                   );
                 },
               ),
