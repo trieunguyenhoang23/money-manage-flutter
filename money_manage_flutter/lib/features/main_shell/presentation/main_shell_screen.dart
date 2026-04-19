@@ -26,7 +26,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
   @override
   Widget build(BuildContext context) {
     double wBottomBar = 1.sw;
-    double hBottomBar = (wBottomBar * 80 / 375).clamp(70, 90);
+    double hBottomBar = (wBottomBar * 80 / 375).clamp(70, 120);
     Radius bottomBarRadius = const Radius.circular(20);
 
     return PopScope(
@@ -111,7 +111,7 @@ class _MainShellScreenState extends State<MainShellScreen> {
                     }),
                   ),
                   Container(
-                    color: Colors.white,
+                    color: context.colorScheme.surface,
                     height:
                         MediaQuery.paddingOf(context).bottom /
                         MediaQuery.devicePixelRatioOf(context),

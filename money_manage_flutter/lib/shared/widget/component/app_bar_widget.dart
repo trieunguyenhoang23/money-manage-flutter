@@ -60,7 +60,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSize {
       ),
       title: TextGGStyle(
         title,
-        0.05.sw.clamp(7, 20),
+        0.05.sw.clamp(15, 30),
         fontWeight: FontWeight.w900,
         color: ColorConstant.primary,
       ),

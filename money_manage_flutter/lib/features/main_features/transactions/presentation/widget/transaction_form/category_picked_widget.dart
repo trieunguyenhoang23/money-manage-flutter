@@ -25,10 +25,10 @@ class CategoryPickedWidget<T extends BaseTransactionState>
     );
 
     return SizedBox(
-      height: 0.25.sh,
+      height: 0.25.sh.clamp(75, 200),
       child: LayoutBuilder(
         builder: (context, cc) {
-          Widget spacingHeight = SizedBox(height: 0.075 * cc.maxHeight);
+          Widget spacingHeight = SizedBox(height: 0.1 * cc.maxHeight);
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,9 +39,11 @@ class CategoryPickedWidget<T extends BaseTransactionState>
                 fontWeight: FontWeight.bold,
               ),
               spacingHeight,
-              TabBarWidget(
-                tabController: tabController,
-                listType: [context.lang.income, context.lang.expense],
+              Center(
+                child: TabBarWidget(
+                  tabController: tabController,
+                  listType: [context.lang.income, context.lang.expense],
+                ),
               ),
               spacingHeight,
               Expanded(
@@ -85,14 +87,11 @@ class _CategoryGridSection<T extends BaseTransactionState>
     return categoriesAsync.when(
       loading: () => const Center(child: LoadingWidget()),
       error: (e, st) => Center(child: Text(e.toString())),
-      data: (categories) => GridView.builder(
-        scrollDirection: Axis.horizontal,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: SizeAppUtils().isTablet ? 3 : 2,
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 10,
-          childAspectRatio: 0.5,
-        ),
+      data: (categories) => GridViewBuilder(
+        isScrollHorizontal: true,
+        crossAxisCount: 2,
+        mainAxisSpacing: SizeAppUtils().isTablet ? 20 : 10,
+        crossAxisSpacing: SizeAppUtils().isTablet ? 20 : 10,
         itemCount: categories.length + 1,
         itemBuilder: (context, index) {
           if (index == 0) {
@@ -105,6 +104,7 @@ class _CategoryGridSection<T extends BaseTransactionState>
           final item = categories[index - 1];
           return _CategoryGridItemWrapper(item: item);
         },
+        childAspectRatio: 0.5,
       ),
     );
   }

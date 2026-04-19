@@ -39,7 +39,7 @@ class CatePieChartWidget extends ConsumerWidget {
             slivers: [
               SliverToBoxAdapter(
                 child: AspectRatio(
-                  aspectRatio: 1.3,
+                  aspectRatio: SizeAppUtils().isTablet ? 2 : 1.3,
                   child: PieChart(
                     PieChartData(
                       sections: analytic.value1,
@@ -57,7 +57,7 @@ class CatePieChartWidget extends ConsumerWidget {
                       analytic.value3.toString(),
                       currency.value ?? 'VND',
                     ),
-                    0.05.sw,
+                    0.05.sw.clamp(25, 35),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -68,8 +68,8 @@ class CatePieChartWidget extends ConsumerWidget {
                   CategoryAnalytics item = analytic.value2[index];
                   return CateAnalyticsItemWidget(item: item);
                 }, childCount: analytic.value2.length),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: SizeAppUtils().isTablet ? 3 : 2,
                   mainAxisSpacing: 20,
                   childAspectRatio: 2,
                   crossAxisSpacing: 20,

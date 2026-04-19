@@ -23,7 +23,7 @@ class InputAmountMoneyWidget extends HookConsumerWidget {
     useListenable(inputController);
 
     double textWidth = inputController.text.length * 15.0;
-    double minWidth = 0.4.sw;
+    double minWidth = 0.4.sw.clamp(150, 200);
     double maxWidth = 0.9.sw;
 
     double finalWidth = (textWidth + 80.0).clamp(minWidth, maxWidth);
@@ -62,7 +62,7 @@ class InputAmountMoneyWidget extends HookConsumerWidget {
               ),
             ),
             SizedBox(width: 0.025.sw),
-            CurrencyWidget(textSize: 0.05.sw),
+            CurrencyWidget(textSize: 0.05.sw.clamp(15, 25)),
           ],
         ),
       ),

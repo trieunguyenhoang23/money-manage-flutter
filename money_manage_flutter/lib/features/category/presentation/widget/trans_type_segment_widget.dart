@@ -48,7 +48,7 @@ class _TransTypeSegmentWidgetState extends State<TransTypeSegmentWidget> {
           .map(
             (s) => ButtonSegment(
               value: s.type,
-              label: TextGGStyle(s.label, 0.03.sw, isAutoSizeText: false),
+              label: TextGGStyle(s.label, 0.025.sw, isAutoSizeText: false),
               icon: Icon(s.icon),
             ),
           )
@@ -61,6 +61,9 @@ class _TransTypeSegmentWidgetState extends State<TransTypeSegmentWidget> {
             }
           : null,
       style: SegmentedButton.styleFrom(
+        textStyle: TextStyle(fontSize: 0.025.sw, fontWeight: FontWeight.w600),
+        iconSize: 0.05.sw,
+        padding: EdgeInsets.all(0.02.sw),
         selectedBackgroundColor: selectedType.color.withValues(alpha: 0.2),
         selectedForegroundColor: selectedType.color,
         disabledBackgroundColor: selectedType.color.withValues(alpha: 0.2),

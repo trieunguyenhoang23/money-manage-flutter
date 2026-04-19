@@ -17,7 +17,7 @@ class OverviewBalanceWidget extends ConsumerWidget {
     ];
 
     double wFrame = 1.sw - 0.05.sw * 2;
-    double hFrame = wFrame * 80 / 375;
+    double hFrame = (wFrame * 80 / 375).clamp(50, 100);
 
     return Container(
       width: wFrame,
@@ -49,22 +49,19 @@ class OverviewBalanceWidget extends ConsumerWidget {
             },
           ),
           Expanded(
-            child: Center(
-              child: GridViewBuilder(
-                crossAxisCount: amountInfo.length,
-                itemCount: amountInfo.length,
-
-                itemBuilder: (context, index) {
-                  Tuple3<String, Provider<double>, Color> item =
-                      amountInfo[index];
-                  return OverViewItemWidget(
-                    title: item.value1,
-                    amountProvider: item.value2,
-                    color: item.value3,
-                  );
-                },
-                childAspectRatio: 70 / 40,
-              ),
+            child: GridViewBuilder(
+              crossAxisCount: amountInfo.length,
+              itemCount: amountInfo.length,
+              itemBuilder: (context, index) {
+                Tuple3<String, Provider<double>, Color> item =
+                    amountInfo[index];
+                return OverViewItemWidget(
+                  title: item.value1,
+                  amountProvider: item.value2,
+                  color: item.value3,
+                );
+              },
+              childAspectRatio: 2.5,
             ),
           ),
         ],
@@ -89,6 +86,7 @@ class OverViewItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, cc) {
+        double textSize = (cc.maxHeight * 0.25).clamp(15, 25);
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -97,10 +95,10 @@ class OverViewItemWidget extends StatelessWidget {
               flex: 5,
               child: Container(
                 alignment: Alignment.center,
-                child: TextGGStyle(title, cc.maxHeight * 0.2, maxLines: 1),
+                child: TextGGStyle(title, cc.maxHeight * 0.3, maxLines: 1),
               ),
             ),
-            Flexible(
+            Expanded(
               flex: 5,
               child: Consumer(
                 builder: (context, ref, _) {
@@ -117,30 +115,33 @@ class OverViewItemWidget extends StatelessWidget {
                   if (!isShowData) {
                     return TextGGStyle(
                       "******",
-                      cc.maxHeight * 0.25,
+                      textSize,
                       fontWeight: FontWeight.bold,
                     );
                   }
 
                   return Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Center(
-                          child: TextGGStyle(
-                            StringUtils.formatPrice(
-                              amountState.toString(),
-                              currency.value ?? 'VND',
-                            ),
-                            textAlign: TextAlign.center,
-                            cc.maxHeight * 0.25,
-                            maxLines: 2,
-                            fontWeight: FontWeight.bold,
-                            color: amountState < 0 ? Colors.red : color,
+                      Flexible(
+                        child: TextGGStyle(
+                          StringUtils.formatPrice(
+                            amountState.toString(),
+                            currency.value ?? 'VND',
                           ),
+                          textAlign: TextAlign.center,
+                          textSize,
+                          maxLines: 2,
+                          fontWeight: FontWeight.bold,
+                          color: amountState < 0 ? Colors.red : color,
                         ),
                       ),
-                      if (amountState < 0)
+                      if (amountState < 0) ...[
+                        SizedBox(width: 0.05 * cc.maxWidth),
                         const Icon(Icons.trending_down, color: Colors.red),
+                      ],
                     ],
                   );
                 },

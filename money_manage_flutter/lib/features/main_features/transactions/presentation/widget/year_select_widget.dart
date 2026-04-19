@@ -27,7 +27,7 @@ class YearSelectWidget extends ConsumerWidget {
                 value: year,
                 child: TextGGStyle(
                   year.toString(),
-                  16,
+                  0.03.sw.clamp(15, 25),
                   fontWeight: FontWeight.bold,
                 ),
               ),

@@ -124,6 +124,7 @@ class _TransactionGridViewWidgetState
         child: GridViewBuilder(
           scrollController: scrollController,
           crossAxisCount: SizeAppUtils().isTablet ? 2 : 1,
+          crossAxisSpacing: 0,
           itemCount: state.visibleList.length,
           itemBuilder: (context, index) {
             TransactionLocalModel item = state.visibleList[index];

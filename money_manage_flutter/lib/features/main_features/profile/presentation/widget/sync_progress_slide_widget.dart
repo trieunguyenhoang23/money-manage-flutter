@@ -53,35 +53,38 @@ class _SyncProgressSlideWidgetState
       SyncProgressBuilderWidget(syncType: SyncType.transaction),
     ];
 
-    double w = 1.sw - 0.05.sw;
+    double w = (1.sw - 0.05.sw).clamp(400, 600);
     double h = w * 130 / 339;
 
-    double wBtn = (109 / 1024).sw;
+    double wBtn = ((109 / 1024).sw).clamp(10, 50);
     double hBtn = wBtn * 24 / 70;
 
     return SizedBox(
       width: w,
       height: h,
-      child: Stack(
+      child: Column(
         children: [
-          Align(
-            alignment: Alignment.topCenter,
-            child: PageView.builder(
-              clipBehavior: Clip.none,
-              controller: pageController,
-              itemCount: syncWidget.length,
-              itemBuilder: (context, index) {
-                return KeepAliveWidget(child: syncWidget[index]);
-              },
+          Expanded(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: PageView.builder(
+                clipBehavior: Clip.none,
+                controller: pageController,
+                itemCount: syncWidget.length,
+                itemBuilder: (context, index) {
+                  return KeepAliveWidget(child: syncWidget[index]);
+                },
+              ),
             ),
           ),
+
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
               width: wBtn,
               height: hBtn,
               alignment: Alignment.center,
-              margin: EdgeInsets.symmetric(vertical: h * 0.1),
+              margin: EdgeInsets.symmetric(vertical: h * 0.05),
               child: LayoutBuilder(
                 builder: (context, cc) {
                   double dotSize = cc.maxWidth * (1 / syncWidget.length - 0.15);

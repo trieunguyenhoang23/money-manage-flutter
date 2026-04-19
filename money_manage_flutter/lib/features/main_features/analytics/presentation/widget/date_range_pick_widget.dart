@@ -37,7 +37,7 @@ class DateRangePickWidget extends ConsumerWidget {
           SizedBox(width: 0.025.sw),
           TextGGStyle(
             dateRangeState.formatDateRange(context),
-            0.04.sw,
+            0.04.sw.clamp(15, 25),
             fontWeight: FontWeight.w600,
           ),
         ],

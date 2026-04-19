@@ -8,7 +8,7 @@ class TransactionFilterWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    double textSize = 0.035.sw;
+    double textSize = 0.035.sw.clamp(10, 20);
     final currentFilter = ref.watch(transactionFilterProvider);
 
     return PopupMenuButton<TransactionType?>(

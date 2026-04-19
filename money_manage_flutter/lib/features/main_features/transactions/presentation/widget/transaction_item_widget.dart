@@ -16,11 +16,12 @@ class TransactionItemWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return PaddingStyle(
-      child: LayoutBuilder(
-        builder: (context, cc) {
-          Radius radius = Radius.circular(cc.maxHeight * 0.1);
-          return RepaintBoundary(
+    return LayoutBuilder(
+      builder: (context, cc) {
+        Radius radius = Radius.circular(cc.maxHeight * 0.1);
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 0.05 * cc.maxWidth),
+          child: RepaintBoundary(
             child: ClipRRect(
               borderRadius: BorderRadius.all(radius),
               child: Slidable(
@@ -167,9 +168,9 @@ class TransactionItemWidget extends ConsumerWidget {
                 ),
               ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 

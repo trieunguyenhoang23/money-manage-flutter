@@ -9,7 +9,7 @@ class MonthSelectWidget extends ConsumerWidget implements PreferredSizeWidget {
   const MonthSelectWidget({super.key});
 
   @override
-  Size get preferredSize => Size.fromHeight(0.065.sh);
+  Size get preferredSize => Size.fromHeight(0.065.sh.clamp(50, 75));
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -63,8 +63,7 @@ class MonthItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double itemHeight = 0.05.sh;
-    final double itemWidth = 0.175.sw;
+    final double itemWidth = 0.175.sw.clamp(50, 125);
 
     return GestureDetector(
       onTap: onTap,
@@ -73,12 +72,12 @@ class MonthItemWidget extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 4),
         decoration: BoxDecoration(
           color: isSelected ? ColorConstant.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(itemHeight * 0.4),
+          borderRadius: BorderRadius.circular(itemWidth * 0.25),
         ),
         child: Center(
           child: TextGGStyle(
             month,
-            itemHeight * 0.35,
+            (itemWidth * 0.2).clamp(10, 20),
             color: isSelected ? Colors.white : Colors.grey,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),

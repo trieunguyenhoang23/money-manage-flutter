@@ -134,7 +134,7 @@ class GraphTitlesConfig {
           reservedSize: 50,
           interval: model.yInterval,
           getTitlesWidget: (val, _) =>
-              TextGGStyle(StringUtils.formatYAxis(val), 0.025.sw, maxLines: 1),
+              TextGGStyle(StringUtils.formatYAxis(val), 0.025.sw.clamp(5, 10), maxLines: 1),
         ),
       ),
 

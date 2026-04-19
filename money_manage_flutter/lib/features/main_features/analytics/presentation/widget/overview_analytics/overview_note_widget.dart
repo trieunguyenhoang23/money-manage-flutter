@@ -27,6 +27,8 @@ class OverviewNoteWidget extends ConsumerWidget {
           Tuple2(context.lang.expense, ColorConstant.error500),
         ];
 
+        double textSize = 0.035.sw.clamp(15, 20);
+
         return Column(
           children: [
             Row(
@@ -34,11 +36,11 @@ class OverviewNoteWidget extends ConsumerWidget {
               children: [
                 TextGGStyle(
                   '${context.lang.profile_currency}: ${currency.value}',
-                  0.035.sw,
+                  textSize,
                 ),
                 TextGGStyle(
                   '${context.lang.analytic_time_line}: ${overviewAnalytics.groupType.toUpperCase()}',
-                  0.035.sw,
+                  textSize,
                 ),
               ],
             ),
@@ -73,7 +75,13 @@ class OverviewNoteWidget extends ConsumerWidget {
               color: item.value2,
             ),
             SizedBox(width: cc.maxWidth * 0.05),
-            Flexible(child: TextGGStyle(item.value1, cc.maxHeight * 0.5,fontWeight: FontWeight.w600,)),
+            Flexible(
+              child: TextGGStyle(
+                item.value1,
+                cc.maxHeight * 0.5,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ],
         );
       },

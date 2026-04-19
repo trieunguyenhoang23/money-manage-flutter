@@ -1,3 +1,4 @@
+import 'package:money_manage_flutter/core/utils/size_app_utils.dart';
 import 'package:money_manage_flutter/export/shared.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import '../provider/profile_provider.dart';
@@ -33,7 +34,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 Consumer(
                   builder: (context, ref, _) {
                     final profileState = ref.watch(profileProvider);
-
                     return SliverToBoxAdapter(
                       child: profileState.when(
                         data: (state) => state.userLocalModel != null
@@ -58,11 +58,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   delegate: SliverChildBuilderDelegate((context, index) {
                     return profileOptions[index];
                   }, childCount: profileOptions.length),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 1,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: SizeAppUtils().isTablet ? 2 : 1,
                     childAspectRatio: 6,
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10,
+                    mainAxisSpacing: SizeAppUtils().isTablet ? 30 : 15,
+                    crossAxisSpacing: SizeAppUtils().isTablet ? 30 : 15,
                   ),
                 ),
                 const SliverToBoxAdapter(child: SpacingStyle()),
@@ -70,7 +70,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
           ),
           const ButtonSwitchLoginWidget(),
-          const SpacingStyle(),
         ],
       ),
     );

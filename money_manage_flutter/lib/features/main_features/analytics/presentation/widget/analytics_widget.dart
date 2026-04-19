@@ -19,7 +19,7 @@ class AnalyticsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double wFrame = 1.sw - 0.05.sw;
-    double hFrame = wFrame / 4;
+    double hFrame = (wFrame / 4).clamp(75, 125);
     return InkWell(
       onTap: () {
         NavigatorRouter.pushNamed(context, namePath);

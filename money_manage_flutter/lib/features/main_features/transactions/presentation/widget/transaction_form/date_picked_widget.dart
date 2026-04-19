@@ -36,8 +36,11 @@ class DatePickedWidget extends ConsumerWidget {
             child: Row(
               children: [
                 const Icon(Icons.calendar_month, color: ColorConstant.primary),
-                SizedBox(width: 0.05.sw),
-                TextGGStyle(datePicked.formatDate(context), 0.04.sw),
+                SizedBox(width: 0.05.sw.clamp(10, 20)),
+                TextGGStyle(
+                  datePicked.formatDate(context),
+                  0.04.sw.clamp(10, 20),
+                ),
               ],
             ),
           ),

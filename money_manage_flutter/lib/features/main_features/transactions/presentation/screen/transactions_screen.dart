@@ -67,30 +67,33 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                   ),
                   const SliverToBoxAdapter(child: SpacingStyle()),
                   const SliverFillRemaining(
-                    child: KeepAliveWidget(
-                      child: TransactionGridViewWidget(),
-                    ),
+                    child: KeepAliveWidget(child: TransactionGridViewWidget()),
                   ),
                 ],
               );
             },
           ),
         ),
-        FlutterFloaty(
-          borderRadius: 1.sw / 2,
-          initialWidth: 0.15.sw,
-          initialHeight: 0.15.sw,
-          initialX: 1.sw - 0.15.sw - 0.025.sw,
-          initialY: 0.65.sh,
-          onTap: () {
-            NavigatorRouter.pushNamed(
-              context,
-              TransactionsRoutes.createNewTransactionName,
-            );
-          },
-          backgroundColor: ColorConstant.primary,
+        Builder(
           builder: (context) {
-            return const Icon(Icons.add, color: Colors.white);
+            double icSize = 0.15.sw.clamp(50, 75);
+            return FlutterFloaty(
+              borderRadius: 1.sw / 2,
+              initialWidth: icSize,
+              initialHeight: icSize,
+              initialX: 1.sw - icSize - 0.025.sw,
+              initialY: 0.65.sh,
+              onTap: () {
+                NavigatorRouter.pushNamed(
+                  context,
+                  TransactionsRoutes.createNewTransactionName,
+                );
+              },
+              backgroundColor: ColorConstant.primary,
+              builder: (context) {
+                return const Icon(Icons.add, color: Colors.white);
+              },
+            );
           },
         ),
       ],

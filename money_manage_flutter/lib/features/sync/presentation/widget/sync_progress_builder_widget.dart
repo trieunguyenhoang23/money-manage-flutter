@@ -44,3 +44,4 @@ class SyncProgressBuilderWidget extends ConsumerWidget {
     return "${context.lang.sync_loading} ${syncType.name.toUpperCase()}...";
   }
 }
+

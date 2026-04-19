@@ -11,7 +11,8 @@ class ProfileLoggedInScreen extends ConsumerWidget {
       profileProvider.select((s) => s.value?.userLocalModel),
     );
 
-    double icSize = 0.25.sw;
+    double icSize = 0.25.sw.clamp(75, 150);
+    double textSize = 0.05.sw.clamp(15, 25);
 
     return user != null
         ? Column(
@@ -26,7 +27,7 @@ class ProfileLoggedInScreen extends ConsumerWidget {
               const SizedBox(height: 10),
               TextGGStyle(
                 user.displayName!,
-                0.05.sw,
+                textSize,
                 fontWeight: FontWeight.w600,
               ),
             ],
