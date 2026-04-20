@@ -59,6 +59,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "language": MessageLookupByLibrary.simpleMessage("Language"),
     "name": MessageLookupByLibrary.simpleMessage("Name"),
     "no_data": MessageLookupByLibrary.simpleMessage("No data available"),
+    "no_sync_data_yet": MessageLookupByLibrary.simpleMessage(
+      "Your data has NOT been synced to the server yet.",
+    ),
     "note": MessageLookupByLibrary.simpleMessage("Note"),
     "profile": MessageLookupByLibrary.simpleMessage("Profile"),
     "profile_currency": MessageLookupByLibrary.simpleMessage("Currency"),
@@ -69,6 +72,9 @@ class MessageLookup extends MessageLookupByLibrary {
     "retry": MessageLookupByLibrary.simpleMessage("Retry"),
     "sync_complete": MessageLookupByLibrary.simpleMessage(
       "Complete synchronization",
+    ),
+    "sync_data_success": MessageLookupByLibrary.simpleMessage(
+      "Your data has been successfully synced to the server.",
     ),
     "sync_error": m0,
     "sync_loading": MessageLookupByLibrary.simpleMessage("Synchronizing"),

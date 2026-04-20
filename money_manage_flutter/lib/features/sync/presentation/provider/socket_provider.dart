@@ -4,6 +4,7 @@ import '../../../../infrastructure/network/socket/i_socket_client_service.dart';
 import '../../../../infrastructure/network/socket/sync_socket_service_impl.dart';
 import '../../../category/presentation/provider/category_provider.dart';
 import '../../../main_features/profile/presentation/provider/profile_provider.dart';
+import '../../../main_features/transactions/presentation/provider/quick_select_cate_provider.dart';
 import '../../../main_features/transactions/presentation/provider/transaction_provider.dart';
 import '../../data/model/sync_batch_progress.dart';
 import 'sync_manager_provider.dart';
@@ -53,6 +54,8 @@ void _handleSyncCompletion(Ref ref, SyncType type) {
   switch (type) {
     case SyncType.category:
       ref.invalidate(loadingCategoryProvider);
+      ref.invalidate(quickSelectCategoryProvider);
+      ref.invalidate(getPopularCategoryUseCaseProvider);
       break;
     case SyncType.transaction:
       ref.invalidate(loadingTransactionProvider);

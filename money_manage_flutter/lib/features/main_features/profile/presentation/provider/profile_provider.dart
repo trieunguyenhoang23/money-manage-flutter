@@ -31,7 +31,11 @@ class ProfileNotifier extends AsyncNotifier<ProfileState> {
   }
 
   Future<void> onSignIn() async {
-    final result = await getIt<AuthUseCase>().execute(AuthMethod.google);
+    final currentCurrency = ref.read(currencyProvider).value ?? 'VND';
+    final result = await getIt<AuthUseCase>().execute(
+      AuthMethod.google,
+      currentCurrency,
+    );
 
     result.fold((error) => ToastUtils.showToastFailed(error.message), (
       userLocal,

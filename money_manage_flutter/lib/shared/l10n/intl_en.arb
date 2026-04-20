@@ -22,6 +22,8 @@
   "sync_complete": "Complete synchronization",
   "language": "Language",
   "no_data": "No data available",
+  "no_sync_data_yet": "Your data has NOT been synced to the server yet.",
+  "sync_data_success": "Your data has been successfully synced to the server.",
   "//TRANSACTIONS": "===============================TRANSACTIONS==============================================",
   "transaction": "Transaction",
   "transactions_income": "Income",

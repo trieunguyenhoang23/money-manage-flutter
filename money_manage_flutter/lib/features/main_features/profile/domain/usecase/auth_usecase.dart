@@ -11,8 +11,11 @@ class AuthUseCase {
 
   AuthUseCase(this._userRepository);
 
-  Future<Either<Failure, UserLocalModel>> execute(AuthMethod method) async {
-    final signInResult = await _userRepository.signIn(method);
+  Future<Either<Failure, UserLocalModel>> execute(
+    AuthMethod method,
+    String currency,
+  ) async {
+    final signInResult = await _userRepository.signIn(method, currency);
     return signInResult;
   }
 }

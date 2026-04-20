@@ -30,7 +30,7 @@ class CateAnalyticsItemWidget extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      flex: 6,
+                      flex: 5,
                       child: Row(
                         children: [
                           Container(
@@ -43,7 +43,7 @@ class CateAnalyticsItemWidget extends StatelessWidget {
                             child: TextGGStyle(
                               item.name,
                               textSize1,
-                              maxLines: 2,
+                              maxLines: 1,
                               isAutoSizeText: false,
                             ),
                           ),
@@ -51,7 +51,7 @@ class CateAnalyticsItemWidget extends StatelessWidget {
                       ),
                     ),
                     Flexible(
-                      flex: 4,
+                      flex: 5,
                       child: Consumer(
                         builder: (context, ref, _) {
                           final currency =
@@ -63,7 +63,7 @@ class CateAnalyticsItemWidget extends StatelessWidget {
                             ),
                             textSize1,
                             fontWeight: FontWeight.bold,
-                            maxLines: 2,
+                            maxLines: 1,
                           );
                         },
                       ),

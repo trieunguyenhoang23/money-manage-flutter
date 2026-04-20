@@ -3,6 +3,7 @@ import 'package:money_manage_flutter/export/core.dart';
 import 'package:money_manage_flutter/export/router.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 import 'package:money_manage_flutter/export/shared.dart';
+import '../../../analytics/presentation/provider/overview_balance_provider.dart';
 import '../../../profile/presentation/provider/currency_provider.dart';
 import '../../data/model/local/transaction_local_model.dart';
 import '../../domain/usecase/remove_transaction_usecase.dart';
@@ -150,11 +151,21 @@ class TransactionItemWidget extends ConsumerWidget {
                                         color: ColorConstant.warning700,
                                       ),
                                     SizedBox(width: cc.maxWidth * 0.025),
-                                    Icon(
-                                      item.isSynced
-                                          ? Icons.cloud
-                                          : Icons.downloading_sharp,
-                                      color: ColorConstant.warning700,
+                                    InkWell(
+                                      onTap: () {
+                                        DialogUtils.handleDecision(
+                                          context,
+                                          title: item.isSynced
+                                              ? context.lang.sync_data_success
+                                              : context.lang.no_sync_data_yet,
+                                        );
+                                      },
+                                      child: Icon(
+                                        item.isSynced
+                                            ? Icons.cloud
+                                            : Icons.downloading_sharp,
+                                        color: ColorConstant.warning700,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -196,10 +207,13 @@ class TransactionItemWidget extends ConsumerWidget {
       (isSuccess) async {
         final container = ProviderScope.containerOf(context, listen: false);
         final syncKey = container.read(transactionFilterProvider);
-        final notifier = container.read(
+        final loadingTransactionNotifier = container.read(
           loadingTransactionProvider(syncKey).notifier,
         );
-        await notifier.refresh();
+
+        /// Refresh provider
+        container.refresh(overviewBalanceProvider);
+        await loadingTransactionNotifier.refresh();
       },
     );
   }

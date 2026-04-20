@@ -5,24 +5,41 @@ import 'package:money_manage_flutter/export/core.dart';
 import '../../data/datasource/sync/transaction_sync_key.dart';
 import '../provider/transaction_filter_provider.dart';
 
-class MonthSelectWidget extends ConsumerWidget implements PreferredSizeWidget {
+class MonthSelectWidget extends ConsumerStatefulWidget
+    implements PreferredSizeWidget {
   const MonthSelectWidget({super.key});
 
   @override
-  Size get preferredSize => Size.fromHeight(0.065.sh.clamp(50, 75));
+  ConsumerState<MonthSelectWidget> createState() => _MonthSelectWidgetState();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentFilter = ref.watch(transactionFilterProvider);
+  Size get preferredSize => Size.fromHeight(0.065.sh.clamp(50, 75));
+}
 
+class _MonthSelectWidgetState extends ConsumerState<MonthSelectWidget> {
+  ScrollController scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    scrollController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currentFilter = ref.watch(transactionFilterProvider);
+    final double itemWidth = 0.175.sw.clamp(50, 125);
     return Container(
-      height: preferredSize.height,
+      height: widget.preferredSize.height,
       padding: const EdgeInsets.only(bottom: 10),
       child: ListView.builder(
+        controller: scrollController,
         scrollDirection: Axis.horizontal,
         itemCount: 12,
         itemBuilder: (context, index) {
           final monthValue = index + 1;
+
           final monthName = DateFormat(
             'MMM',
             Localizations.localeOf(context).languageCode,
@@ -32,6 +49,12 @@ class MonthSelectWidget extends ConsumerWidget implements PreferredSizeWidget {
             month: monthName,
             isSelected: currentFilter.month == monthValue,
             onTap: () {
+              scrollController.animateTo(
+                itemWidth * (index - 1),
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.linear,
+              );
+
               ref
                   .read(transactionFilterProvider.notifier)
                   .update(

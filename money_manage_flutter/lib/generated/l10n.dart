@@ -199,6 +199,26 @@ class S {
     );
   }
 
+  /// `Your data has NOT been synced to the server yet.`
+  String get no_sync_data_yet {
+    return Intl.message(
+      'Your data has NOT been synced to the server yet.',
+      name: 'no_sync_data_yet',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Your data has been successfully synced to the server.`
+  String get sync_data_success {
+    return Intl.message(
+      'Your data has been successfully synced to the server.',
+      name: 'sync_data_success',
+      desc: '',
+      args: [],
+    );
+  }
+
   // skipped getter for the '//TRANSACTIONS' key
 
   /// `Transaction`

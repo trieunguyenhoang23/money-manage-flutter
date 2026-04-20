@@ -38,8 +38,8 @@ class DialogUtils {
     BuildContext context, {
     required String title,
     String? content,
-     String? confirmLabel,
-     VoidCallback? onConfirm,
+    String? confirmLabel,
+    VoidCallback? onConfirm,
     String? cancelLabel,
     VoidCallback? onCancel,
     Color? confirmColor,

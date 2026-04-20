@@ -27,7 +27,10 @@ class UserRepositoryImpl implements UserRepository {
   );
 
   @override
-  Future<Either<Failure, UserLocalModel>> signIn(AuthMethod method) async {
+  Future<Either<Failure, UserLocalModel>> signIn(
+    AuthMethod method,
+    String currency,
+  ) async {
     // Get the specific service (Google/Apple)
     final service = _socialAuthFactory.getService(method);
 
@@ -37,7 +40,7 @@ class UserRepositoryImpl implements UserRepository {
 
     // Sync with your LoopBack backend via RemoteDatasource
     final data = await _remoteDatasource.verifyAuthenticate(
-      jsonBody: socialUser.toJson(),
+      jsonBody: {...socialUser.toJson(), 'currency': currency},
     );
 
     //Error

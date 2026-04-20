@@ -24,10 +24,23 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+    "all": MessageLookupByLibrary.simpleMessage("Tất cả"),
+    "analytic_category": MessageLookupByLibrary.simpleMessage(
+      "Phân tích theo danh mục",
+    ),
+    "analytic_overview": MessageLookupByLibrary.simpleMessage(
+      "Tổng quan phân tích",
+    ),
+    "analytic_time_line": MessageLookupByLibrary.simpleMessage(
+      "Dòng thời gian",
+    ),
     "analytics": MessageLookupByLibrary.simpleMessage("Phân tích"),
+    "balance": MessageLookupByLibrary.simpleMessage("Số dư"),
     "cancel": MessageLookupByLibrary.simpleMessage("Hủy"),
     "category": MessageLookupByLibrary.simpleMessage("Danh mục"),
-    "category_create_new": MessageLookupByLibrary.simpleMessage("Danh mục mới"),
+    "category_create_new": MessageLookupByLibrary.simpleMessage(
+      "Tạo danh mục mới",
+    ),
     "category_edit": MessageLookupByLibrary.simpleMessage("Chỉnh sửa danh mục"),
     "category_error_desc_empty": MessageLookupByLibrary.simpleMessage(
       "Mô tả không được để trống",
@@ -36,21 +49,25 @@ class MessageLookup extends MessageLookupByLibrary {
       "Tên phải có ít nhất 3 ký tự",
     ),
     "category_error_server": MessageLookupByLibrary.simpleMessage(
-      "Đã có lỗi xảy ra từ phía hệ thống",
+      "Đã xảy ra lỗi từ hệ thống",
     ),
     "confirm": MessageLookupByLibrary.simpleMessage("Xác nhận"),
-    "create": MessageLookupByLibrary.simpleMessage("Tạo mới"),
-    "created_at": MessageLookupByLibrary.simpleMessage("Ngày tạo:"),
+    "create": MessageLookupByLibrary.simpleMessage("Tạo"),
+    "created_at": MessageLookupByLibrary.simpleMessage("Tạo lúc:"),
     "description": MessageLookupByLibrary.simpleMessage("Mô tả"),
     "expense": MessageLookupByLibrary.simpleMessage("Chi tiêu"),
-    "file": MessageLookupByLibrary.simpleMessage("Tệp tin"),
-    "gallery": MessageLookupByLibrary.simpleMessage("Thư viện"),
+    "file": MessageLookupByLibrary.simpleMessage("Tệp"),
+    "gallery": MessageLookupByLibrary.simpleMessage("Thư viện ảnh"),
     "image": MessageLookupByLibrary.simpleMessage("Hình ảnh"),
     "income": MessageLookupByLibrary.simpleMessage("Thu nhập"),
     "language": MessageLookupByLibrary.simpleMessage("Ngôn ngữ"),
     "name": MessageLookupByLibrary.simpleMessage("Tên"),
+    "no_data": MessageLookupByLibrary.simpleMessage("Không có dữ liệu"),
+    "no_sync_data_yet": MessageLookupByLibrary.simpleMessage(
+      "Dữ liệu của bạn chưa được đồng bộ lên máy chủ.",
+    ),
     "note": MessageLookupByLibrary.simpleMessage("Ghi chú"),
-    "profile": MessageLookupByLibrary.simpleMessage("Cá nhân"),
+    "profile": MessageLookupByLibrary.simpleMessage("Hồ sơ"),
     "profile_currency": MessageLookupByLibrary.simpleMessage("Tiền tệ"),
     "profile_login": MessageLookupByLibrary.simpleMessage("Đăng nhập"),
     "profile_logout": MessageLookupByLibrary.simpleMessage("Đăng xuất"),
@@ -58,12 +75,15 @@ class MessageLookup extends MessageLookupByLibrary {
     "profile_theme": MessageLookupByLibrary.simpleMessage("Giao diện"),
     "retry": MessageLookupByLibrary.simpleMessage("Thử lại"),
     "sync_complete": MessageLookupByLibrary.simpleMessage("Đồng bộ hoàn tất"),
+    "sync_data_success": MessageLookupByLibrary.simpleMessage(
+      "Dữ liệu của bạn đã được đồng bộ lên máy chủ thành công.",
+    ),
     "sync_error": m0,
     "sync_loading": MessageLookupByLibrary.simpleMessage("Đang đồng bộ"),
     "transaction": MessageLookupByLibrary.simpleMessage("Giao dịch"),
     "transaction_at": MessageLookupByLibrary.simpleMessage("Ngày giao dịch:"),
     "transaction_create_new": MessageLookupByLibrary.simpleMessage(
-      "Giao dịch mới",
+      "Tạo giao dịch mới",
     ),
     "transaction_delete_item_content": MessageLookupByLibrary.simpleMessage(
       "Sau khi xóa, bạn sẽ không thể khôi phục lại bản ghi này",
@@ -78,13 +98,13 @@ class MessageLookup extends MessageLookupByLibrary {
       "Vui lòng nhập số tiền",
     ),
     "transaction_validator_empty_category":
-        MessageLookupByLibrary.simpleMessage("Vui lòng chọn một danh mục"),
+        MessageLookupByLibrary.simpleMessage("Vui lòng chọn danh mục"),
     "transaction_validator_no_change": MessageLookupByLibrary.simpleMessage(
-      "Không có thay đổi nào được ghi nhận.",
+      "Không có thay đổi nào.",
     ),
-    "transactions_expense": MessageLookupByLibrary.simpleMessage("Khoản chi"),
-    "transactions_income": MessageLookupByLibrary.simpleMessage("Khoản thu"),
+    "transactions_expense": MessageLookupByLibrary.simpleMessage("Chi tiêu"),
+    "transactions_income": MessageLookupByLibrary.simpleMessage("Thu nhập"),
     "update": MessageLookupByLibrary.simpleMessage("Cập nhật"),
-    "updated_at": MessageLookupByLibrary.simpleMessage("Cập nhật gần đây:"),
+    "updated_at": MessageLookupByLibrary.simpleMessage("Cập nhật gần nhất:"),
   };
 }

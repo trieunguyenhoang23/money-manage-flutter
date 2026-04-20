@@ -22,7 +22,6 @@ class ThumbnailNetworkWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dpr = MediaQuery.devicePixelRatioOf(context);
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(radius)),
@@ -37,11 +36,9 @@ class ThumbnailNetworkWidget extends StatelessWidget {
         width: w,
         height: h,
         fit: boxFit ?? BoxFit.cover,
-        cacheWidth: (w * dpr).toInt(),
-        cacheHeight: (h * dpr).toInt(),
         // TRUE is free up buffers immediately
         clearMemoryCacheWhenDispose: true,
-        // Keep this TRUE to avoid keeping "broken" image placeholders in RAM
+        // avoid keeping "broken" image placeholders in RAM
         clearMemoryCacheIfFailed: true,
         loadStateChanged: (state) {
           switch (state.extendedImageLoadState) {
@@ -50,7 +47,7 @@ class ThumbnailNetworkWidget extends StatelessWidget {
             case LoadState.failed:
               return const Icon(Icons.error);
             case LoadState.completed:
-              return null; // giữ nguyên ảnh
+              return null;
           }
         },
       ),

@@ -25,7 +25,6 @@ class OverviewBalanceWidget extends ConsumerWidget {
       decoration: BoxDecoration(
         color: context.colorScheme.surface,
         borderRadius: BorderRadius.all(Radius.circular(hFrame * 0.05)),
-        // boxShadow: [],
       ),
       child: Row(
         children: [
@@ -92,14 +91,14 @@ class OverViewItemWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
-              flex: 5,
+              flex: 4,
               child: Container(
                 alignment: Alignment.center,
                 child: TextGGStyle(title, cc.maxHeight * 0.3, maxLines: 1),
               ),
             ),
             Expanded(
-              flex: 5,
+              flex: 6,
               child: Consumer(
                 builder: (context, ref, _) {
                   final amountState = ref.watch(amountProvider);
@@ -121,21 +120,25 @@ class OverViewItemWidget extends StatelessWidget {
                   }
 
                   return Row(
-                    mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Flexible(
-                        child: TextGGStyle(
-                          StringUtils.formatPrice(
-                            amountState.toString(),
-                            currency.value ?? 'VND',
+                      Expanded(
+                        child: SizedBox.expand(
+                          child: Container(
+                            alignment: Alignment.center,
+                            child: TextGGStyle(
+                              StringUtils.formatPrice(
+                                amountState.toString(),
+                                currency.value ?? 'VND',
+                              ),
+                              textAlign: TextAlign.center,
+                              textSize,
+                              maxLines: 2,
+                              fontWeight: FontWeight.bold,
+                              color: amountState < 0 ? Colors.red : color,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                          textSize,
-                          maxLines: 2,
-                          fontWeight: FontWeight.bold,
-                          color: amountState < 0 ? Colors.red : color,
                         ),
                       ),
                       if (amountState < 0) ...[
@@ -153,3 +156,4 @@ class OverViewItemWidget extends StatelessWidget {
     );
   }
 }
+
