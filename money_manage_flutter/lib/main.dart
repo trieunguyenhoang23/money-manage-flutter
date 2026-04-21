@@ -1,3 +1,5 @@
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+
 import 'export/shared.dart';
 import 'export/core.dart';
 import 'export/ui_external.dart';
@@ -8,11 +10,8 @@ import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await configureDependencies();
   await initializeDateFormatting();
-
-  // await Workmanager().initialize(callbackDispatcher, isInDebugMode: kDebugMode);
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

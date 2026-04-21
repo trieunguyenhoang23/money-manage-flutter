@@ -36,13 +36,13 @@ class PullToRefreshNotifier<T> extends StateNotifier<PullToRefreshState<T>> {
   int page = 0;
 
   PullToRefreshNotifier({required this.fetchPage, this.pageSize = 20})
-    : super(
-        PullToRefreshState(
-          visibleList: [],
-          isLoading: false,
-          isCanLoadMoreItem: true,
-        ),
-      );
+      : super(
+    PullToRefreshState(
+      visibleList: [],
+      isLoading: false,
+      isCanLoadMoreItem: true,
+    ),
+  );
 
   List<T> get visibleItems => state.visibleList;
 
@@ -52,7 +52,6 @@ class PullToRefreshNotifier<T> extends StateNotifier<PullToRefreshState<T>> {
 
   Future<List<T>> loadMore({bool isFetchUntilHasEnoughData = true}) async {
     if (!state.isCanLoadMoreItem) {
-      ToastUtils.showToastFailed('No more item');
       return [];
     }
 
@@ -77,7 +76,7 @@ class PullToRefreshNotifier<T> extends StateNotifier<PullToRefreshState<T>> {
           page++;
           fetchCount++;
 
-          // Data source không còn gì trả về
+          // Data source has nothing left to return
           if (pageData.isEmpty) {
             break;
           }
@@ -86,10 +85,9 @@ class PullToRefreshNotifier<T> extends StateNotifier<PullToRefreshState<T>> {
         }
       }
 
-      // Không lấy được gì cả → hết data
+      // out of data
       if (buffer.isEmpty) {
         state = state.copyWith(isLoading: false, isCanLoadMoreItem: false);
-        ToastUtils.showToastFailed('No more item');
         return [];
       }
 

@@ -7,7 +7,7 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:label="Personal "
+        android:label="Personal Finance Management"
         android:usesCleartextTraffic="true"
         tools:targetApi="23">
         <activity

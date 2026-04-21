@@ -1,5 +1,5 @@
 class APIConstants {
-  static const String bareUrl = 'http://192.168.1.9:2305';
+  static const String bareUrl = 'https://managemoney.nhtdnp.com';
 }
 
 class UserAuthAPI {

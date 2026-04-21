@@ -25,63 +25,66 @@ class OverviewItemWidget extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Flexible(
-                  child: TextGGStyle(
-                    item.label,
-                    textSize2,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Flexible(
-                      child: TextGGStyle(
-                        StringUtils.formatNumber(item.balance.toString()),
-                        textSize1,
-                        fontWeight: FontWeight.bold,
-                        color: ColorConstant.warning500,
+                      child: SizedBox(
+                        height: 0.2 * cc.maxHeight,
+                        child: TextGGStyle(
+                          item.label,
+                          textSize2,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                     if (item.trend != TrendingPattern.none)
                       if (item.trend == TrendingPattern.up)
-                        const Icon(
+                        Icon(
                           Icons.trending_up,
                           color: ColorConstant.success700,
+                          size: 0.2 * cc.maxHeight,
                         )
                       else if (item.trend == TrendingPattern.down)
-                        const Icon(
+                        Icon(
                           Icons.trending_down,
                           color: ColorConstant.error700,
+                          size: 0.2 * cc.maxHeight,
                         )
                       else
-                        const Icon(
+                        Icon(
                           Icons.trending_flat,
                           color: ColorConstant.warning700,
+                          size: 0.2 * cc.maxHeight,
                         ),
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Flexible(
-                      child: TextGGStyle(
-                        StringUtils.formatNumber(item.expense.toString()),
-                        textSize1,
-                        fontWeight: FontWeight.bold,
-                        color: ColorConstant.error500,
-                      ),
-                    ),
-                    Flexible(
-                      child: TextGGStyle(
-                        StringUtils.formatNumber(item.income.toString()),
-                        textSize1,
-                        fontWeight: FontWeight.bold,
-                        color: ColorConstant.success500,
-                      ),
-                    ),
-                  ],
+                Flexible(
+                  child: TextGGStyle(
+                    StringUtils.formatNumber(item.balance.toString()),
+                    textSize1,
+                    fontWeight: FontWeight.bold,
+                    color: ColorConstant.warning500,
+                    maxLines: 1,
+                  ),
+                ),
+                Flexible(
+                  child: TextGGStyle(
+                    StringUtils.formatNumber((item.income).toString()),
+                    textSize1,
+                    fontWeight: FontWeight.bold,
+                    color: ColorConstant.success500,
+                    maxLines: 1,
+                  ),
+                ),
+                Flexible(
+                  child: TextGGStyle(
+                    StringUtils.formatNumber(item.expense.toString()),
+                    textSize1,
+                    fontWeight: FontWeight.bold,
+                    color: ColorConstant.error500,
+                    maxLines: 1,
+                  ),
                 ),
               ],
             ),

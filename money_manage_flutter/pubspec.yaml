@@ -84,6 +84,7 @@ dependencies:
   flutter_image_compress: ^2.4.0
   fl_chart: ^1.2.0
   rxdart: ^0.28.0
+  flutter_native_splash: ^2.4.7
 
 dev_dependencies:
   flutter_test:
@@ -91,7 +92,7 @@ dev_dependencies:
   injectable_generator: 2.8.1
   isar_community_generator: 3.3.0
   build_runner: 2.7.1
-
+#  icons_launcher:
   flutter_lints: ^5.0.0
 
 flutter:
@@ -105,3 +106,21 @@ flutter_intl:
   arb_dir: lib/shared/l10n
   output_dir: lib/generated
 
+#  flutter pub run icons_launcher:create
+icons_launcher:
+  image_path: 'assets/icon/app_icon.png'
+  platforms:
+    android:
+      enable: true
+    ios:
+      enable: true
+
+#dart run flutter_native_splash:create
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/icon/app_icon.png
+  android: true
+  ios: true
+  android_12:
+    color: "#FFFFFF"
+    image: assets/icon/app_icon.png
