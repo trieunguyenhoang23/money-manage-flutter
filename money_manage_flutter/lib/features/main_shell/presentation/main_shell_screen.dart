@@ -1,3 +1,5 @@
+import 'package:money_manage_flutter/shared/widget/component/connection_wifi_widget.dart';
+
 import 'main_tab.dart';
 import 'widget/bottom_navigation_widget.dart';
 import 'package:money_manage_flutter/export/router.dart';
@@ -24,67 +26,100 @@ class _MainShellScreenState extends State<MainShellScreen> {
   @override
   Widget build(BuildContext context) {
     double wBottomBar = 1.sw;
-    double hBottomBar = (wBottomBar * 80 / 375).clamp(70, 90);
+    double hBottomBar = (wBottomBar * 80 / 375).clamp(70, 120);
     Radius bottomBarRadius = const Radius.circular(20);
 
     return PopScope(
       canPop: false,
       child: Scaffold(
-        body: widget.navigationShell,
-        bottomNavigationBar: Container(
-          width: wBottomBar,
-          height: hBottomBar,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-              topLeft: bottomBarRadius,
-              topRight: bottomBarRadius,
+        backgroundColor: context.colorScheme.background,
+        appBar: AppBarWidget(
+          title: 'Money Manage',
+          isSetting: false,
+          isLeading: false,
+          isCentralTitle: true,
+          actionBtn: [
+            SizedBox(width: 0.025.sw),
+            BtnAppbarWidget(
+              widget: const Icon(
+                Icons.category_outlined,
+                color: ColorConstant.primary,
+              ),
+              onTap: () {
+                NavigatorRouter.pushNamed(
+                  context,
+                  CategoryRoutes.categoryName,
+                  pathParameters: {},
+                );
+              },
             ),
-            boxShadow: [
-              shadowStyle(ColorConstant.neutral300, const Offset(0, 5), 10),
-            ],
-            color: Colors.white,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              ///Bottom Bar Item
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.generate(bottomTabBars.length, (index) {
-                  final tab = bottomTabBars[index];
-                  final isSelected =
-                      widget.navigationShell.currentIndex == index;
+          ],
+        ),
+        body: widget.navigationShell,
+        bottomNavigationBar: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const ConnectionWifiWidget(),
+            const SpacingStyle(),
+            Container(
+              width: wBottomBar,
+              height: hBottomBar,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: bottomBarRadius,
+                  topRight: bottomBarRadius,
+                ),
+                boxShadow: [
+                  shadowStyle(ColorConstant.neutral300, const Offset(0, 5), 10),
+                ],
+                color: context.colorScheme.surface,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  ///Bottom Bar Item
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: List.generate(bottomTabBars.length, (index) {
+                      final tab = bottomTabBars[index];
+                      final isSelected =
+                          widget.navigationShell.currentIndex == index;
 
-                  double wItem = (1.sw / bottomTabBars.length).clamp(55, 65);
-                  double hItem = ((41 / 80) * hBottomBar).clamp(50, 60);
-
-                  return InkWell(
-                    onTap: () {
-                      NavigationShellHolder.shell?.goBranch(
-                        index,
-                        initialLocation: true,
+                      double wItem = (1.sw / bottomTabBars.length).clamp(
+                        75,
+                        100,
                       );
-                    },
-                    child: SizedBox(
-                      width: wItem,
-                      height: hItem,
-                      child: BottomNavigationWidget(
-                        tab: tab,
-                        isSelected: isSelected,
-                      ),
-                    ),
-                  );
-                }),
+                      double hItem = ((41 / 80) * hBottomBar).clamp(50, 60);
+
+                      return InkWell(
+                        onTap: () {
+                          NavigationShellHolder.shell?.goBranch(
+                            index,
+                            initialLocation: true,
+                          );
+                        },
+                        child: SizedBox(
+                          width: wItem,
+                          height: hItem,
+                          child: BottomNavigationWidget(
+                            tab: tab,
+                            isSelected: isSelected,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                  Container(
+                    color: context.colorScheme.surface,
+                    height:
+                        MediaQuery.paddingOf(context).bottom /
+                        MediaQuery.devicePixelRatioOf(context),
+                  ),
+                ],
               ),
-              Container(
-                color: Colors.white,
-                height:
-                    MediaQuery.paddingOf(context).bottom /
-                    MediaQuery.devicePixelRatioOf(context),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

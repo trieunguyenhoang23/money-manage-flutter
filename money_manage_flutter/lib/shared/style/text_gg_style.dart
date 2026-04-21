@@ -1,5 +1,6 @@
 import 'package:auto_size_text_plus/auto_size_text_plus.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:money_manage_flutter/core/extension/context_extension.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
 
 class TextGGStyle extends StatelessWidget {
@@ -9,7 +10,7 @@ class TextGGStyle extends StatelessWidget {
   final int maxLines;
   final double textHeight;
   final TextAlign textAlign;
-  final bool isAutoSizeTet;
+  final bool isAutoSizeText;
   final bool isUnderLine;
   final bool isShadow;
   final FontWeight? fontWeight;
@@ -21,7 +22,7 @@ class TextGGStyle extends StatelessWidget {
     this.color,
     this.maxLines = 3,
     this.textHeight = 1.25,
-    this.isAutoSizeTet = true,
+    this.isAutoSizeText = true,
     this.textAlign = TextAlign.left,
     this.isUnderLine = false,
     this.isShadow = false,
@@ -40,9 +41,10 @@ class TextGGStyle extends StatelessWidget {
       isShadow: isShadow,
       fontWeight: fontWeight,
       customStyle: style,
+      context: context,
     );
 
-    return isAutoSizeTet
+    return isAutoSizeText
         ? AutoSizeText(
             text,
             minFontSize: 1,
@@ -69,13 +71,21 @@ TextStyle styleCommon({
   required bool isShadow,
   FontWeight? fontWeight,
   TextStyle? customStyle,
+  required BuildContext context,
 }) {
-  final base = customStyle ?? GoogleFonts.montserrat();
+  final TextStyle base = customStyle != null
+      ? customStyle.copyWith(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          color: color ?? context.colorScheme.onBackground,
+        )
+      : GoogleFonts.montserrat(
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          color: color ?? context.colorScheme.onBackground,
+        );
 
   return base.copyWith(
-    color: color ?? base.color,
-    fontWeight: fontWeight ?? base.fontWeight,
-    fontSize: fontSize,
     height: textHeight,
     decoration: isUnderLine ? TextDecoration.underline : TextDecoration.none,
     shadows: isShadow

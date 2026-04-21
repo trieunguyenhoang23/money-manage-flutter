@@ -1,13 +1,15 @@
 import 'dart:async';
-import 'package:money_manage_flutter/core/router/navigator_router.dart';
-import 'package:money_manage_flutter/export/router.dart';
-
+import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:money_manage_flutter/core/constant/string_constant.dart';
+import 'package:money_manage_flutter/core/di/injection.dart';
+import 'package:money_manage_flutter/export/infrastructure.dart';
 import '../../../firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:money_manage_flutter/core/di/di_shortcuts.dart';
 import 'package:money_manage_flutter/export/ui_external.dart';
-import '../../../infrastructure/firebase/remote_config/remote_config_service.dart';
+
+import '../../../infrastructure/network/socket/i_socket_client_service.dart';
 
 final splashProvider =
     AsyncNotifierProvider.autoDispose<SplashProvider, double>(
@@ -24,6 +26,12 @@ class SplashProvider extends AsyncNotifier<double> {
   Future<void> initialize() async {
     List<Future<void> Function()> tasks = [_initFirebase];
 
+    if (kDebugMode) {
+      String accessToken =
+          await getIt<FlutterSecureStorage>().read(key: tokenKey) ?? 'Empty';
+      print('============== Access Token: $accessToken ==============');
+    }
+
     for (int i = 0; i < tasks.length; i++) {
       try {
         debugPrint('SplashInitializer - current index: $i');
@@ -31,7 +39,7 @@ class SplashProvider extends AsyncNotifier<double> {
       } catch (e) {
         String error = 'Error SplashInitializer: $e - index: $i';
         debugPrint(error);
-        analyticFirebaseInf.logEventCrashSplashScreen(error);
+        AnalyticFirebaseService.logEventCrashSplashScreen(error);
       }
 
       state = AsyncData((i + 1) / tasks.length);
@@ -42,14 +50,27 @@ class SplashProvider extends AsyncNotifier<double> {
   }
 
   Future<void> _initFirebase() async {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    ).timeout(const Duration(seconds: 10));
+    try {
+      debugPrint('Firebase init start');
 
-    await RemoteConfigService.initFirebaseRemoteConfig();
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
 
-    FlutterError.onError = (FlutterErrorDetails e) => FirebaseCrashlytics
-        .instance
-        .recordError(e.exception, e.stack, fatal: false);
+      debugPrint('Firebase init DONE');
+
+      await RemoteConfigService.initFirebaseRemoteConfig();
+
+      FlutterError.onError = (FlutterErrorDetails e) {
+        FirebaseCrashlytics.instance.recordError(
+          e.exception,
+          e.stack,
+          fatal: false,
+        );
+      };
+    } catch (e, stack) {
+      debugPrint('Firebase init ERROR: $e');
+      debugPrint(stack.toString());
+    }
   }
 }

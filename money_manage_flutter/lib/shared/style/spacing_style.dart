@@ -6,7 +6,7 @@ class SpacingStyle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 0.025.sh,
+      height: 0.025.sh.clamp(10, 20),
     );
   }
 }

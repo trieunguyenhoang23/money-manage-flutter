@@ -1,40 +1,99 @@
-import 'dart:io';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dio/dio.dart';
+import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:isar_community/isar.dart';
+import 'package:money_manage_flutter/export/core.dart';
 import '../../export/core_external.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import '../../features/category/data/model/local/category_local_model.dart';
+import '../../features/main_features/profile/data/model/local/user_local_model.dart';
+import '../../features/main_features/transactions/data/model/local/transaction_local_model.dart';
+import '../../features/sync/data/sync_task/category_sync_task.dart';
+import '../../features/sync/data/sync_task/transaction_sync_task.dart';
+import '../../features/sync/domain/sync_task/i_sync_task.dart';
+import '../network/auth_interceptor.dart';
 
 @module
 abstract class ModuleDI {
-  //Dependency này cần khởi tạo trước khi DI container hoàn tất setup, và nó là async.
-  @preResolve
+  @preResolve // Needed because SharedPreferences.getInstance() is async
   Future<SharedPreferences> get prefs => SharedPreferences.getInstance();
 
   @lazySingleton
-  FlutterSecureStorage get secureStorage => const FlutterSecureStorage();
+  FlutterSecureStorage get secureStorage =>
+      const FlutterSecureStorage(aOptions: AndroidOptions(resetOnError: true));
 
-  // @preResolve
-  // Future<Isar> get isar async {
-  //   final dir = await getApplicationDocumentsDirectory();
-  //   final schemas = [
-  //
-  //   ];
-  //   return await Isar.open(
-  //     schemas,
-  //     directory: dir.path,
-  //     inspector: kDebugMode,
-  //   );
-  // }
+  @Named(dioNoCache)
+  @lazySingleton
+  Dio dioNoCacheInstance(AuthInterceptor authInterceptor) {
+    final dio = Dio(BaseOptions(baseUrl: APIConstants.bareUrl));
+    dio.interceptors.addAll([
+      authInterceptor,
+      LogInterceptor(responseBody: true),
+    ]);
+    return dio;
+  }
 
-  // @lazySingleton
-  // List<NotificationHandler> provideNotificationHandlers(
-  //         OpenDetailWallpaperHandler openDetailWallpaperHandler) =>
-  //     [openDetailWallpaperHandler];
-  //
-  // @lazySingleton
-  // IapPlatformHandler provideIapPlatformHandler() {
-  //   return Platform.isAndroid ? IapAndroidHandler() : IapIosHandler();
-  // }
+  @Named(dioWithCache)
+  @preResolve
+  @lazySingleton
+  Future<Dio> dioWithCacheInstance(AuthInterceptor authInterceptor) async {
+    final dio = Dio(BaseOptions(baseUrl: APIConstants.bareUrl));
+
+    final dir = await getTemporaryDirectory();
+    final cacheStore = HiveCacheStore(dir.path);
+
+    final cacheOptions = CacheOptions(
+      store: cacheStore,
+      policy: CachePolicy.refreshForceCache,
+      maxStale: const Duration(days: 1),
+      hitCacheOnErrorExcept: [401, 403],
+    );
+
+    dio.interceptors.addAll([
+      authInterceptor,
+      DioCacheInterceptor(options: cacheOptions),
+    ]);
+
+    return dio;
+  }
+
+  @preResolve
+  Future<Isar> get isar async {
+    final dir = await getApplicationDocumentsDirectory();
+
+    if (Isar.instanceNames.isNotEmpty) {
+      return Isar.getInstance()!;
+    }
+
+    final schemas = [
+      CategoryLocalModelSchema,
+      UserLocalModelSchema,
+      TransactionLocalModelSchema,
+    ];
+
+    return await Isar.open(
+      schemas,
+      directory: dir.path,
+      inspector: kDebugMode,
+      name: 'default',
+    );
+  }
+
+  @lazySingleton
+  ImagePicker get imagePicker => ImagePicker();
+
+  @lazySingleton
+  Connectivity get connectivity => Connectivity();
+
+  @injectable
+  List<ISyncTask> provideSyncTasks(
+    CategorySyncTask categoryTask,
+    TransactionSyncTask transactionTask,
+  ) {
+    return [categoryTask, transactionTask];
+  }
 }

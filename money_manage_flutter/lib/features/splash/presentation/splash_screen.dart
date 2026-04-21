@@ -54,15 +54,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              // ClipRRect(
-              //   borderRadius: BorderRadius.all(Radius.circular(0.0425.sw)),
-              //   // child: Image.asset(
-              //   //   IcPathConstant.icApp2,
-              //   //   width: 0.5.sw,
-              //   //   height: 0.5.sw,
-              //   //   fit: BoxFit.fill,
-              //   // ),
-              // ),
+              ClipRRect(
+                borderRadius: BorderRadius.all(Radius.circular(0.0425.sw)),
+                child: Image.asset(
+                  IcPathConstant.icApp,
+                  width: 0.5.sw,
+                  height: 0.5.sw,
+                  fit: BoxFit.fill,
+                ),
+              ),
               const SpacingStyle(),
               Consumer(
                 builder: (context, ref, _) {

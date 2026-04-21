@@ -12,7 +12,20 @@
           "package_name": "vn.nht.manage.money"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "249271941631-v01afcue3u12enfeepkhmr0rrdd3cqvv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "vn.nht.manage.money",
+            "certificate_hash": "fb929275a8de55741322f5adf550a52a814acff3"
+          }
+        },
+        {
+          "client_id": "249271941631-uq021p3k62jla4ci5ujn9i6ophe178no.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBVmiaQ4DktHxz9HiDpjfR9ji0olpInE80"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "249271941631-uq021p3k62jla4ci5ujn9i6ophe178no.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "249271941631-h5pb8tndqr54147m6psldd2b2tu5c7tm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "vn.nht.manage.money"
+              }
+            }
+          ]
         }
       }
     }

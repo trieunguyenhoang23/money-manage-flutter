@@ -1,15 +1,17 @@
-import 'core/di/injection.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+
+import 'export/shared.dart';
 import 'export/core.dart';
+import 'export/ui_external.dart';
 import 'generated/l10n.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await configureDependencies();
+  await initializeDateFormatting();
 
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -19,17 +21,22 @@ void main() async {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final lang = ref.watch(langProvider);
+    final theme = ref.watch(themeProvider);
+
     return ScreenUtilInit(
       designSize: const Size(375, 812),
 
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         routerConfig: AppRouter.router,
+        locale: lang,
+        theme: theme,
         builder: (context, child) {
           SizeAppUtils().getSizeApp(context);
           return child ?? Container();

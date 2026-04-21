@@ -7,6 +7,10 @@ class AppRouter {
   static final GoRouter router = GoRouter(
     navigatorKey: appNavigatorKey,
     initialLocation: SplashRoutes.splashPath,
-    routes: [...SplashRoutes.routes, MainShellRoutes.mainRoutes],
+    routes: [
+      ...SplashRoutes.routes,
+      MainShellRoutes.mainRoutes,
+      ...CategoryRoutes.routes,
+    ],
   );
 }
